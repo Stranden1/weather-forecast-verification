@@ -1,0 +1,11 @@
+WeatherApp — local quick start
+
+Run run_windows.bat, or use:
+  .\.venv\Scripts\python.exe -m streamlit run app.py
+
+Keep .env, .venv and data/weather.db in place. GitHub stores code and documentation,
+not your weather history or credentials. The existing scheduled collector remains
+unchanged. Do not reinstall it or rebuild the network just because Git was added.
+
+See README.md for installation on another machine and normal Git commands.
+See WEATHERNEXT.md for the already integrated WeatherNext provider.

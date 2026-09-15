@@ -1,0 +1,6 @@
+streamlit>=1.39,<2
+requests>=2.32,<3
+pandas>=2.2,<3
+python-dotenv>=1.0,<2
+pydeck>=0.9,<1
+earthengine-api>=1.5,<2
