@@ -103,4 +103,4 @@ and history. Do not restore an older database over the current database.
   50 active stations as metadata in config/stations.json (not auto-imported).
 - All 18 regression tests, fixture UI test and production dashboard render passed.
   Staged secret scan found no local credential values or recognized token/key patterns.
-- Preparation complete; next: initial commit, push and remote verification.
+- Complete: initial commit ef2871b pushed to main; private visibility verified. Remote commit/tree matched locally, with 37 code/config/documentation files and no runtime data. No GitHub setup work remains.
