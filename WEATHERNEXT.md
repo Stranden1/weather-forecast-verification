@@ -64,9 +64,10 @@ rerunning fills missing data and never replaces existing saved values.
   ensemble mean of direction angles.
 - Mean sea-level pressure: Pa → hPa. Temperature: K → °C.
 
-Rainfall is retained in the normalized table. It is not put into MET's existing
-forward-looking precipitation slot until interval alignment is validated; the
-existing Frost collector and scoreboards currently verify temperature and wind.
+Rainfall is retained in the normalized table. The Frost collector now stores the
+validated hourly observation element, but scoreboards remain limited to
+temperature and wind. See `PRECIPITATION.md` for the canonical interval-end
+mapping required by any future rainfall scoring work.
 
 No existing columns or tables were dropped or renamed. Existing records were
 checked before/after migration using row counts and row-content comparisons.
