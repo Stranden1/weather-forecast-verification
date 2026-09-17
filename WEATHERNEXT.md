@@ -115,3 +115,51 @@ Do not restore a trial database over the current database.
 Sources: [Earth Engine WeatherNext guide](https://developers.google.com/weathernext/guides/earth-engine),
 [gridded catalog](https://developers.google.com/earth-engine/datasets/catalog/projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p1deg),
 [station catalog](https://developers.google.com/earth-engine/datasets/catalog/projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg).
+
+
+## Focused historical temperature backfill (2026-09-17)
+
+`backfill_weathernext_temperature.py` accepts a JSON mapping of original UTC
+initializations to forecast-hour lists; it is a dry run unless `--save` is set.
+It validates original Earth Engine metadata for every requested image, samples
+all active coordinates using the operational source/normalizer, and reuses the
+existing atomic, duplicate-protected writer. `--report` retains metadata and
+per-run completion checkpoints. Existing retrieval timestamps are preserved;
+new archive rows record actual local retrieval time.
+
+The completed local plan covers 34 synoptic initializations, September 5 12:00
+through September 13 18:00 UTC, and 88 images at selected 72/120/168/216h leads.
+It added 4,400 temperature points with mean/p10/p25/p50/p75/p90. These historical
+runs are sparse; do not infer that they contain every hourly lead or variable.
+An identical rerun added zero values, with no duplicate keys or prior data edits.
+
+`analyze_historical_temperature.py` opens the authoritative database read-only.
+It checks exact Frost targets, both nominal ±3h windows, ≤3h model lead gaps,
+original issue and proven availability before target, and equal target weighting.
+It compares archive publication availability separately from local collection;
+the production scorer's retrieved-before-target check is unchanged. Keep the
+local image manifests to reproduce the provenance validation.
+
+See `outputs/temperature-backfill/REPORT.md` for complete results, actual leads,
+individual cases and runnable commands; evidence is under
+`work/temperature-backfill/`. Both directories intentionally remain outside Git.
+
+
+### Persistent historical eligibility
+
+Saved temperature backfills now call `weathernext_history.register_verified_history`
+after completing ingestion. This adds point-specific original publication evidence
+to `weathernext_verified_history` in the existing database, without changing any
+forecast, observation or local retrieval timestamp. Import the previously saved
+manifest once with the existing environment:
+
+```powershell
+.\.venv\Scripts\python.exe weathernext_history.py --manifest work/temperature-backfill/first-run.json
+```
+
+Registration is atomic/idempotent; incomplete, inconsistent or conflicting evidence
+is rejected. The current 4,400 historical points are registered and repeated import
+adds zero. The compact **Long-range temperature** dashboard tab uses this persisted
+evidence for retrospective scoring; it does not read runtime manifests. Retain the
+manifests for audit and keep the verification table with the authoritative database.
+Operational collection and scoring remain separate and unchanged.

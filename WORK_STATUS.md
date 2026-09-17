@@ -104,3 +104,204 @@ and history. Do not restore an older database over the current database.
 - All 18 regression tests, fixture UI test and production dashboard render passed.
   Staged secret scan found no local credential values or recognized token/key patterns.
 - Complete: initial commit ef2871b pushed to main; private visibility verified. Remote commit/tree matched locally, with 37 code/config/documentation files and no runtime data. No GitHub setup work remains.
+
+
+## Accuracy dashboard checkpoint — 2026-09-16
+
+Completed: variable audit (SCORING.md); wind Forecast vs Actual; exact-time observed
+values; paired Overall Accuracy with variable/period/station/lead filters, MAE,
+bias, equal sample counts, MAE difference and daily trends; future Model Disagreement
+with station/run navigation. Existing scoring buckets/aggregation are reused.
+
+Validated: 27 unit/regression tests; expanded fixture UI test including all new
+controls, empty states, drill-through and unchanged fixture database; live local
+Streamlit startup and browser checks with production data. No browser page errors.
+All-history pairing plus disagreement queries took about 0.7 seconds per variable.
+The read-only audit found 785 temperature and 676 wind station/time/bucket pairs;
+counts will grow as normal collection continues.
+
+No database migration or historical-data write, collector change, task restart,
+credential change or new provider. Application remains runnable. Existing runtime
+deprecation warnings are non-fatal. Files are local, not committed/pushed in this task.
+
+Remaining: no requested dashboard feature is pending. Continue ordinary collection,
+then evaluate longer matched history. Precipitation/pressure/direction/cloud scoring
+remain deliberately disabled pending compatible observations/definitions. The newer
+15 September 18:00 WeatherNext cycle is stored, satisfying the earlier cycle follow-up.
+
+## Frost hourly precipitation checkpoint — 2026-09-16
+
+Completed: the existing Frost collector now requests
+`sum(precipitation_amount PT1H)` only for capable active stations and stores it in
+the existing `observations.precipitation_1h` field. Frost `referenceTime` remains
+the canonical end of `[T-1h, T)`. The normal `sync_recent` and background path now
+include precipitation; temperature and wind collection is unchanged.
+
+Production backfill: 13,118 station-hours across 29 of 50 active stations, from
+2026-08-26 16:00 through 2026-09-16 14:00 UTC; 2,162 values are non-zero. Total
+observation rows are 184,259. Existing non-null temperature and wind counts are
+168,873 and 168,580 after a normal collection run. An exact-range rerun changed
+none of these counts; duplicate keys and off-hour precipitation rows are both zero.
+
+Alignment sanity check: for Bergen-Florida (`SN50540`) and
+`[2026-09-15 23:00, 2026-09-16 00:00 UTC)`, Frost stores 10.1 mm at end time
+00:00, WeatherNext stores 3.373389 mm at end time 00:00, and Yr/MET stores
+6.6 mm at start/`valid_at` 23:00. These are three forecasts/measurements for the
+same physical hour, not an accuracy score.
+
+Validation: 31 focused tests pass. They cover exact Frost metadata, supported
+station filtering, timestamp preservation and cross-provider interval mapping,
+merge preservation, rejection of incompatible intervals, and idempotency. The
+ordinary combined Frost run completed with no errors. No schema, scorer,
+dashboard, station-network, provider, secret, or scheduled-task changes were made.
+
+Remaining before rainfall scoring: teach the scoring path to compare by canonical
+interval end (`Frost T = WeatherNext T = Yr valid_at + 1h`) while enforcing the
+existing retrieved-before-target rule, identical observed targets, and comparable
+lead times. Rainfall scoring remains disabled.
+
+## Collection health checkpoint — 2026-09-17
+
+Completed: a compact dashboard table now shows Yr/MET, WeatherNext, and Frost last
+successful retrieval, UTC-safe age, and OK/Delayed/Stale state. It is placed above
+the existing tabs; WeatherNext details, collection logs, and manual controls remain
+collapsed. The table reads actual completed collection outcomes rather than valid
+forecast/observation times.
+
+The existing six-hour Windows schedule was inspected and left unchanged. Thresholds
+are OK through 8 hours, Delayed above 8 through 12, and Stale above 12. A latest
+source error yields Delayed immediately. Stale Yr displays the unrecoverable-history
+warning. Recent Yr gaps are consecutive successes more than 12 hours apart in a
+7-day window.
+
+For historical continuity, the parser reads existing finalized combined log lines.
+Going forward, `background_collect.py` appends a stable source-level outcome as
+each collector completes, so a later Frost or WeatherNext failure cannot hide a
+successful Yr retrieval. Missing credentials/disabled collection are recorded as
+SKIPPED and do not advance last success. No database schema was added.
+
+Validation: 51 unit/regression tests pass; the isolated background-run test records
+all three source completions; the disposable Streamlit test verifies healthy and
+stale rendering, the exact Yr warning, long-range temperature behavior, and zero
+database writes. Production is currently OK for all three sources with last success
+at 2026-09-17 04:13 UTC and no recent Yr gap. Database counts remain 4,504 runs,
+344,008 forecast points, and 189,084 observation rows.
+
+Remaining: no feature work is pending. The next ordinary scheduled run will be the
+first production run to emit the new explicit per-source lines; legacy summaries
+remain sufficient until then.
+
+
+## Historical WeatherNext temperature checkpoint — 2026-09-17
+
+Completed: focused 0.05° station-head archive backfill for the existing 50 active
+stations, using existing normalization/storage and six temperature statistics.
+34 initializations (2026-09-05 12:00 through 2026-09-13 18:00 UTC), 88 selected
+image slices, and leads 72/120/168/216h added 4,400 forecast points, 1,700
+station/run rows and 26,400 statistic values. Valid range: 2026-09-08 12:00
+through 2026-09-16 18:00 UTC. These historical runs contain sparse temperature
+horizons, not full hourly/multivariable forecasts.
+
+Identical second execution added zero values. Duplicate run/point/statistic keys
+are all zero. Before/after row-content checks preserved every existing station,
+run, forecast, observation and WeatherNext statistic. MET remains 209,254 points;
+WeatherNext grew 108,000 → 112,400; Frost temperature/wind/precipitation remain
+171,313 / 171,037 / 13,344 non-null values. No migration was required.
+
+Read-only retrospective shared counts at 72/120/168/216h: 1,603 / 1,215 / 824 /
+438. Yr MAE: 1.077 / 1.325 / 1.490 / 1.532 °C; WeatherNext mean MAE: 1.065 /
+1.300 / 1.708 / 1.720 °C. Exact Frost targets, both nominal ±3h and pair gap ≤3h,
+one error-independent closest-lead pair per station/target/horizon. Largest gap:
+2.677h. All 50 stations contribute at each horizon. The short period and usually
+shorter WeatherNext lead limit conclusions, especially the tiny 3/5-day gaps.
+
+Original Earth Engine ingestion was checked before each valid time and retained
+in local manifests. Local retrieved_at stays truthful. Production scoring still
+requires local retrieval before valid time: operational long-range shared counts
+remain zero. No production scorer, UI, scheduled-task, secret or other collector
+changes were made for this task.
+
+Validation: all 39 unit/regression tests pass; fixture UI interactions pass with
+zero writes; production dashboard render passes with no exceptions. Existing
+non-fatal dependency deprecation warnings remain.
+
+Evidence and exact commands: outputs/temperature-backfill/REPORT.md. All 4,080
+matches, aggregate metrics, actual lead distributions and four individual cases
+are saved as CSV/JSON there. Plans, original image metadata, preservation checks
+and logs are retained under work/temperature-backfill/. Both folders stay local
+and ignored. Reusable helpers are backfill_weathernext_temperature.py and
+analyze_historical_temperature.py; coverage is in test_weathernext_backfill.py.
+Source/doc changes are local and uncommitted; no push was requested.
+
+Remaining: none of this task. Continue operational collection for live-collected
+long-horizon validation. Dashboard additions, rainfall and calibration scoring
+require separate work. Never restore an old database to undo this additive task.
+
+
+## Verified retrospective scoring and compact view — 2026-09-17
+
+Completed: historical-verified WeatherNext temperatures now qualify for
+retrospective scoring through the existing database. An additive
+`weathernext_verified_history` table links each point to its verified original
+publication time, exact asset, initialization, lead and mean value. Registration
+checks the complete saved backfill manifest and stored station/sample identity
+inside one transaction. Existing forecast values and retrieved_at are unchanged.
+4,400 points registered; identical registration added zero. Before/after
+row-content checks confirmed every existing station, forecast and observation
+was preserved; foreign-key checks passed. Future saved temperature backfills
+register their verified provenance automatically.
+
+The new **Long-range temperature** tab shows four compact 3/5/7/9-day rows:
+Yr and WeatherNext MAE, signed MAE difference, shared sample count, matched dates,
+plus the actual overall evaluation period in UTC. Filters select evaluation
+window and station; an expander shows bias, actual leads, original availability
+rules and counts of historical samples. No score is shown for an empty horizon.
+
+Scoring reuses the audited exact-horizon matcher: original issue and verified
+availability before target, exact Frost time, both nominal ±3h, pair gap ≤3h,
+and one error-independent closest-lead pair per station/time/horizon. Missing
+or inconsistent verification falls back to collected-before-target eligibility.
+Operational Overall accuracy and selected-run scoring retain their existing
+rules. Temperature is the only historically certified variable.
+
+Validation: 45 unit/regression tests pass, including idempotency, conflicting
+provenance rollback, missing-table compatibility, malformed leads, exact-time
+observations, period/station filters, zero-sample summaries and read-only scoring.
+The expanded fixture UI test passes, including historical scores, date/count
+labels, filter/empty states and zero database writes. Live browser verification
+confirmed the compact table and all four horizons with production data.
+
+The database-backed scorer reproduces all 4,080 audited historical comparisons:
+1,603 / 1,215 / 824 / 438 samples. Each horizon ends September 16 18:00 UTC and
+starts September 8 / 10 / 12 / 14 at 12:00 UTC respectively. Scores match the prior
+report exactly; read-only query plus summary took approximately 1.5 seconds.
+Evidence: work/retrospective-view/ (migration checks, test logs, live summary and
+screenshot). Runtime evidence and database remain ignored by Git. The existing
+scheduled collection continued normally during the pause in this task.
+
+Remaining: none for the requested retrospective eligibility/view. No new provider,
+service, dependency in requirements, or collection/scheduling change. Changes are
+local and uncommitted; no commit or push was requested.
+
+
+## Git checkpoint review — 2026-09-17
+
+Reviewed the complete mixed worktree against the prior implementation checkpoints.
+The source/test/doc changes belong to shared accuracy and model disagreement,
+historical temperature backfill, verified retrospective scoring, the compact
+3/5/7/9-day view, collection health and per-source completion logging. No unrelated
+or suspicious changes were found. These interdependent changes are grouped in one
+checkpoint: `Checkpoint long-range verification and collection health`.
+
+Validation at checkpoint: all 51 unit/regression tests pass; the fixture dashboard
+interaction test passes, including healthy/stale health states, long-range filters
+and zero database writes. Production dashboard startup and both requested views
+pass with enforced read-only database connections. Current shared long-range counts
+are 1,607 / 1,219 / 828 / 442; all three collection sources report OK, last success
+2026-09-17 10:12 UTC. The existing .env is unchanged. No collector, backfill,
+migration, scheduled-task action, or application behavior change was performed.
+
+Only reviewed source, tests and documentation belong in this checkpoint. Database,
+credentials, logs, environments, screenshots and generated evidence remain ignored
+and local. Validation evidence is under work/checkpoint-review/. Commit is local;
+no push is requested. No feature work remains for this checkpoint task.

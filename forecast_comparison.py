@@ -7,8 +7,9 @@ import pandas as pd
 
 MET_PROVIDER = "MET"
 WEATHERNEXT_PROVIDER = "WeatherNext3-mean"
-LEAD_BINS = [0, 18, 36, 60, 84, 144, 216, float("inf")]
-LEAD_LABELS = ["0–18h", "18–36h", "36–60h", "60–84h", "3.5–6d", "6–9d", "9d+"]
+from scoring.scorer import BANDS as LEAD_BINS, LABELS as LEAD_LABELS
+
+VARIABLES = {"air_temperature": ("Temperature", "°C"), "wind_speed": ("Wind speed", "m/s")}
 
 
 def comparison_stations(con: sqlite3.Connection) -> list[dict]:
@@ -39,53 +40,53 @@ def recent_runs(
     return [dict(row) for row in rows]
 
 
-def load_temperature_timeline(
-    con: sqlite3.Connection, location_id: int, met_run_id: int, wn_run_id: int
-) -> pd.DataFrame:
-    met = pd.read_sql_query(
-        """
-        SELECT valid_at, lead_hours AS met_lead_hours,
-               air_temperature AS met_temperature
-        FROM forecasts
-        WHERE run_id=? AND air_temperature IS NOT NULL
-        """,
-        con,
-        params=(met_run_id,),
-    )
-    wn = pd.read_sql_query(
-        """
-        SELECT f.valid_at, f.lead_hours AS wn_lead_hours,
-               f.air_temperature AS wn_temperature,
-               p10.value AS wn_p10, p90.value AS wn_p90
-        FROM forecasts f
-        LEFT JOIN weathernext_samples p10
-          ON p10.run_id=f.run_id AND p10.valid_at=f.valid_at
-         AND p10.metric='air_temperature' AND p10.statistic='p10'
-        LEFT JOIN weathernext_samples p90
-          ON p90.run_id=f.run_id AND p90.valid_at=f.valid_at
-         AND p90.metric='air_temperature' AND p90.statistic='p90'
-        WHERE f.run_id=? AND f.air_temperature IS NOT NULL
-        """,
-        con,
-        params=(wn_run_id,),
-    )
-    observations = pd.read_sql_query(
-        """
-        SELECT strftime('%Y-%m-%dT%H:00:00Z', observed_at) AS valid_at,
-               AVG(air_temperature) AS actual_temperature
-        FROM observations
-        WHERE location_id=? AND air_temperature IS NOT NULL
-        GROUP BY strftime('%Y-%m-%dT%H:00:00Z', observed_at)
-        """,
-        con,
-        params=(location_id,),
-    )
+def load_timeline(con, location_id, met_run_id, wn_run_id, metric="air_temperature"):
+    """Exact valid-time observations only; never average future sub-hour readings."""
+    if metric not in VARIABLES:
+        raise ValueError("Unsupported metric")
+    frames = []
+    for prefix, run_id in (("met", met_run_id), ("wn", wn_run_id)):
+        frame = pd.read_sql_query(f"""
+            SELECT f.valid_at, f.lead_hours AS {prefix}_lead_hours,
+                   f.{metric} AS {prefix}_value
+            FROM forecasts f JOIN forecast_runs r ON r.id=f.run_id
+            WHERE f.run_id=? AND r.location_id=? AND f.{metric} IS NOT NULL AND f.lead_hours>=0
+        """, con, params=(run_id, location_id))
+        frame["valid_at"] = pd.to_datetime(frame["valid_at"], utc=True, format="mixed")
+        frames.append(frame)
+    timeline = frames[0].merge(frames[1], on="valid_at", how="outer")
+    quantiles = pd.read_sql_query("""
+        SELECT valid_at, MAX(CASE WHEN statistic='p10' THEN value END) AS wn_p10,
+               MAX(CASE WHEN statistic='p90' THEN value END) AS wn_p90
+        FROM weathernext_samples WHERE run_id=? AND metric=? GROUP BY valid_at
+    """, con, params=(wn_run_id, metric))
+    quantiles["valid_at"] = pd.to_datetime(quantiles["valid_at"], utc=True, format="mixed")
+    observations = pd.read_sql_query(f"""
+        SELECT observed_at AS valid_at, {metric} AS actual_value
+        FROM observations WHERE location_id=? AND {metric} IS NOT NULL
+    """, con, params=(location_id,))
+    observations["valid_at"] = pd.to_datetime(observations["valid_at"], utc=True, format="mixed")
+    # Duplicate copies of the same value count once. Conflicting exact-time records
+    # have no unambiguous ground truth; omit them rather than inventing an average.
+    observations = observations.groupby("valid_at").actual_value.agg(["min", "max"]).reset_index()
+    observations = observations[observations["min"] == observations["max"]].rename(columns={"min": "actual_value"})
+    return (timeline.merge(quantiles, on="valid_at", how="left")
+            .merge(observations[["valid_at", "actual_value"]], on="valid_at", how="left")
+            .sort_values("valid_at").reset_index(drop=True))
 
-    timeline = met.merge(wn, on="valid_at", how="outer").merge(
-        observations, on="valid_at", how="left"
-    )
-    timeline["valid_at"] = pd.to_datetime(timeline["valid_at"], utc=True)
-    return timeline.sort_values("valid_at").reset_index(drop=True)
+
+def past_rows(timeline, now=None):
+    now = pd.Timestamp.now(tz="UTC") if now is None else pd.Timestamp(now)
+    now = now.tz_localize("UTC") if now.tzinfo is None else now.tz_convert("UTC")
+    rows = timeline[(timeline.valid_at <= now) & timeline.actual_value.notna()].copy()
+    for prefix in ("met", "wn"):
+        rows[f"{prefix}_abs_error"] = (rows[f"{prefix}_value"] - rows.actual_value).abs()
+    return rows
+
+
+def load_temperature_timeline(con, location_id, met_run_id, wn_run_id):
+    return load_timeline(con, location_id, met_run_id, wn_run_id).rename(columns={
+        "met_value": "met_temperature", "wn_value": "wn_temperature", "actual_value": "actual_temperature"})
 
 
 def past_temperature_rows(timeline: pd.DataFrame, now=None) -> pd.DataFrame:

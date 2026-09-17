@@ -20,17 +20,25 @@ from forecast_comparison import (
     MET_PROVIDER,
     WEATHERNEXT_PROVIDER,
     comparison_stations,
-    load_temperature_timeline,
+    load_timeline,
+    VARIABLES,
+    LEAD_BINS,
+    LEAD_LABELS,
     mae_by_lead_bucket,
-    past_temperature_rows,
+    past_rows as elapsed_rows,
     recent_runs,
 )
-from dashboard_scores import load_accuracy_rows, accuracy_board
+from dashboard_scores import (load_shared_pairs, shared_accuracy, model_disagreement,
+                              load_long_range_temperature, long_range_summary)
+from scoring.scorer import paired_score_rows
+from collection_health import load_collection_health, yr_stale_warning
 from weathernext_status import load_weathernext_status
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
-BACKGROUND_LOG_PATH = BASE_DIR / "data" / "background.log"
+BACKGROUND_LOG_PATH = Path(
+    os.getenv("WEATHERAPP_BACKGROUND_LOG_PATH", BASE_DIR / "data" / "background.log")
+)
 load_dotenv(ENV_PATH)
 
 st.set_page_config(page_title="Weather Benchmark", page_icon="🌦️", layout="wide")
@@ -109,6 +117,7 @@ with connect() as con:
     weathernext_status, weathernext_log = load_weathernext_status(
         con, BACKGROUND_LOG_PATH
     )
+collection_health = load_collection_health(BACKGROUND_LOG_PATH)
 
 
 def display_timestamp(value):
@@ -127,22 +136,60 @@ def polish_chart(chart):
 
 
 def accuracy_chart(rows, metric):
+    rows = rows.copy()
+    rows["provider"] = rows.provider.replace({MET_PROVIDER: "Yr/MET", WEATHERNEXT_PROVIDER: "WeatherNext"})
     return alt.Chart(rows).mark_bar().encode(
-        x=alt.X("horizon:N", title="Lead time", sort=None),
+        x=alt.X("horizon:N", title="Lead time", sort=LEAD_LABELS, axis=alt.Axis(labelAngle=0)),
         y=alt.Y(f"{metric}:Q", title="MAE (°C)" if metric == "MAE_C" else "MAE (m/s)"),
         xOffset="provider:N",
         color=alt.Color("provider:N", title=None, scale=alt.Scale(
-            domain=["MET", "WeatherNext3-mean"], range=["#3b82f6", "#2f9e44"])),
+            domain=["Yr/MET", "WeatherNext"], range=["#6099e8", "#55ad92"])),
         tooltip=["provider:N", "horizon:N", alt.Tooltip(f"{metric}:Q", format=".2f"), "samples:Q"],
     ).properties(height=230).configure_legend(orient="top")
+
+
+st.markdown("**Collection health**")
+health_table = pd.DataFrame(
+    {
+        "Source": row["label"],
+        "Last success (UTC)": (
+            row["last_success"].strftime("%Y-%m-%d %H:%M")
+            if row["last_success"]
+            else "—"
+        ),
+        "Age": row["age"],
+        "Status": row["status"],
+    }
+    for row in collection_health["sources"].values()
+)
+st.dataframe(health_table, hide_index=True, use_container_width=True, height=143)
+st.caption("Completed source retrievals · Expected every 6 h · OK ≤8 h · Delayed ≤12 h · Stale >12 h")
+warning = yr_stale_warning(collection_health)
+if warning:
+    st.warning(warning)
+elif collection_health["yr_gap"]:
+    gap = collection_health["yr_gap"]
+    st.warning(
+        f"Recent Yr collection gap detected: {gap['hours']:.1f} h between "
+        f"{gap['start']:%d %b %H:%M} and {gap['end']:%d %b %H:%M} UTC."
+    )
 
 
 
 # Avoid running the expensive historical accuracy queries while browsing forecasts.
 stateful_tabs = "on_change" in inspect.signature(st.tabs).parameters
-forecast_tab, network_tab, accuracy_tab = st.tabs(
-    ["Forecast vs Actual", "Station network", "Overall accuracy"],
-    **({"on_change": "rerun"} if stateful_tabs else {}),
+pending = st.session_state.pop("inspect_disagreement", None)
+if pending:
+    station = int(pending["location_id"])
+    st.session_state["forecast_actual_station"] = station
+    st.session_state["forecast_variable"] = pending["metric"]
+    st.session_state[f"met_run_{station}"] = int(pending["met_run_id"])
+    st.session_state[f"wn_run_{station}"] = int(pending["wn_run_id"])
+    if stateful_tabs:
+        st.session_state["dashboard_tabs"] = "Forecast vs Actual"
+forecast_tab, network_tab, accuracy_tab, long_range_tab, disagreement_tab = st.tabs(
+    ["Forecast vs Actual", "Station network", "Overall accuracy", "Long-range temperature", "Model disagreement"],
+    **({"on_change": "rerun", "key": "dashboard_tabs"} if stateful_tabs else {}),
 )
 with forecast_tab:
     if not stateful_tabs or forecast_tab.open:
@@ -156,7 +203,9 @@ with forecast_tab:
                 row["id"]: f'{row["station_name"].title().replace(" - ", "-")} ({row["station_id"] or "no station ID"})'
                 for row in comparison_station_rows
             }
-            select_station, select_met, select_wn, select_window = st.columns([2.2, 1.5, 1.5, 0.9], gap="small")
+            select_variable, select_station, select_met, select_wn, select_window = st.columns([1, 2.2, 1.5, 1.5, 0.9], gap="small")
+            metric = select_variable.selectbox("Variable", list(VARIABLES), format_func=lambda m: VARIABLES[m][0], key="forecast_variable")
+            variable_label, unit = VARIABLES[metric]
             selected_location_id = select_station.selectbox(
                 "Station",
                 options=list(station_labels),
@@ -174,7 +223,7 @@ with forecast_tab:
                     missing.append("Yr/MET")
                 if not wn_runs:
                     missing.append("WeatherNext")
-                st.info(f"No stored {' and '.join(missing)} temperature run is available for this station yet.")
+                st.info(f"No stored {' and '.join(missing)} run is available for this station yet.")
             else:
                 def run_label(run):
                     return pd.Timestamp(run["issued_at"]).strftime("%d %b · %H:%M")
@@ -195,91 +244,105 @@ with forecast_tab:
                     )
 
                 with connect() as con:
-                    temperature_timeline = load_temperature_timeline(
-                        con, selected_location_id, met_run_id, wn_run_id
+                    timeline = load_timeline(
+                        con, selected_location_id, met_run_id, wn_run_id, metric
                     )
 
                 now = pd.Timestamp.now(tz="UTC")
                 # Display only elapsed actuals; the selected runs remain unchanged.
-                temperature_timeline.loc[temperature_timeline["valid_at"] > now, "actual_temperature"] = float("nan")
-                past_rows = past_temperature_rows(temperature_timeline, now)
+                timeline.loc[timeline["valid_at"] > now, "actual_value"] = float("nan")
+                past_rows = elapsed_rows(timeline, now)
                 view_window = select_window.selectbox("Chart window", ["72 h", "7 days", "Full run"])
-                if view_window != "Full run" and not temperature_timeline.empty:
-                    cutoff = temperature_timeline["valid_at"].min() + pd.Timedelta(hours=72 if view_window == "72 h" else 168)
-                    temperature_timeline = temperature_timeline[temperature_timeline["valid_at"] <= cutoff]
+                if view_window != "Full run" and not timeline.empty:
+                    cutoff = timeline["valid_at"].min() + pd.Timedelta(hours=72 if view_window == "72 h" else 168)
+                    timeline = timeline[timeline["valid_at"] <= cutoff]
                 latest_actual = past_rows.iloc[-1] if not past_rows.empty else None
                 paired = past_rows.dropna(subset=["met_abs_error", "wn_abs_error"])
                 paired = paired[(paired["met_lead_hours"] >= 0) & (paired["wn_lead_hours"] >= 0)]
+                paired = paired[((paired.met_lead_hours - paired.wn_lead_hours).abs() <= 3)
+                    & (pd.cut(paired.met_lead_hours, LEAD_BINS, labels=LEAD_LABELS, right=False)
+                       == pd.cut(paired.wn_lead_hours, LEAD_BINS, labels=LEAD_LABELS, right=False))]
+                collected_by = max(pd.Timestamp(next(r for r in runs if r["id"] == run_id)["retrieved_at"])
+                                   for runs, run_id in ((met_runs, met_run_id), (wn_runs, wn_run_id)))
+                paired = paired[paired.valid_at >= collected_by]
                 m1, m2, m3, m4 = st.columns(4)
-                m1.metric("Latest observed", "—" if latest_actual is None else f"{latest_actual['actual_temperature']:.1f} °C")
-                m2.metric("Yr/MET MAE", "—" if paired.empty else f"{paired['met_abs_error'].mean():.2f} °C", help="Mean absolute error over shared observed hours for the selected runs.")
-                m3.metric("WeatherNext MAE", "—" if paired.empty else f"{paired['wn_abs_error'].mean():.2f} °C", help="Mean absolute error over the same shared observed hours as Yr/MET.")
+                m1.metric("Latest observed", "—" if latest_actual is None else f"{latest_actual['actual_value']:.1f} {unit}")
+                m2.metric("Yr/MET MAE", "—" if paired.empty else f"{paired['met_abs_error'].mean():.2f} {unit}", help="Mean absolute error over shared observed hours for the selected runs.")
+                m3.metric("WeatherNext MAE", "—" if paired.empty else f"{paired['wn_abs_error'].mean():.2f} {unit}", help="Mean absolute error over the same shared observed hours as Yr/MET.")
                 m4.metric("Shared observed hours", len(paired))
                 if latest_actual is not None:
-                    st.caption(f"Latest observation: {latest_actual['valid_at']:%d %b %H:%M UTC} · WeatherNext ensemble mean · Frost hourly average")
+                    st.caption(f"Latest observation: {latest_actual['valid_at']:%d %b %H:%M UTC} · WeatherNext ensemble mean · Frost at forecast valid time")
 
-                temperature_timeline = temperature_timeline.copy()
-                temperature_timeline["time_utc"] = temperature_timeline["valid_at"].dt.strftime("%d %b %H:%M UTC")
-                chart_lines = temperature_timeline[
-                    ["valid_at", "time_utc", "met_temperature", "wn_temperature"]
+                timeline = timeline.copy()
+                timeline["time_utc"] = timeline["valid_at"].dt.strftime("%d %b %H:%M UTC")
+                chart_lines = timeline[
+                    ["valid_at", "time_utc", "met_value", "wn_value"]
                 ].melt(
                     id_vars=["valid_at", "time_utc"],
                     var_name="series",
-                    value_name="temperature",
+                    value_name="value",
                 )
                 chart_lines["series"] = chart_lines["series"].map(
-                    {"met_temperature": "Yr/MET", "wn_temperature": "WeatherNext"}
+                    {"met_value": "Yr/MET", "wn_value": "WeatherNext"}
                 )
+                lead_lookup = timeline.set_index("valid_at")
+                chart_lines["lead_hours"] = chart_lines.valid_at.map(lead_lookup.met_lead_hours).where(
+                    chart_lines.series == "Yr/MET", chart_lines.valid_at.map(lead_lookup.wn_lead_hours))
+                chart_lines["issued"] = chart_lines["series"].map({
+                    "Yr/MET": run_label(next(r for r in met_runs if r["id"] == met_run_id)),
+                    "WeatherNext": run_label(next(r for r in wn_runs if r["id"] == wn_run_id))})
                 colors = alt.Scale(
                     domain=["Yr/MET", "WeatherNext", "Frost actual"],
                     range=["#6099e8", "#55ad92", "#dfa44e"],
                 )
                 forecast_lines = (
-                    alt.Chart(chart_lines.dropna(subset=["temperature"]))
+                    alt.Chart(chart_lines.dropna(subset=["value"]))
                     .mark_line(strokeWidth=1.7)
                     .encode(
                         x=alt.X("valid_at:T", title="Time (UTC)", scale=alt.Scale(type="utc"),
                                 axis=alt.Axis(labelExpr="utcFormat(datum.value, '%d %b %H:%M')", tickCount=8)),
-                        y=alt.Y("temperature:Q", title="Temperature (°C)", scale=alt.Scale(zero=False)),
+                        y=alt.Y("value:Q", title=f"{variable_label} ({unit})", scale=alt.Scale(zero=False)),
                         color=alt.Color("series:N", title=None, scale=colors),
                         tooltip=[
                             alt.Tooltip("time_utc:N", title="Time"),
                             alt.Tooltip("series:N", title="Source"),
-                            alt.Tooltip("temperature:Q", title="Temperature °C", format=".1f"),
+                            alt.Tooltip("issued:N", title="Run UTC"),
+                            alt.Tooltip("lead_hours:Q", title="Lead hours", format=".1f"),
+                            alt.Tooltip("value:Q", title=f"{variable_label} {unit}", format=".1f"),
                         ],
                     )
                 )
                 uncertainty = (
-                    alt.Chart(temperature_timeline.dropna(subset=["wn_p10", "wn_p90"]))
+                    alt.Chart(timeline.dropna(subset=["wn_p10", "wn_p90"]))
                     .mark_area(color="#55ad92", opacity=0.09)
                     .encode(
                         x=alt.X("valid_at:T", scale=alt.Scale(type="utc")),
-                        y=alt.Y("wn_p10:Q", title="Temperature (°C)", scale=alt.Scale(zero=False)),
+                        y=alt.Y("wn_p10:Q", title=f"{variable_label} ({unit})", scale=alt.Scale(zero=False)),
                         y2="wn_p90:Q",
                         tooltip=[
                             alt.Tooltip("time_utc:N", title="Time"),
-                            alt.Tooltip("wn_p10:Q", title="WeatherNext p10 °C", format=".1f"),
-                            alt.Tooltip("wn_p90:Q", title="WeatherNext p90 °C", format=".1f"),
+                            alt.Tooltip("wn_p10:Q", title=f"WeatherNext p10 {unit}", format=".1f"),
+                            alt.Tooltip("wn_p90:Q", title=f"WeatherNext p90 {unit}", format=".1f"),
                         ],
                     )
                 )
-                actual_data = temperature_timeline.dropna(subset=["actual_temperature"]).copy()
+                actual_data = timeline.dropna(subset=["actual_value"]).copy()
                 actual_data["series"] = "Frost actual"
                 actual_line = (
                     alt.Chart(actual_data)
                     .mark_line(point=alt.OverlayMarkDef(size=13, filled=True), strokeWidth=2)
                     .encode(
                         x=alt.X("valid_at:T", scale=alt.Scale(type="utc")),
-                        y=alt.Y("actual_temperature:Q", title="Temperature (°C)", scale=alt.Scale(zero=False)),
+                        y=alt.Y("actual_value:Q", title=f"{variable_label} ({unit})", scale=alt.Scale(zero=False)),
                         color=alt.Color("series:N", title=None, scale=colors),
                         tooltip=[
                             alt.Tooltip("time_utc:N", title="Time"),
-                            alt.Tooltip("actual_temperature:Q", title="Frost actual °C", format=".1f"),
+                            alt.Tooltip("actual_value:Q", title=f"Frost actual {unit}", format=".1f"),
                         ],
                     )
                 )
                 now_rule = (
-                    alt.Chart(pd.DataFrame({"now": [now] if not temperature_timeline.empty and temperature_timeline["valid_at"].min() <= now <= temperature_timeline["valid_at"].max() else []}))
+                    alt.Chart(pd.DataFrame({"now": [now] if not timeline.empty and timeline["valid_at"].min() <= now <= timeline["valid_at"].max() else []}))
                     .mark_rule(color="#929aa6", strokeDash=[3, 4], strokeWidth=1, opacity=0.7)
                     .encode(x=alt.X("now:T", scale=alt.Scale(type="utc")))
                 )
@@ -288,14 +351,20 @@ with forecast_tab:
                     .properties(height=245).interactive()),
                     use_container_width=True,
                 )
-                st.caption("Shading: WeatherNext p10–p90 · Dashed line: now · Summary MAE uses shared observed hours")
+                st.caption("Shading: WeatherNext p10–p90 · Dashed line: now · MAE: shared targets, leads ≤3 h apart in the same bucket, collected before valid time")
+                if metric == "wind_speed":
+                    st.caption("Wind speed at 10 m · Frost: preceding 10-minute mean · WeatherNext: gridded ensemble mean")
+                if paired.empty and not past_rows.empty:
+                    st.caption("No comparable observed targets for these runs. Choose runs issued closer together.")
 
                 table_rows = past_rows[
                     [
                         "valid_at",
-                        "met_temperature",
-                        "wn_temperature",
-                        "actual_temperature",
+                        "met_value",
+                        "wn_value",
+                        "actual_value",
+                        "met_lead_hours",
+                        "wn_lead_hours",
                         "met_abs_error",
                         "wn_abs_error",
                     ]
@@ -305,6 +374,8 @@ with forecast_tab:
                     "Yr",
                     "WeatherNext",
                     "Actual",
+                    "Yr lead h",
+                    "WN lead h",
                     "Yr |error|",
                     "WN |error|",
                 ]
@@ -314,7 +385,7 @@ with forecast_tab:
 
                 table_c1, table_c2 = st.columns([3, 2])
                 with table_c1:
-                    st.markdown("**Recent results · °C**")
+                    st.markdown(f"**Recent results · {unit}**")
                     if table_rows.empty:
                         st.caption("No elapsed forecast timestamps have a matching Frost observation yet.")
                     else:
@@ -328,7 +399,7 @@ with forecast_tab:
                         st.caption("Latest 24 matched hours from the selected runs. Errors use available observations.")
                 with table_c2:
                     st.markdown("**MAE by forecast lead time**")
-                    mae_rows = mae_by_lead_bucket(past_rows)
+                    mae_rows = mae_by_lead_bucket(paired.rename(columns={"met_value": "met_temperature", "wn_value": "wn_temperature", "actual_value": "actual_temperature"}))
                     if mae_rows.empty:
                         st.caption("MAE appears when forecast timestamps have matching Frost observations.")
                     else:
@@ -337,7 +408,7 @@ with forecast_tab:
                             .mark_point(filled=True, size=75, opacity=1)
                             .encode(
                                 y=alt.Y("lead bucket:N", title=None, sort=None, axis=alt.Axis(grid=False)),
-                                x=alt.X("MAE:Q", title="MAE (°C) · lower is better", scale=alt.Scale(zero=True), axis=alt.Axis(grid=True, tickCount=4)),
+                                x=alt.X("MAE:Q", title=f"MAE ({unit}) · lower is better", scale=alt.Scale(zero=True), axis=alt.Axis(grid=True, tickCount=4)),
                                 yOffset="provider:N",
                                 shape=alt.Shape("provider:N", title=None, scale=alt.Scale(domain=["Yr/MET", "WeatherNext"], range=["circle", "diamond"])),
                                 color=alt.Color("provider:N", title=None, scale=alt.Scale(
@@ -345,14 +416,14 @@ with forecast_tab:
                                 tooltip=[
                                     alt.Tooltip("provider:N", title="Provider"),
                                     alt.Tooltip("lead bucket:N", title="Lead time"),
-                                    alt.Tooltip("MAE:Q", title="MAE °C", format=".2f"),
+                                    alt.Tooltip("MAE:Q", title=f"MAE {unit}", format=".2f"),
                                     alt.Tooltip("samples:Q", title="Matched hours"),
                                 ],
                             )
                             .properties(height=max(65, min(155, mae_rows["lead bucket"].nunique() * 38)))
                         )
                         st.altair_chart(polish_chart(mae_chart), use_container_width=True)
-                        st.caption("Selected runs · each provider’s own lead time; hover for sample counts.")
+                        st.caption("Shared targets in the same lead bucket · hover for sample counts.")
                         # Keep detailed figures available without another always-open table.
                         with st.expander("MAE details"):
                             st.dataframe(
@@ -460,49 +531,139 @@ with network_tab:
 
 with accuracy_tab:
     if not stateful_tabs or accuracy_tab.open:
-        tab_temp, tab_wind = st.tabs(["Temperature", "Wind"])
-        with tab_temp:
-            with connect() as con:
-                temperature_rows = load_accuracy_rows(con, "air_temperature")
-            board = accuracy_board(temperature_rows, "air_temperature")
-            if board.empty:
-                st.info("No temperature scores yet. They appear automatically after stored forecast times pass and Frost observations are synced.")
-            else:
-                display = board.copy()
-                display["MAE_C"] = display["MAE_C"].round(2)
-                display["bias"] = display["bias"].round(2)
-                chart = display.pivot(index="horizon", columns="provider", values="MAE_C")
-                st.markdown("**Mean absolute error by forecast horizon**")
-                st.altair_chart(accuracy_chart(display, "MAE_C"), use_container_width=True)
-                with st.expander("Score details"):
-                    st.dataframe(display, use_container_width=True, hide_index=True)
+        with connect() as con:
+            stations = comparison_stations(con)
+        names = {row["id"]: row["station_name"].title() for row in stations}
+        c1, c2, c3, c4 = st.columns([1, 1, 2, 1])
+        accuracy_metric = c1.selectbox("Variable", list(VARIABLES), format_func=lambda m: VARIABLES[m][0], key="accuracy_variable")
+        period = c2.selectbox("Period", ["24 h", "7 days", "30 days", "All available"], index=1, key="accuracy_period")
+        station_id = c3.selectbox("Station", [None, *names], format_func=lambda sid: "All stations" if sid is None else names[sid], key="accuracy_station")
+        horizon = c4.selectbox("Lead time", ["All buckets", *LEAD_LABELS], key="accuracy_horizon")
+        unit = VARIABLES[accuracy_metric][1]
+        with connect() as con:
+            pairs = load_shared_pairs(con, accuracy_metric, {"24 h": 1, "7 days": 7, "30 days": 30, "All available": None}[period], station_id)
+        if horizon != "All buckets":
+            pairs = pairs[pairs.horizon == horizon]
+        if pairs.empty:
+            st.info("No shared observations with comparable forecast leads in this selection yet.")
+        else:
+            scored = paired_score_rows(pairs)
+            totals = scored.groupby("provider").agg(MAE=("abs_error", "mean"), bias=("signed_error", "mean"), samples=("abs_error", "size"))
+            m1, m2, m3, m4 = st.columns(4)
+            for card, provider, label in ((m1, MET_PROVIDER, "Yr/MET"), (m2, WEATHERNEXT_PROVIDER, "WeatherNext")):
+                row = totals.loc[provider]
+                card.metric(f"{label} MAE", f"{row.MAE:.2f} {unit}")
+                card.caption(f"Bias {row.bias:+.2f} {unit} · n={int(row.samples):,}")
+            difference = totals.loc[WEATHERNEXT_PROVIDER, "MAE"] - totals.loc[MET_PROVIDER, "MAE"]
+            m3.metric("MAE difference", f"{difference:+.2f} {unit}", help="WeatherNext minus Yr/MET. Positive means lower error for Yr/MET; negative means lower error for WeatherNext.")
+            m3.caption("WeatherNext − Yr/MET")
+            m4.metric("Shared samples", f"{len(pairs):,}")
+            m4.caption(f"{pairs.location_id.nunique()} stations · {pairs.drop_duplicates(['location_id','valid_at']).shape[0]:,} targets")
+            board = shared_accuracy(pairs, accuracy_metric)
+            left, right = st.columns(2)
+            with left:
+                st.markdown("**MAE by lead time**")
+                st.altair_chart(accuracy_chart(board, "MAE_C" if accuracy_metric == "air_temperature" else "MAE_ms"), use_container_width=True)
+            with right:
+                st.markdown("**Daily accuracy · shared targets**")
+                scored["day"] = scored.valid_at.dt.floor("D")
+                daily = scored.groupby(["day", "provider"], as_index=False).agg(MAE=("abs_error", "mean"), samples=("abs_error", "size"))
+                daily["day_label"] = daily.day.dt.strftime("%d %b")
+                daily["provider"] = daily.provider.replace({MET_PROVIDER: "Yr/MET", WEATHERNEXT_PROVIDER: "WeatherNext"})
+                chart = alt.Chart(daily).mark_line(point=True).encode(
+                    x=alt.X("day_label:O", title="Valid day (UTC)", sort=None, axis=alt.Axis(labelAngle=0)),
+                    y=alt.Y("MAE:Q", title=f"MAE ({unit})", scale=alt.Scale(zero=True)),
+                    color=alt.Color("provider:N", scale=alt.Scale(domain=["Yr/MET", "WeatherNext"], range=["#6099e8", "#55ad92"])),
+                    tooltip=["provider:N", alt.Tooltip("day:T", format="%d %b"), alt.Tooltip("MAE:Q", format=".2f"), "samples:Q"])
+                st.altair_chart(polish_chart(chart.properties(height=230)), use_container_width=True)
+            st.caption(f"One pair per station/time/lead bucket · Same observed targets · Mean lead gap {pairs.lead_gap.mean():.1f} h (maximum 3 h)")
+            with st.expander("Score details and matching rules"):
+                st.caption("Period filters forecast valid time. Use the closest forecast leads within the same existing bucket; break ties with the newest runs. Both forecasts must have been collected before valid time. Each station/time may appear once in each bucket. Bias = forecast − actual. Missing or conflicting exact-time observations are excluded.")
+                st.dataframe(board.round(2), hide_index=True, use_container_width=True)
+                by_station = scored.groupby(["station", "provider"], as_index=False).agg(MAE=("abs_error", "mean"), bias=("signed_error", "mean"), samples=("abs_error", "size"))
+                st.dataframe(by_station.round(2), hide_index=True, use_container_width=True)
+                st.caption("Lead times are close, not identical. Gridded wind differs from a station's 10-minute mean. No combined score across units.")
 
-                rows = temperature_rows
-                if not rows.empty:
-                    by_location = (
-                        rows.groupby(["location", "provider"], as_index=False)
-                        .agg(MAE_C=("abs_error", "mean"), samples=("abs_error", "size"))
-                        .sort_values(["location", "MAE_C"])
-                    )
-                    by_location["MAE_C"] = by_location["MAE_C"].round(2)
-                    with st.expander("Accuracy by station"):
-                        st.dataframe(by_location, use_container_width=True, hide_index=True)
 
-        with tab_wind:
-            with connect() as con:
-                wind_rows = load_accuracy_rows(con, "wind_speed")
-            board = accuracy_board(wind_rows, "wind_speed")
-            if board.empty:
-                st.info("Wind scores will appear for stations where Frost provides matching hourly wind observations.")
-            else:
-                display = board.copy()
-                display["MAE_ms"] = display["MAE_ms"].round(2)
-                display["bias"] = display["bias"].round(2)
-                chart = display.pivot(index="horizon", columns="provider", values="MAE_ms")
-                st.markdown("**Mean absolute wind-speed error by forecast horizon**")
-                st.altair_chart(accuracy_chart(display, "MAE_ms"), use_container_width=True)
-                with st.expander("Score details"):
-                    st.dataframe(display, use_container_width=True, hide_index=True)
+with long_range_tab:
+    if not stateful_tabs or long_range_tab.open:
+        st.markdown("**Temperature · 3, 5, 7 and 9 days ahead**")
+        st.caption("Retrospective evaluation · Includes verified historical WeatherNext forecasts · Lower MAE is better")
+        with connect() as con:
+            long_stations = comparison_stations(con)
+        long_names = {row["id"]: row["station_name"].title() for row in long_stations}
+        c1, c2 = st.columns([1, 2])
+        long_period = c1.selectbox("Evaluation window", ["All available", "30 days", "7 days", "24 h"], key="long_range_period")
+        long_station = c2.selectbox("Station", [None, *long_names],
+            format_func=lambda sid: "All stations" if sid is None else long_names[sid], key="long_range_station")
+        with connect() as con:
+            long_pairs = load_long_range_temperature(con,
+                days={"All available": None, "30 days": 30, "7 days": 7, "24 h": 1}[long_period],
+                location_id=long_station)
+        summary = long_range_summary(long_pairs)
+        if long_pairs.empty:
+            st.info("No shared long-range temperature targets in this selection yet. Try All available or another station.")
+            st.caption("Evaluation period: no matched targets · Shared samples: 0")
+        else:
+            first, last = long_pairs.valid_at.min(), long_pairs.valid_at.max()
+            st.caption(f"Evaluation period (matched targets, UTC): {first:%d %b %Y %H:%M} – {last:%d %b %Y %H:%M} · {long_pairs.location_id.nunique()} stations")
+        display = pd.DataFrame({
+            "Ahead": summary.horizon.map(lambda h: f"{h // 24} days"),
+            "Yr MAE °C": summary.yr_mae, "WeatherNext MAE °C": summary.wn_mae,
+            "Δ MAE °C": summary.difference, "Shared samples": summary.samples,
+            "Matched dates (UTC)": summary.apply(lambda r: "—" if not r.samples else
+                f"{r.period_start:%d %b} – {r.period_end:%d %b}", axis=1),
+        })
+        st.dataframe(display, hide_index=True, use_container_width=True, height=178,
+            column_config={name: st.column_config.NumberColumn(format="%.3f")
+                           for name in ["Yr MAE °C", "WeatherNext MAE °C", "Δ MAE °C"]})
+        st.caption("Shared samples = the same station/time targets for both models at each horizon. Δ = WeatherNext − Yr; negative favors WeatherNext. Empty horizons have no score.")
+        if not long_pairs.empty:
+            historical_count = int(summary.historical_samples.sum())
+            st.caption(f"{historical_count:,} shared comparisons use verified historical forecasts. Short evaluation periods and slightly different leads can affect the result.")
+        with st.expander("Bias, actual leads and matching rules"):
+            st.caption("Both forecasts were issued before the observed time. Historical WeatherNext publication is verified before that time; local retrieval may be later. Unverified forecasts must have been collected before the target. Local collection dates are preserved.")
+            st.caption("Exact Frost timestamps · Both leads within ±3 h of 72/120/168/216 h · Pair gap ≤3 h · One closest-lead pair per station/time/horizon, selected without using errors. Operational accuracy keeps its collected-before-target rule.")
+            detail = summary.rename(columns={"horizon":"Horizon h", "samples":"Shared samples", "stations":"Stations",
+                "yr_bias":"Yr bias °C", "wn_bias":"WeatherNext bias °C", "yr_lead_min":"Yr lead min h",
+                "yr_lead_max":"Yr lead max h", "wn_lead_min":"WN lead min h", "wn_lead_max":"WN lead max h",
+                "mean_gap":"Mean gap h", "max_gap":"Max gap h", "historical_samples":"Historical samples",
+                "period_start":"First target UTC", "period_end":"Last target UTC"})
+            st.dataframe(detail[["Horizon h", "Shared samples", "Historical samples", "Stations", "First target UTC", "Last target UTC",
+                "Yr bias °C", "WeatherNext bias °C", "Yr lead min h", "Yr lead max h", "WN lead min h", "WN lead max h",
+                "Mean gap h", "Max gap h"]].round(3), hide_index=True, use_container_width=True)
+
+
+with disagreement_tab:
+    if not stateful_tabs or disagreement_tab.open:
+        c1, c2 = st.columns([1, 3])
+        disagreement_metric = c1.selectbox("Variable", list(VARIABLES), format_func=lambda m: VARIABLES[m][0], key="disagreement_variable")
+        window = c2.selectbox("Future window", [72, 168, 360], format_func=lambda h: f"Next {h} hours", key="disagreement_window")
+        unit = VARIABLES[disagreement_metric][1]
+        with connect() as con:
+            disagreements = model_disagreement(con, disagreement_metric, window)
+        if disagreements.empty:
+            st.info("No overlapping future forecasts for the latest stored runs yet.")
+        else:
+            top = disagreements.head(20).copy()
+            top["target"] = top.station.str.title() + " · " + top.valid_at.dt.strftime("%d %b %H:%M")
+            chart = alt.Chart(top.head(10)).mark_bar(color="#8496b0", cornerRadiusEnd=3).encode(
+                y=alt.Y("target:N", sort="-x", title=None, axis=alt.Axis(labelLimit=290, labelOverlap=False)),
+                x=alt.X("difference:Q", title=f"Absolute forecast difference ({unit})", axis=alt.Axis(tickCount=6)),
+                tooltip=["station:N", alt.Tooltip("valid_at:T", title="Valid UTC"), alt.Tooltip("difference:Q", format=".1f"),
+                         alt.Tooltip("met_value:Q", title="Yr/MET", format=".1f"), alt.Tooltip("wn_value:Q", title="WeatherNext", format=".1f")])
+            st.altair_chart(polish_chart(chart.properties(height=250)), use_container_width=True)
+            st.caption("Latest stored runs per station · Future shared times only · Run ages may differ; disagreement is not an accuracy score.")
+            display = top[["station", "valid_at", "met_issued_at", "wn_issued_at", "met_lead_hours", "wn_lead_hours", "met_value", "wn_value", "difference"]].rename(columns={
+                "station": "Station", "valid_at": "Valid UTC", "met_issued_at": "Yr run UTC", "wn_issued_at": "WN run UTC",
+                "met_lead_hours": "Yr lead h", "wn_lead_hours": "WN lead h", "met_value": f"Yr {unit}", "wn_value": f"WN {unit}", "difference": f"Difference {unit}"})
+            st.dataframe(display.round(1), hide_index=True, use_container_width=True, height=210, row_height=26,
+                column_config={name: st.column_config.DatetimeColumn(format="DD MMM HH:mm")
+                               for name in ["Valid UTC", "Yr run UTC", "WN run UTC"]})
+            chosen = st.selectbox("Inspect forecast", list(top.index), format_func=lambda i: f"{top.loc[i, 'target']} UTC · Δ {top.loc[i, 'difference']:.1f} {unit}")
+            if st.button("Inspect in Forecast vs Actual"):
+                st.session_state["inspect_disagreement"] = {**top.loc[chosen].to_dict(), "metric": disagreement_metric}
+                st.rerun()
 
 
 with st.expander("WeatherNext system status"):

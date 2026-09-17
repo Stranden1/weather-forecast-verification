@@ -6,6 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from collection_health import append_source_event
 from collectors.frost_observations import sync_recent
 from collectors.met_forecast import collect_all
 from collectors.station_network import discover_and_save
@@ -49,14 +50,20 @@ def _collect_weathernext(messages: list[str]) -> bool:
     """Isolate WeatherNext failures from MET and Frost. Enable after live verification."""
     if os.getenv('WEATHERNEXT_ENABLED','0').strip() != '1':
         messages.append('WeatherNext disabled')
+        append_source_event(LOG_PATH, "WeatherNext", "SKIPPED", "collector disabled")
         return True
     try:
         from collectors.weathernext import collect_all as collect_weathernext
         result = collect_weathernext(progress=_write_log)
         messages.append(f'WeatherNext={result["sample_values_added"]} new values; run={result["issued_at"]}')
+        append_source_event(
+            LOG_PATH, "WeatherNext", "OK",
+            f'values={result["sample_values_added"]} run={result["issued_at"]}',
+        )
         return True
     except Exception as exc:
         messages.append(f'WeatherNext ERROR {type(exc).__name__}: {exc}')
+        append_source_event(LOG_PATH, "WeatherNext", "ERROR", f"{type(exc).__name__}: {exc}")
         return False
 
 
@@ -75,14 +82,31 @@ def main() -> int:
             discovery = discover_and_save(frost, target=target)
             messages.append(f"network={discovery}")
 
-        met = collect_all(ua)
+        try:
+            met = collect_all(ua)
+        except Exception as exc:
+            append_source_event(LOG_PATH, "MET", "ERROR", f"{type(exc).__name__}: {exc}")
+            raise
         messages.append(f"MET={met}")
+        append_source_event(
+            LOG_PATH, "MET", "ERROR" if met["errors"] else "OK",
+            f'locations={met["locations"]} rows={met["rows_added"]} errors={len(met["errors"])}',
+        )
 
         if frost:
-            obs = sync_recent(frost, days=3)
+            try:
+                obs = sync_recent(frost, days=3)
+            except Exception as exc:
+                append_source_event(LOG_PATH, "Frost", "ERROR", f"{type(exc).__name__}: {exc}")
+                raise
             messages.append(f"Frost={obs}")
+            append_source_event(
+                LOG_PATH, "Frost", "ERROR" if obs["errors"] else "OK",
+                f'locations={obs["locations"]} rows={obs["rows_added"]} errors={len(obs["errors"])}',
+            )
         else:
             messages.append("Frost skipped: no client ID")
+            append_source_event(LOG_PATH, "Frost", "SKIPPED", "no client ID")
 
         wn_ok = _collect_weathernext(messages)
         message = " | ".join(messages)

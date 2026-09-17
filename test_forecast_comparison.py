@@ -72,19 +72,19 @@ class ForecastComparisonTests(unittest.TestCase):
         self.assertEqual(recent_runs(self.con, 2, MET_PROVIDER)[0]["id"], 10)
         self.assertEqual(recent_runs(self.con, 2, WEATHERNEXT_PROVIDER)[0]["id"], 11)
 
-    def test_timeline_hourly_actual_errors_and_mae(self):
+    def test_timeline_exact_time_actual_errors_and_mae(self):
         timeline = load_temperature_timeline(self.con, 2, 10, 11)
         self.assertEqual(len(timeline), 2)
-        self.assertEqual(timeline.iloc[0].actual_temperature, 7)
+        self.assertEqual(timeline.iloc[0].actual_temperature, 6)
         self.assertEqual(timeline.iloc[0].wn_p10, 5)
 
         past = past_temperature_rows(timeline, pd.Timestamp("2026-09-15T03:00:00Z"))
-        self.assertEqual(past.met_abs_error.tolist(), [1, 2])
-        self.assertEqual(past.wn_abs_error.tolist(), [0, 1])
+        self.assertEqual(past.met_abs_error.tolist(), [2, 2])
+        self.assertEqual(past.wn_abs_error.tolist(), [1, 1])
 
         mae = mae_by_lead_bucket(past).set_index("provider")
-        self.assertEqual(mae.loc["Yr/MET", "MAE"], 1.5)
-        self.assertEqual(mae.loc["WeatherNext", "MAE"], 0.5)
+        self.assertEqual(mae.loc["Yr/MET", "MAE"], 2.0)
+        self.assertEqual(mae.loc["WeatherNext", "MAE"], 1.0)
 
 
 if __name__ == "__main__":

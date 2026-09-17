@@ -2,7 +2,7 @@
 
 Local Windows weather forecast verification dashboard. Compares Yr/MET and Google
 WeatherNext 3 forecasts with Frost observations across a shared Norwegian station
-network. Stores forecast history in SQLite and displays temperature comparisons,
+network. Stores forecast history in SQLite and displays temperature/wind comparisons,
 WeatherNext uncertainty, station maps, and temperature/wind accuracy in Streamlit.
 WeatherNext rainfall is stored but is not yet scored.
 
@@ -81,3 +81,19 @@ git push
 Review staged changes for secrets before committing. See `PROJECT_STATUS.md`,
 `WORK_STATUS.md`, `NEXT_STEPS.md` and `DECISIONS.md` for the project handoff.
 Historical references to `work/` in those documents refer to local-only evidence.
+
+
+The dashboard also offers fair shared-target Overall Accuracy and a future Model
+Disagreement view. See [SCORING.md](SCORING.md) for the variable audit and matching
+rules, including exact observation times and comparable forecast leads.
+
+
+### Long-range temperature comparison
+
+Open **Long-range temperature** for retrospective Yr/WeatherNext temperature MAE
+at 3, 5, 7 and 9 days. The compact table shows shared sample counts and evaluation
+dates; choose a station or time window, and expand details for bias and actual
+leads. Verified historical WeatherNext forecasts qualify using original publication
+time. Actual local retrieval timestamps and operational accuracy rules are kept.
+The existing database stores verification alongside forecasts; no extra service is
+needed. See `SCORING.md` and `WEATHERNEXT.md` for details.

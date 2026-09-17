@@ -179,13 +179,14 @@ class WeatherNextTests(unittest.TestCase):
 
     def test_background_is_opt_in_and_failure_is_reported(self):
         import background_collect as bg
-        with patch.dict('os.environ',{'WEATHERNEXT_ENABLED':'0'}),patch.object(wn,'collect_all') as run:
-            self.assertTrue(bg._collect_weathernext([]))
-            run.assert_not_called()
-        messages=[]
-        with patch.dict('os.environ',{'WEATHERNEXT_ENABLED':'1'}),patch.object(wn,'collect_all',side_effect=RuntimeError('quota')):
-            self.assertFalse(bg._collect_weathernext(messages))
-            self.assertIn('quota',messages[0])
+        with patch.object(bg,'LOG_PATH',Path(self.tmp.name)/'background.log'):
+            with patch.dict('os.environ',{'WEATHERNEXT_ENABLED':'0'}),patch.object(wn,'collect_all') as run:
+                self.assertTrue(bg._collect_weathernext([]))
+                run.assert_not_called()
+            messages=[]
+            with patch.dict('os.environ',{'WEATHERNEXT_ENABLED':'1'}),patch.object(wn,'collect_all',side_effect=RuntimeError('quota')):
+                self.assertFalse(bg._collect_weathernext(messages))
+                self.assertIn('quota',messages[0])
 
 
 if __name__ == '__main__':

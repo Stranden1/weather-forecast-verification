@@ -71,3 +71,16 @@ def temperature_scoreboard() -> pd.DataFrame:
 
 def wind_scoreboard() -> pd.DataFrame:
     return _scoreboard(scored_wind_rows(), "MAE_ms")
+
+
+def paired_score_rows(pairs):
+    """Use the existing MAE/bias aggregation on identical paired targets."""
+    frames = []
+    for prefix, provider in (("met", "MET"), ("wn", "WeatherNext3-mean")):
+        frame = pairs[["location_id", "station", "station_id", "valid_at", "horizon"]].copy()
+        frame["provider"] = provider
+        frame["lead_hours"] = pairs[f"{prefix}_lead_hours"]
+        frame["signed_error"] = pairs[f"{prefix}_value"] - pairs["actual_value"]
+        frame["abs_error"] = frame["signed_error"].abs()
+        frames.append(frame)
+    return pd.concat(frames, ignore_index=True)

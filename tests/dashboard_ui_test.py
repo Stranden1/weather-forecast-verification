@@ -1,5 +1,6 @@
 """Exercise dashboard interactions against fixture data and assert no DB writes."""
 import sys
+import os
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -19,6 +20,12 @@ with tempfile.TemporaryDirectory() as folder:
     now=datetime.now(timezone.utc).replace(minute=0,second=0,microsecond=0)
     init=now-timedelta(hours=6)
     iso=lambda x:x.isoformat().replace('+00:00','Z')
+    health_log=Path(folder)/'background.log'
+    health_log.write_text(
+        f"{iso(now-timedelta(hours=2))}  OK  MET={{'locations': 50, 'errors': []}} | "
+        f"Frost={{'locations': 50, 'errors': []}} | WeatherNext=0 new values; run={iso(init)}\n",
+        encoding='utf-8')
+    os.environ['WEATHERAPP_BACKGROUND_LOG_PATH']=str(health_log)
     with database.connect() as con:
         migrate(con)
         for run_id,provider,issued in [(1,'MET',init-timedelta(hours=6)),(2,'MET',init),(3,'WeatherNext3-mean',init)]:
@@ -35,6 +42,21 @@ with tempfile.TemporaryDirectory() as folder:
             con.execute('INSERT INTO observations(location_id,source_id,observed_at,air_temperature) VALUES (?,?,?,?)',
                         (1,'SN68860',iso(init+timedelta(hours=hour)),8))
     with database.connect() as con:
+        con.execute('UPDATE forecasts SET wind_speed=air_temperature/2')
+        con.execute('UPDATE observations SET wind_speed=air_temperature/2')
+        con.execute("INSERT INTO weathernext_samples SELECT run_id,valid_at,'wind_speed',statistic,value/2,asset_id,latitude,longitude,retrieved_at,'m/s' FROM weathernext_samples WHERE metric='air_temperature'")
+    # Historical points retrieved today are eligible only through verified evidence.
+    from backfill_weathernext_temperature import backfill
+    from test_weathernext_backfill import Source, metadata
+    long_init=(now-timedelta(days=10)).replace(hour=0)
+    backfill({iso(long_init):[72,120,168,216]},Source(),write=True,metadata_loader=metadata)
+    with database.connect() as con:
+        run=con.execute('INSERT INTO forecast_runs(provider,location_id,issued_at,retrieved_at) VALUES(?,?,?,?)',
+                        ('MET',1,iso(long_init),iso(long_init))).lastrowid
+        for hour in [72,120,168,216]:
+            valid=iso(long_init+timedelta(hours=hour))
+            con.execute('INSERT INTO forecasts(run_id,valid_at,lead_hours,air_temperature) VALUES(?,?,?,?)',(run,valid,hour,8))
+            con.execute('INSERT INTO observations(location_id,source_id,observed_at,air_temperature) VALUES(?,?,?,?)',(1,'SN68860',valid,6))
         before=list(con.iterdump())
     app=AppTest.from_file(str(root/'app.py'),default_timeout=30).run()
     check(app)
@@ -44,6 +66,24 @@ with tempfile.TemporaryDirectory() as folder:
     assert any(b.label=='Fetch WeatherNext' for b in app.button)
     admin=next(e for e in app.expander if e.label=='Admin / Manual controls')
     assert admin.proto.expanded is False
+    health=next(d.value for d in app.dataframe if list(d.value.columns)==['Source','Last success (UTC)','Age','Status'])
+    assert health['Source'].tolist()==['Yr/MET','WeatherNext','Frost']
+    assert health['Status'].tolist()==['OK','OK','OK']
+    assert not any('Yr collection may have a gap' in w.value for w in app.warning)
+    stale=now-timedelta(hours=13)
+    health_log.write_text(
+        f"{iso(stale)}  OK  MET={{'locations': 50, 'errors': []}} | "
+        f"Frost={{'locations': 50, 'errors': []}} | WeatherNext=0 new values; run={iso(stale)}\n",
+        encoding='utf-8')
+    app.run()
+    check(app)
+    assert any('Historical long-range forecasts missed' in w.value for w in app.warning)
+    health_log.write_text(
+        f"{iso(now-timedelta(hours=2))}  OK  MET={{'locations': 50, 'errors': []}} | "
+        f"Frost={{'locations': 50, 'errors': []}} | WeatherNext=0 new values; run={iso(init)}\n",
+        encoding='utf-8')
+    app.run()
+    check(app)
     assert next(m for m in app.metric if m.label=='Shared observed hours').value=='6'
     app.selectbox(key='met_run_1').set_value(1).run()
     check(app)
@@ -53,6 +93,67 @@ with tempfile.TemporaryDirectory() as folder:
     app.selectbox(key='forecast_actual_station').set_value(2).run()
     check(app)
     assert any('No stored' in x.value for x in app.info)
+    app.selectbox(key='forecast_actual_station').set_value(1).run()
+    app.selectbox(key='forecast_variable').set_value('wind_speed').run()
+    check(app)
+    assert any('m/s' in m.value for m in app.metric)
+    # AppTest does not serialize stateful tab selection between widget reruns.
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.run()
+    check(app)
+    assert next(m for m in app.metric if m.label=='Shared samples').value=='6'
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_variable').set_value('wind_speed').run()
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_period').set_value('24 h').run()
+    check(app)
+    assert any('m/s' in m.value for m in app.metric)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_horizon').set_value('9d+').run()
+    check(app)
+    assert any('No shared' in x.value for x in app.info)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_horizon').set_value('All buckets').run()
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_station').set_value(2).run()
+    check(app)
+    assert any('No shared' in x.value for x in app.info)
+    app.session_state['dashboard_tabs']='Long-range temperature'
+    app.run()
+    check(app)
+    long_table=next(d.value for d in app.dataframe if 'Ahead' in d.value.columns)
+    assert long_table['Ahead'].tolist()==['3 days','5 days','7 days','9 days']
+    assert long_table['Shared samples'].tolist()==[1,1,1,1]
+    assert (long_table['Yr MAE °C']==2).all()
+    assert any('Evaluation period (matched targets, UTC)' in c.value for c in app.caption)
+    assert any('4 shared comparisons use verified historical forecasts' in c.value for c in app.caption)
+    app.session_state['dashboard_tabs']='Long-range temperature'
+    app.selectbox(key='long_range_station').set_value(2).run()
+    check(app)
+    assert any('No shared long-range' in i.value for i in app.info)
+    empty=next(d.value for d in app.dataframe if 'Ahead' in d.value.columns)
+    assert empty['Shared samples'].tolist()==[0,0,0,0]
+    assert empty['Yr MAE °C'].isna().all()
+    app.session_state['dashboard_tabs']='Long-range temperature'
+    app.selectbox(key='long_range_station').set_value(None).run()
+    app.session_state['dashboard_tabs']='Long-range temperature'
+    app.selectbox(key='long_range_period').set_value('24 h').run()
+    check(app)
+    filtered=next(d.value for d in app.dataframe if 'Ahead' in d.value.columns)
+    assert filtered['Shared samples'].iloc[:3].sum()==0
+    app.session_state['dashboard_tabs']='Model disagreement'
+    app.run()
+    check(app)
+    app.session_state['dashboard_tabs']='Model disagreement'
+    app.selectbox(key='disagreement_variable').set_value('wind_speed').run()
+    check(app)
+    app.session_state['dashboard_tabs']='Model disagreement'
+    next(b for b in app.button if b.label=='Inspect in Forecast vs Actual').click().run()
+    check(app)
+    assert app.selectbox(key='forecast_actual_station').value==1
+    assert app.selectbox(key='forecast_variable').value=='wind_speed'
+    assert app.selectbox(key='met_run_1').value==2
+    assert app.selectbox(key='wn_run_1').value==3
     with database.connect() as con:
         assert before==list(con.iterdump()),'Dashboard changed fixture history'
-    print('UI passed: station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')
+    print('Expanded UI passed: verified retrospective horizons/periods/counts/empty filters, wind, shared accuracy filters/empty states, disagreement drill-through, zero DB writes; station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')
