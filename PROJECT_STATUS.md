@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-09-17_
+_Updated 2026-09-22_
 
 ## Summary
 
@@ -18,7 +18,8 @@ Streamlit dashboard are operational.
   precipitation observations.
 - Collects 360-hour WeatherNext forecasts for the shared station network,
   including means, percentiles, precipitation, wind components, and pressure.
-- Shows a compact Forecast vs Actual temperature/wind view with run selection,
+- Shows a compact Forecast vs Actual temperature/wind view with automatic fair
+  run pairing and optional advanced manual selection,
   WeatherNext p10–p90 uncertainty, elapsed Frost observations, errors, and MAE.
 - Shows station metadata/maps, overall temperature and wind accuracy, and
   WeatherNext collection status/history.
@@ -44,7 +45,8 @@ Streamlit dashboard are operational.
 
 ## Validation
 
-All 51 unit/regression tests pass. The compact retrospective and collection-health views also passed
+All 59 unit/regression tests pass. Front-page automatic/manual/no-pair behavior,
+compact health states and existing pages pass fixture UI and live render checks. The compact retrospective and collection-health views also passed
 fixture interaction tests and a live browser check. The additive verification
 table contains 4,400 historical points; registration preserved all prior data. Historical temperature ingestion was repeated
 with zero additions and zero duplicate keys; every pre-existing domain row was
@@ -151,3 +153,21 @@ health. No application behavior or live data was changed during checkpoint revie
 The checkpoint message is `Checkpoint long-range verification and collection health`;
 use Git history for its hash. No push was requested. Earlier uncommitted notes above
 record the state at the time of each implementation task.
+
+
+## Front-page usability — 2026-09-22
+
+Forecast vs Actual defaults to **Automatic fair pair** for the station, variable
+and chart window. It reuses the operational matcher: exact shared Frost targets,
+issued/collected before target, same lead bucket and a maximum 3-hour lead gap.
+Among pairs with observations, the newest pair is chosen by older initialization,
+then newer initialization and stable run IDs. Errors and sample counts do not rank
+pairs. If no observed pair exists, a fair future pair is preferred; missing matches
+have a concise data-based explanation. Independent dropdowns remain in Advanced /
+Manual run selection, and disagreement drill-through enters Manual runs.
+
+Healthy collectors occupy one status line and a collapsed details panel. Active
+source delays/failures and stale Yr warnings remain prominent; resolved recent gaps
+remain in details. Thresholds, logging, collectors, schema and history are unchanged.
+The existing dashboard process was restarted once to clear stale Python imports;
+no scheduled collection task was changed or restarted.

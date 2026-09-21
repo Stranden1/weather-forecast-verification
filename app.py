@@ -29,7 +29,8 @@ from forecast_comparison import (
     recent_runs,
 )
 from dashboard_scores import (load_shared_pairs, shared_accuracy, model_disagreement,
-                              load_long_range_temperature, long_range_summary)
+                              load_long_range_temperature, long_range_summary,
+                              automatic_run_pair, selected_run_pairs)
 from scoring.scorer import paired_score_rows
 from collection_health import load_collection_health, yr_stale_warning
 from weathernext_status import load_weathernext_status
@@ -148,38 +149,42 @@ def accuracy_chart(rows, metric):
     ).properties(height=230).configure_legend(orient="top")
 
 
-st.markdown("**Collection health**")
-health_table = pd.DataFrame(
-    {
-        "Source": row["label"],
-        "Last success (UTC)": (
-            row["last_success"].strftime("%Y-%m-%d %H:%M")
-            if row["last_success"]
-            else "—"
-        ),
-        "Age": row["age"],
-        "Status": row["status"],
-    }
-    for row in collection_health["sources"].values()
-)
-st.dataframe(health_table, hide_index=True, use_container_width=True, height=143)
-st.caption("Completed source retrievals · Expected every 6 h · OK ≤8 h · Delayed ≤12 h · Stale >12 h")
+health_sources = list(collection_health["sources"].values())
+active_health = [row for row in health_sources if row["status"] != "OK"]
+if not active_health:
+    oldest_success = max(health_sources, key=lambda row: row["age_hours"])
+    st.caption(f"● All collectors OK · All sources succeeded within {oldest_success['age']} · UTC")
+else:
+    st.warning("Collection attention: " + " · ".join(f"{row['label']}: {row['status']}" for row in active_health))
 warning = yr_stale_warning(collection_health)
 if warning:
     st.warning(warning)
-elif collection_health["yr_gap"]:
-    gap = collection_health["yr_gap"]
-    st.warning(
-        f"Recent Yr collection gap detected: {gap['hours']:.1f} h between "
-        f"{gap['start']:%d %b %H:%M} and {gap['end']:%d %b %H:%M} UTC."
+with st.expander("Collection health details", expanded=False):
+    health_table = pd.DataFrame(
+        {
+            "Source": row["label"],
+            "Last success (UTC)": (
+                row["last_success"].strftime("%Y-%m-%d %H:%M")
+                if row["last_success"]
+                else "—"
+            ),
+            "Age": row["age"],
+            "Status": row["status"],
+        }
+        for row in collection_health["sources"].values()
     )
-
+    st.dataframe(health_table, hide_index=True, use_container_width=True, height=143)
+    st.caption("Completed source retrievals · Expected every 6 h · OK ≤8 h · Delayed ≤12 h · Stale >12 h")
+    if collection_health["yr_gap"]:
+        gap = collection_health["yr_gap"]
+        st.caption(f"Recent Yr collection gap: {gap['hours']:.1f} h between {gap['start']:%d %b %H:%M} and {gap['end']:%d %b %H:%M} UTC.")
 
 
 # Avoid running the expensive historical accuracy queries while browsing forecasts.
 stateful_tabs = "on_change" in inspect.signature(st.tabs).parameters
 pending = st.session_state.pop("inspect_disagreement", None)
 if pending:
+    st.session_state["comparison_mode"] = "Manual runs"
     station = int(pending["location_id"])
     st.session_state["forecast_actual_station"] = station
     st.session_state["forecast_variable"] = pending["metric"]
@@ -203,7 +208,7 @@ with forecast_tab:
                 row["id"]: f'{row["station_name"].title().replace(" - ", "-")} ({row["station_id"] or "no station ID"})'
                 for row in comparison_station_rows
             }
-            select_variable, select_station, select_met, select_wn, select_window = st.columns([1, 2.2, 1.5, 1.5, 0.9], gap="small")
+            select_variable, select_station, select_mode, select_window = st.columns([1, 2.2, 1.6, 0.9], gap="small")
             metric = select_variable.selectbox("Variable", list(VARIABLES), format_func=lambda m: VARIABLES[m][0], key="forecast_variable")
             variable_label, unit = VARIABLES[metric]
             selected_location_id = select_station.selectbox(
@@ -213,7 +218,12 @@ with forecast_tab:
                 key="forecast_actual_station",
             )
 
+            comparison_mode = select_mode.selectbox("Comparison", ["Automatic fair pair", "Manual runs"], key="comparison_mode")
+            view_window = select_window.selectbox("Chart window", ["72 h", "7 days", "Full run"])
+            now = pd.Timestamp.now(tz="UTC")
+            automatic = comparison_mode == "Automatic fair pair"
             with connect() as con:
+                auto_result = automatic_run_pair(con, selected_location_id, metric, view_window, now) if automatic else None
                 met_runs = recent_runs(con, selected_location_id, MET_PROVIDER)
                 wn_runs = recent_runs(con, selected_location_id, WEATHERNEXT_PROVIDER)
 
@@ -228,43 +238,65 @@ with forecast_tab:
                 def run_label(run):
                     return pd.Timestamp(run["issued_at"]).strftime("%d %b · %H:%M")
 
-                with select_met:
-                    met_run_id = st.selectbox(
-                        "Yr/MET run",
-                        key=f"met_run_{selected_location_id}",
+                if automatic:
+                    if auto_result['reason']:
+                        st.info(auto_result['reason'])
+                    if auto_result['pair']:
+                        for prefix, runs in [('met', met_runs), ('wn', wn_runs)]:
+                            chosen_run = auto_result['pair'][prefix]
+                            if chosen_run['id'] not in [r['id'] for r in runs]:
+                                runs.append(chosen_run)
+                            st.session_state[f"{prefix}_run_{selected_location_id}"] = chosen_run['id']
+                    else:
+                        st.caption("Showing latest runs for inspection only; use Manual runs to choose others.")
+                        st.session_state[f"met_run_{selected_location_id}"] = met_runs[0]['id']
+                        st.session_state[f"wn_run_{selected_location_id}"] = wn_runs[0]['id']
+                # Keep an automatically chosen older run selectable when entering manual mode.
+                if not automatic:
+                    with connect() as con:
+                        for prefix, provider, runs in [('met', MET_PROVIDER, met_runs), ('wn', WEATHERNEXT_PROVIDER, wn_runs)]:
+                            saved_id = st.session_state.get(f"{prefix}_run_{selected_location_id}")
+                            if saved_id is not None and saved_id not in [r['id'] for r in runs]:
+                                saved = con.execute('SELECT id, issued_at, retrieved_at FROM forecast_runs WHERE id=? AND location_id=? AND provider=?',
+                                                    (saved_id, selected_location_id, provider)).fetchone()
+                                if saved is not None:
+                                    runs.append(dict(saved))
+                with st.expander("Advanced / Manual run selection", expanded=not automatic):
+                    if automatic:
+                        st.caption("Choose Manual runs in Comparison to select independent runs.")
+                    select_met, select_wn = st.columns(2)
+                    met_run_id = select_met.selectbox(
+                        "Yr/MET run", key=f"met_run_{selected_location_id}", disabled=automatic,
                         options=[run["id"] for run in met_runs],
-                        format_func=lambda run_id: run_label(next(run for run in met_runs if run["id"] == run_id)),
-                    )
-                with select_wn:
-                    wn_run_id = st.selectbox(
-                        "WeatherNext run",
-                        key=f"wn_run_{selected_location_id}",
+                        format_func=lambda run_id: run_label(next(run for run in met_runs if run["id"] == run_id)))
+                    wn_run_id = select_wn.selectbox(
+                        "WeatherNext run", key=f"wn_run_{selected_location_id}", disabled=automatic,
                         options=[run["id"] for run in wn_runs],
-                        format_func=lambda run_id: run_label(next(run for run in wn_runs if run["id"] == run_id)),
-                    )
+                        format_func=lambda run_id: run_label(next(run for run in wn_runs if run["id"] == run_id)))
+                met_run = next(r for r in met_runs if r['id'] == met_run_id)
+                wn_run = next(r for r in wn_runs if r['id'] == wn_run_id)
+                if automatic and auto_result['pair']:
+                    st.caption(f"Auto pair: Yr {run_label(met_run)} · WeatherNext {run_label(wn_run)} UTC")
 
                 with connect() as con:
                     timeline = load_timeline(
                         con, selected_location_id, met_run_id, wn_run_id, metric
                     )
 
-                now = pd.Timestamp.now(tz="UTC")
                 # Display only elapsed actuals; the selected runs remain unchanged.
                 timeline.loc[timeline["valid_at"] > now, "actual_value"] = float("nan")
-                past_rows = elapsed_rows(timeline, now)
-                view_window = select_window.selectbox("Chart window", ["72 h", "7 days", "Full run"])
                 if view_window != "Full run" and not timeline.empty:
                     cutoff = timeline["valid_at"].min() + pd.Timedelta(hours=72 if view_window == "72 h" else 168)
                     timeline = timeline[timeline["valid_at"] <= cutoff]
+                past_rows = elapsed_rows(timeline, now)
                 latest_actual = past_rows.iloc[-1] if not past_rows.empty else None
-                paired = past_rows.dropna(subset=["met_abs_error", "wn_abs_error"])
-                paired = paired[(paired["met_lead_hours"] >= 0) & (paired["wn_lead_hours"] >= 0)]
-                paired = paired[((paired.met_lead_hours - paired.wn_lead_hours).abs() <= 3)
-                    & (pd.cut(paired.met_lead_hours, LEAD_BINS, labels=LEAD_LABELS, right=False)
-                       == pd.cut(paired.wn_lead_hours, LEAD_BINS, labels=LEAD_LABELS, right=False))]
-                collected_by = max(pd.Timestamp(next(r for r in runs if r["id"] == run_id)["retrieved_at"])
-                                   for runs, run_id in ((met_runs, met_run_id), (wn_runs, wn_run_id)))
-                paired = paired[paired.valid_at >= collected_by]
+                paired = selected_run_pairs(timeline, met_run, wn_run, now)
+                if not automatic and paired.empty:
+                    gap = abs((pd.Timestamp(met_run['issued_at']) - pd.Timestamp(wn_run['issued_at'])).total_seconds()) / 3600
+                    if gap > 3:
+                        st.info(f"These manual runs are {gap:.1f} h apart (fair comparison requires ≤3 h). Forecasts remain available for inspection.")
+                    else:
+                        st.info("No shared exact-time observations meet the fair comparison rules in this chart window yet.")
                 m1, m2, m3, m4 = st.columns(4)
                 m1.metric("Latest observed", "—" if latest_actual is None else f"{latest_actual['actual_value']:.1f} {unit}")
                 m2.metric("Yr/MET MAE", "—" if paired.empty else f"{paired['met_abs_error'].mean():.2f} {unit}", help="Mean absolute error over shared observed hours for the selected runs.")

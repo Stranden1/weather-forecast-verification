@@ -305,3 +305,46 @@ Only reviewed source, tests and documentation belong in this checkpoint. Databas
 credentials, logs, environments, screenshots and generated evidence remain ignored
 and local. Validation evidence is under work/checkpoint-review/. Commit is local;
 no push is requested. No feature work remains for this checkpoint task.
+
+
+## Front-page usability checkpoint — 2026-09-22
+
+Completed: automatic fair run pairing is the Forecast vs Actual default. It uses
+the existing operational matcher and prefers the newest pair with exact observed
+targets in the selected station/variable/chart window. Ranking: earlier issue,
+later issue, then run IDs descending; never errors or sample counts. With no
+observed pair it prefers a fair future pair and explains the missing observations.
+No eligible pair produces a data-based explanation and an inspection-only label.
+Advanced independent dropdowns remain available in Manual runs, including older
+automatically selected runs. Disagreement drill-through preserves manual choices.
+Selected-run MAE describes the displayed window with the same fairness rules.
+
+Collection health is one healthy text summary plus collapsed details. Active
+failures/delays remain visible; stale Yr retains its unrecoverable-history warning.
+Resolved recent gaps remain inspectable within details. Health thresholds and
+source-level logging are unchanged. No database, collector, backfill, long-range
+scoring or scheduled-task change. No .env edits. The existing Streamlit process
+was restarted once after stale imports were detected; its browser render then passed.
+
+Validation: all 59 unit/regression tests pass. Eight focused pairing regressions
+cover older fair pairs, newest qualification, missing pairs, variables/stations,
+future fallback, retrieval/bucket constraints, exact timestamps/window limits and
+conflicting observations. The expanded fixture UI test covers automatic/manual
+selection, no-pair messages, collapsed healthy status, resolved gaps, active/stale
+Yr warnings, long-range/disagreement navigation, and zero database writes.
+A live read-only snapshot confirmed operational temperature/wind and long-range
+scorer output identical to HEAD. Production render and browser screenshot passed;
+all production connections were enforced read-only and .env remained unchanged.
+
+Live Trondheim-Voll example captured 2026-09-21 22:16:54 UTC (72h window):
+- Independent newest runs: Yr 21 Sep 21:30:08 / WeatherNext 21 Sep 12:00;
+  latest common observed target 22:00 had leads 0.498h / 10h. Zero fair matches,
+  so both shared MAEs were empty.
+- Automatic runs: Yr 21 Sep 03:30:15 / WeatherNext 21 Sep 06:00. Five eligible
+  shared observations; Yr MAE 1.100°C, WeatherNext MAE 1.514°C. All matched rows
+  retain the same bucket, exact-observation and collected-before-target rules.
+
+Evidence is local under work/auto-pair/ (tests, live example, unchanged-score audit
+and screenshot). Worktree was clean before this bounded task; only related source,
+tests and handoff documentation are included in its checkpoint. No push requested.
+Remaining: none for this task. Existing dependency deprecation warnings are non-fatal.

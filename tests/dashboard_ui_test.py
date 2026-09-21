@@ -22,6 +22,7 @@ with tempfile.TemporaryDirectory() as folder:
     iso=lambda x:x.isoformat().replace('+00:00','Z')
     health_log=Path(folder)/'background.log'
     health_log.write_text(
+        f"{iso(now-timedelta(hours=36))}  SOURCE  MET  OK\n"
         f"{iso(now-timedelta(hours=2))}  OK  MET={{'locations': 50, 'errors': []}} | "
         f"Frost={{'locations': 50, 'errors': []}} | WeatherNext=0 new values; run={iso(init)}\n",
         encoding='utf-8')
@@ -45,6 +46,13 @@ with tempfile.TemporaryDirectory() as folder:
         con.execute('UPDATE forecasts SET wind_speed=air_temperature/2')
         con.execute('UPDATE observations SET wind_speed=air_temperature/2')
         con.execute("INSERT INTO weathernext_samples SELECT run_id,valid_at,'wind_speed',statistic,value/2,asset_id,latitude,longitude,retrieved_at,'m/s' FROM weathernext_samples WHERE metric='air_temperature'")
+    with database.connect() as con:
+        # A station with two individually available runs but no <=3h fair pair.
+        for run_id,provider,issued in [(20,'MET',now-timedelta(hours=1)),(21,'WeatherNext3-mean',now-timedelta(hours=12))]:
+            con.execute('INSERT INTO forecast_runs VALUES(?,?,?,?,?)',(run_id,provider,3,iso(issued),iso(issued)))
+            con.execute('INSERT INTO forecasts(run_id,valid_at,lead_hours,air_temperature) VALUES(?,?,?,9)',
+                        (run_id,iso(now),(now-issued).total_seconds()/3600))
+        con.execute('INSERT INTO observations(location_id,source_id,observed_at,air_temperature) VALUES(?,?,?,7)',(3,'SN50540',iso(now)))
     # Historical points retrieved today are eligible only through verified evidence.
     from backfill_weathernext_temperature import backfill
     from test_weathernext_backfill import Source, metadata
@@ -62,6 +70,8 @@ with tempfile.TemporaryDirectory() as folder:
     check(app)
     assert [t.label for t in app.tabs][:3]==['Forecast vs Actual','Station network','Overall accuracy']
     assert app.selectbox(key='forecast_actual_station').value==1
+    assert app.selectbox(key='comparison_mode').value=='Automatic fair pair'
+    assert app.selectbox(key='met_run_1').disabled
     assert app.selectbox(key='met_run_1').value==2
     assert any(b.label=='Fetch WeatherNext' for b in app.button)
     admin=next(e for e in app.expander if e.label=='Admin / Manual controls')
@@ -69,7 +79,11 @@ with tempfile.TemporaryDirectory() as folder:
     health=next(d.value for d in app.dataframe if list(d.value.columns)==['Source','Last success (UTC)','Age','Status'])
     assert health['Source'].tolist()==['Yr/MET','WeatherNext','Frost']
     assert health['Status'].tolist()==['OK','OK','OK']
-    assert not any('Yr collection may have a gap' in w.value for w in app.warning)
+    assert next(e for e in app.expander if e.label=='Collection health details').proto.expanded is False
+    assert next(e for e in app.expander if e.label=='Advanced / Manual run selection').proto.expanded is False
+    assert any('All collectors OK' in c.value for c in app.caption)
+    assert any('Recent Yr collection gap:' in c.value for c in app.caption)
+    assert not app.warning
     stale=now-timedelta(hours=13)
     health_log.write_text(
         f"{iso(stale)}  OK  MET={{'locations': 50, 'errors': []}} | "
@@ -84,16 +98,34 @@ with tempfile.TemporaryDirectory() as folder:
         encoding='utf-8')
     app.run()
     check(app)
+    healthy_text=health_log.read_text(encoding='utf-8')
+    health_log.write_text(healthy_text+f"{iso(now-timedelta(hours=1))}  SOURCE  MET  ERROR\n",encoding='utf-8')
+    app.run()
+    check(app)
+    assert any('Yr/MET: Delayed' in w.value for w in app.warning)
+    assert not any('All collectors OK' in c.value for c in app.caption)
+    health_log.write_text(healthy_text,encoding='utf-8')
+    app.run()
     assert next(m for m in app.metric if m.label=='Shared observed hours').value=='6'
+    app.selectbox(key='comparison_mode').set_value('Manual runs').run()
+    assert not app.selectbox(key='met_run_1').disabled
     app.selectbox(key='met_run_1').set_value(1).run()
     check(app)
     assert app.selectbox(key='met_run_1').value==1
+    assert any('These manual runs are 6.0 h apart' in i.value for i in app.info)
     next(s for s in app.selectbox if s.label=='Chart window').set_value('Full run').run()
     check(app)
+    app.selectbox(key='comparison_mode').set_value('Automatic fair pair').run()
+    app.selectbox(key='forecast_actual_station').set_value(3).run()
+    check(app)
+    assert any('No fair run pair' in i.value and '11.0 h' in i.value for i in app.info)
+    assert any('inspection only' in c.value for c in app.caption)
     app.selectbox(key='forecast_actual_station').set_value(2).run()
     check(app)
     assert any('No stored' in x.value for x in app.info)
     app.selectbox(key='forecast_actual_station').set_value(1).run()
+    app.selectbox(key='comparison_mode').set_value('Automatic fair pair').run()
+    assert app.selectbox(key='met_run_1').value==2
     app.selectbox(key='forecast_variable').set_value('wind_speed').run()
     check(app)
     assert any('m/s' in m.value for m in app.metric)
@@ -154,6 +186,7 @@ with tempfile.TemporaryDirectory() as folder:
     assert app.selectbox(key='forecast_variable').value=='wind_speed'
     assert app.selectbox(key='met_run_1').value==2
     assert app.selectbox(key='wn_run_1').value==3
+    assert app.selectbox(key='comparison_mode').value=='Manual runs'
     with database.connect() as con:
         assert before==list(con.iterdump()),'Dashboard changed fixture history'
-    print('Expanded UI passed: verified retrospective horizons/periods/counts/empty filters, wind, shared accuracy filters/empty states, disagreement drill-through, zero DB writes; station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')
+    print('Expanded UI passed: automatic/manual/no-fair pairing, collapsed healthy state, resolved gaps, active Yr failures, verified retrospective horizons/periods/counts/empty filters, wind, shared accuracy filters/empty states, disagreement drill-through, zero DB writes; station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')

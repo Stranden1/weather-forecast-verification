@@ -106,3 +106,27 @@ sample count, MAE and WN-minus-Yr MAE difference. Details include signed bias,
 actual lead ranges and historical sample counts. Station/window filters apply
 to target time. Zero samples produce no MAE/bias, not a perfect zero error.
 Small samples, correlated targets and unequal leads limit model-ranking claims.
+
+
+## Default Forecast vs Actual pair selection — 2026-09-22
+
+Automatic fair pair reuses the operational pair_forecasts eligibility logic, with
+original issues before valid time: equal target, same existing lead bucket, ≤3h
+lead gap and both collected before target. It considers the selected station and
+variable across stored runs, not just the newest 12 dropdown entries. Windows are
+72h or 168h from the earliest stored valid time of either run; Full run is unbounded.
+
+Choose the newest pair having at least one exact, unambiguous Frost observation in
+that window. Newness is ordered by the earlier of the two issues, then the later
+issue and stable run IDs, all descending. This deliberately does not minimize
+forecast errors, maximize sample count or merely minimize the lead gap. Without
+observed pairs, prefer a fair pair with upcoming targets and explain that observed
+MAE is unavailable; otherwise select the newest fair pair and explain the empty
+observed pool. If none qualifies, show an explicit reason and label independent
+latest-run forecasts as inspection-only.
+
+The selected-run MAE helper uses the same operational matcher and displayed chart
+window. Manual mode can still inspect unfair pairs, whose shared MAE remains empty
+with an explanation. Overall Accuracy, Long-range temperature and Model disagreement
+results were compared with the committed implementation on the same live read-only
+snapshot and remained unchanged. Health changes are presentation only.

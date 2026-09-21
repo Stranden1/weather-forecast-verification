@@ -1,6 +1,6 @@
 # Decisions
 
-_Updated 2026-09-17_
+_Updated 2026-09-22_
 
 - SQLite remains the local source of truth; WeatherNext extends the existing
   forecast model rather than introducing a separate datastore.
@@ -25,8 +25,9 @@ _Updated 2026-09-17_
 - A recent Yr gap means consecutive successful Yr completions more than 12 hours
   apart within the last 7 days. Only report the gap; do not reconstruct or backfill
   missing Yr history automatically.
-- Forecast vs Actual selects Yr/MET and WeatherNext runs independently, defaults
-  to Trondheim-Voll and the newest runs, and uses Frost at the exact forecast valid time as actual.
+- Forecast vs Actual defaults to Trondheim-Voll and the newest useful fair run
+  pair. Advanced manual mode retains independent run selection. Both use Frost
+  at the exact forecast valid time as actual.
 - Selected-run MAE uses elapsed matched hours and the established lead-time
   buckets for both temperature and wind speed; leads must be within 3 hours.
 - WeatherNext p10–p90 is displayed as uncertainty, not as a confidence guarantee.
@@ -123,3 +124,25 @@ _Updated 2026-09-17_
 - Checkpoint preparation changes documentation only; no application behavior,
   live database, credentials or schedule changes. Keep runtime evidence ignored.
 - This checkpoint is local; pushing is a separate user-controlled action.
+
+
+## Automatic front-page pairing and health presentation — 2026-09-22
+
+- Reuse pair_forecasts for eligibility rather than invent another fair matcher.
+  The default scorer path and its target deduplication remain unchanged; the UI
+  can request all eligible pairs before choosing one whole-run pair.
+- For the selected station/variable/window, prioritize pairs with exact observed
+  targets. Choose the maximum (earlier issue, later issue, MET run ID, WN run ID).
+  Neither forecast error nor sample count determines which pair is selected.
+- If there are no observed pairs, prefer a fair pair with future targets, then
+  the newest remaining fair pair. Explain missing observations explicitly. If
+  no eligible pair exists, label latest independent runs as inspection-only and
+  report a measured issue gap when it exceeds 3h; otherwise explain target eligibility.
+- Apply 72h/168h windows from the first stored valid time of either selected run;
+  Full run has no such cut. Front-page summaries describe the displayed window.
+  Preserve exact targets, issued/collected-before-valid, lead buckets and ≤3h gap.
+- Manual mode keeps independent dropdowns, including a selected older automatic
+  run outside the usual recent list. Disagreement inspection opens manual mode.
+- Healthy status uses text plus a single summary line; source details and resolved
+  recent gaps stay collapsed. Active source problems and stale Yr warnings stay
+  visible. Do not change health thresholds or source-completion logging.

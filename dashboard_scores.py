@@ -64,11 +64,12 @@ def load_forecast_rows(con, metric, start=None, end=None, location_id=None):
     return rows
 
 
-def pair_forecasts(rows, now=None, latest_only=False):
+def pair_forecasts(rows, now=None, latest_only=False, deduplicate=True):
     """One pair per target/bucket: nearest leads (<=3h), newest pair breaks ties.
 
     Disagreements instead use latest available runs per station, with both leads
     shown; their run ages can differ. No errors are used to select either pair.
+    deduplicate=False exposes all eligible pairs for whole-run UI selection only.
     """
     now = utc_now(now)
     rows = rows[(rows.issued_at <= now) & (rows.retrieved_at <= now)].copy()
@@ -88,7 +89,9 @@ def pair_forecasts(rows, now=None, latest_only=False):
     if not latest_only:
         pairs = pairs[pairs.lead_gap <= 3.0]
     pairs = pairs.sort_values(["lead_gap", "wn_issued_at", "met_issued_at", "met_run_id", "wn_run_id"],
-                              ascending=[True, False, False, False, False]).drop_duplicates(keys)
+                              ascending=[True, False, False, False, False])
+    if deduplicate:
+        pairs = pairs.drop_duplicates(keys)
     return pairs.reset_index(drop=True)
 
 
@@ -96,6 +99,10 @@ def load_shared_pairs(con, metric, days=7, location_id=None, now=None):
     now = utc_now(now)
     start = None if days is None else now - pd.Timedelta(days=days)
     pairs = pair_forecasts(load_forecast_rows(con, metric, start, now, location_id), now)
+    return _with_exact_observations(con, pairs, metric, now)
+
+
+def _with_exact_observations(con, pairs, metric, now):
     if pairs.empty:
         pairs["actual_value"] = pd.Series(dtype=float)
         return pairs
@@ -220,3 +227,79 @@ def long_range_summary(pairs):
                    mean_gap=group.lead_gap.mean(), max_gap=group.lead_gap.max())
         result.append(row)
     return pd.DataFrame(result)
+
+
+CHART_WINDOWS = {"72 h": 72, "7 days": 168, "Full run": None}
+
+
+def automatic_run_pair(con, location_id, metric="air_temperature", window="72 h", now=None):
+    """Newest useful whole-run pair, using the operational fair matcher.
+
+    Prefer pairs with exact observed targets in the displayed window. Rank by
+    the pair's older issue descending, then its newer issue and stable IDs.
+    With no observed pair, prefer a fair pair with future targets, then any fair
+    pair. No selection uses errors or the number of observations as a ranking.
+    """
+    hours = CHART_WINDOWS[window]
+    now = utc_now(now)
+    rows = load_forecast_rows(con, metric, location_id=location_id)
+    starts = rows.groupby('run_id').valid_at.min()
+    rows = rows[(rows.issued_at < rows.valid_at) & (rows.issued_at <= now) & (rows.retrieved_at <= now)]
+    pairs = pair_forecasts(rows, now, deduplicate=False)
+    if hours is not None and not pairs.empty:
+        starts_pair = pd.concat([pairs.met_run_id.map(starts), pairs.wn_run_id.map(starts)], axis=1).min(axis=1)
+        pairs = pairs[pairs.valid_at <= starts_pair + pd.Timedelta(hours=hours)]
+    if pairs.empty:
+        reason = "No fair run pair is available for this station/window."
+        if rows.empty or rows.provider.nunique() < 2:
+            reason += " Both sources need stored forecasts for the selected variable."
+        else:
+            met = rows[rows.provider == 'MET'].issued_at.drop_duplicates()
+            wn = rows[rows.provider == 'WeatherNext3-mean'].issued_at.drop_duplicates()
+            gap = min(abs((m-w).total_seconds())/3600 for m in met for w in wn)
+            if gap > 3:
+                reason += f" Closest stored issue-time gap: {gap:.1f} h (maximum 3 h)."
+            else:
+                reason += " No common targets meet the lead-bucket and collected-before-target rules in this window."
+        return {'pair': None, 'reason': reason}
+    observed = _with_exact_observations(con, pairs[pairs.valid_at <= now], metric, now)
+    choices = observed
+    reason = None
+    if choices.empty:
+        future = pairs[pairs.valid_at > now]
+        choices = future if not future.empty else pairs
+        reason = "Fair runs selected; no shared exact-time Frost observations in this chart window yet."
+    choices = choices.copy()
+    choices['older_issue'] = choices[['met_issued_at','wn_issued_at']].min(axis=1)
+    choices['newer_issue'] = choices[['met_issued_at','wn_issued_at']].max(axis=1)
+    chosen = choices.sort_values(['older_issue','newer_issue','met_run_id','wn_run_id'], ascending=False).iloc[0]
+    result = {}
+    for prefix in ['met','wn']:
+        run_id = int(chosen[prefix+'_run_id'])
+        source = rows[rows.run_id == run_id].iloc[0]
+        result[prefix] = {'id': run_id, 'issued_at': source.issued_at.isoformat(), 'retrieved_at': source.retrieved_at.isoformat()}
+    result['shared_samples'] = int(((observed.met_run_id == chosen.met_run_id) & (observed.wn_run_id == chosen.wn_run_id)).sum())
+    return {'pair': result, 'reason': reason}
+
+
+def selected_run_pairs(timeline, met_run, wn_run, now=None):
+    """Expose the same operational fair matcher to selected-run UI summaries."""
+    from forecast_comparison import past_rows
+    now = utc_now(now)
+    frames = []
+    for prefix, provider, run in [('met','MET',met_run), ('wn','WeatherNext3-mean',wn_run)]:
+        frame = timeline[['valid_at',prefix+'_lead_hours',prefix+'_value']].rename(
+            columns={prefix+'_lead_hours':'lead_hours',prefix+'_value':'value'}).dropna()
+        frame['run_id'] = run['id']
+        frame['provider'] = provider
+        frame['issued_at'] = utc_now(run['issued_at'])
+        frame['retrieved_at'] = utc_now(run['retrieved_at'])
+        frame['location_id'] = 0
+        frame['station_id'] = ''
+        frame['station'] = ''
+        frames.append(frame)
+    rows = pd.concat(frames, ignore_index=True)
+    rows = rows[(rows.lead_hours >= 0) & (rows.issued_at < rows.valid_at)]
+    paired = pair_forecasts(rows, now)
+    elapsed = past_rows(timeline, now)
+    return elapsed[elapsed.valid_at.isin(paired.valid_at)].dropna(subset=['met_abs_error','wn_abs_error'])

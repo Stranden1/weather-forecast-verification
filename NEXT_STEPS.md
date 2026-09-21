@@ -1,6 +1,6 @@
 # Next steps
 
-_Updated 2026-09-17_
+_Updated 2026-09-22_
 
 The temperature/wind dashboard, fair Overall Accuracy and Model Disagreement are
 complete. A newer WeatherNext run (15 September 18:00 UTC) is present in the live
@@ -39,3 +39,13 @@ operational scoring still requires collection before target. Continue gathering
 more model cycles before treating small MAE differences as stable conclusions.
 Keep the verification table with the authoritative database and retain the local
 manifests as audit evidence. No further UI work is pending for this request.
+
+
+## Front-page usability: complete
+
+Automatic fair pairing and compact healthy collection status are complete and
+validated. Use Comparison → Manual runs for independent inspection; the chosen
+automatic runs and actual match counts remain visible. No scientific scoring or
+collection changes are pending from this task. Continue normal collection and
+use existing health details for any active failure. Local front-page validation
+evidence is retained under work/auto-pair/.
