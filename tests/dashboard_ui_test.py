@@ -65,6 +65,22 @@ with tempfile.TemporaryDirectory() as folder:
             valid=iso(long_init+timedelta(hours=hour))
             con.execute('INSERT INTO forecasts(run_id,valid_at,lead_hours,air_temperature) VALUES(?,?,?,?)',(run,valid,hour,8))
             con.execute('INSERT INTO observations(location_id,source_id,observed_at,air_temperature) VALUES(?,?,?,?)',(1,'SN68860',valid,6))
+        # Rainfall is stored at different raw timestamps, but the same physical hour.
+        for run_id,provider,age in [(200,'MET',56),(201,'WeatherNext3-mean',54),
+                                    (202,'MET',18),(203,'WeatherNext3-mean',16)]:
+            issue=now-timedelta(hours=age)
+            con.execute('INSERT INTO forecast_runs VALUES(?,?,?,?,?)',(run_id,provider,1,iso(issue),iso(issue)))
+            for ago,value in [(3,0.0),(2,0.8)]:
+                end=now-timedelta(hours=ago)
+                valid=end-timedelta(hours=1) if provider=='MET' else end
+                con.execute('INSERT INTO forecasts(run_id,valid_at,lead_hours,precipitation_1h) VALUES(?,?,?,?)',
+                            (run_id,iso(valid),(valid-issue).total_seconds()/3600,value if provider=='MET' else None))
+                if provider!='MET':
+                    con.execute('INSERT INTO weathernext_samples VALUES(?,?,?,?,?,?,?,?,?,?)',
+                                (run_id,iso(valid),'precipitation_1h','mean',value+0.2,'rain-fixture',63,10,iso(issue),'mm'))
+        for ago,value in [(3,0.0),(2,1.0)]:
+            con.execute('UPDATE observations SET precipitation_1h=? WHERE location_id=1 AND observed_at=?',
+                        (value,iso(now-timedelta(hours=ago))))
         before=list(con.iterdump())
     app=AppTest.from_file(str(root/'app.py'),default_timeout=30).run()
     check(app)
@@ -187,6 +203,45 @@ with tempfile.TemporaryDirectory() as folder:
     assert app.selectbox(key='met_run_1').value==2
     assert app.selectbox(key='wn_run_1').value==3
     assert app.selectbox(key='comparison_mode').value=='Manual runs'
+    app.selectbox(key='forecast_variable').set_value('precipitation_1h').run()
+    app.selectbox(key='comparison_mode').set_value('Automatic fair pair').run()
+    check(app)
+    assert app.selectbox(key='met_run_1').value==202
+    assert app.selectbox(key='wn_run_1').value==203
+    assert any(m.label=='Yr event skill · CSI' for m in app.metric)
+    assert any('2 shared samples' in c.value and 'Evaluation period' in c.value for c in app.caption)
+    amounts=next(d.value for d in app.dataframe if 'Wet-hour MAE' in d.value.columns)
+    assert abs(amounts.loc['Yr/MET','Wet-hour MAE']-0.2)<1e-9
+    assert any('all-hour MAE can reward' in c.value for c in app.caption)
+    assert any('Event skill · CSI %' in d.value.index for d in app.dataframe)
+    app.selectbox(key='comparison_mode').set_value('Manual runs').run()
+    app.selectbox(key='met_run_1').set_value(200).run()
+    check(app)
+    assert any('These manual runs' in i.value for i in app.info)
+    assert any('No fair shared hourly precipitation' in i.value for i in app.info)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.run()
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_variable').set_value('precipitation_1h').run()
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_station').set_value(None).run()
+    check(app)
+    assert app.selectbox(key='rain_horizon').value=='12–24h'
+    assert any('2 shared samples' in c.value and '1 stations' in c.value for c in app.caption)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='rain_horizon').set_value('48–72h').run()
+    check(app)
+    assert any('partial coverage' in c.value and '54.0' in c.value and '52.0' in c.value for c in app.caption)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='rain_horizon').set_value('0–12h').run()
+    check(app)
+    assert any('0 shared samples' in c.value for c in app.caption)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='rain_horizon').set_value('12–24h').run()
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_station').set_value(2).run()
+    check(app)
+    assert any('No fair shared hourly precipitation' in i.value for i in app.info)
     with database.connect() as con:
         assert before==list(con.iterdump()),'Dashboard changed fixture history'
     print('Expanded UI passed: automatic/manual/no-fair pairing, collapsed healthy state, resolved gaps, active Yr failures, verified retrospective horizons/periods/counts/empty filters, wind, shared accuracy filters/empty states, disagreement drill-through, zero DB writes; station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')

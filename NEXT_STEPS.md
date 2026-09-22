@@ -8,10 +8,9 @@ history; the earlier first-new-cycle follow-up is satisfied by stored data.
 
 1. Accumulate more paired model cycles before drawing conclusions; use shared counts
    and one lead bucket when assessing daily changes.
-2. In a separate task, add precipitation scoring only after implementing the
-   canonical interval-end join (`Frost T = WeatherNext T = Yr valid_at + 1h`),
-   identical observed targets, comparable lead buckets, and collected-before-valid
-   eligibility. Pressure, direction and cloud cover still require observed ground truth.
+2. Hourly precipitation scoring is implemented. Continue gathering independent
+   rain events and reviewing wet-hour/event metrics alongside all-hour MAE.
+   Pressure, direction and cloud cover still require observed ground truth.
 3. Revalidate wind height/unit metadata when changing the station network or collectors.
 4. The validated dashboard/backfill/collection-health work is grouped in a local
    Git checkpoint. Push it when desired; keep runtime data and provenance manifests local.
@@ -49,3 +48,26 @@ automatic runs and actual match counts remain visible. No scientific scoring or
 collection changes are pending from this task. Continue normal collection and
 use existing health details for any active failure. Local front-page validation
 evidence is retained under work/auto-pair/.
+
+
+## Precipitation analysis complete — 2026-09-22
+
+Read work/precipitation-benchmark/REPORT.md before a separately requested rainfall
+scoring/view implementation. Preserve canonical end targets, issue/retrieval
+before interval start, comparable leads and error-independent deduplication.
+Show wet-hour accuracy and event counts alongside all-hour MAE, actual dates and
+sample counts. Expose empty 0–12h and partial 48–72h coverage. Continue accumulating
+independent weather events and reviewing station biases; do not shift timestamps
+to optimize scores. No implementation or further analysis is pending in this task.
+
+
+## Production precipitation complete — 2026-09-22
+
+Use Hourly precipitation in Forecast vs Actual or Overall accuracy. Existing
+station, period and lead filters apply; observed dates/counts and partial coverage
+are explicit. No implementation remains for this request. Preserve the canonical
+interval and shared matcher if extending this later. Longer accumulations,
+calibration, probability scoring, new providers/stations remain outside scope.
+The worktree began with four uncommitted benchmark documentation updates; those
+are preserved. This task remains uncommitted under the clean-start checkpoint
+condition. No automatic push.

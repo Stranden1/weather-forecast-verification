@@ -45,9 +45,9 @@ _Updated 2026-09-22_
   WeatherNext `end_time = T`, and Yr/MET `valid_at + 1h = T`. Never compare Yr's
   raw `valid_at` directly to the Frost precipitation timestamp.
 - Request Frost precipitation only for active stations registered with the exact
-  supported element. Keep rainfall scoring disabled until the canonical mapping,
-  forecast availability, identical targets, and comparable leads are enforced in
-  the scoring path.
+  supported element. Production rainfall scoring now enforces the canonical
+  mapping, availability before interval start, identical targets and comparable
+  leads; see the production decision below.
 
 - GitHub stores code history privately; keep separate local database/credential backups.
 - config/stations.json is a metadata snapshot only. The live database remains authoritative.
@@ -146,3 +146,37 @@ _Updated 2026-09-22_
 - Healthy status uses text plus a single summary line; source details and resolved
   recent gaps stay collapsed. Active source problems and stale Yr warnings stay
   visible. Do not change health thresholds or source-completion logging.
+
+
+## Exploratory precipitation analysis — 2026-09-22
+
+- Keep this benchmark outside production scoring/dashboard; no data edits.
+- Use canonical interval-end leads for both models and require original issue
+  and metric retrieval strictly before interval start. WeatherNext rainfall uses
+  normalized mean samples and sample-level retrieval timestamps.
+- Requested [0,12)/[12,24)/[24,48)/[48,72)h summaries retain existing bucket equality
+  as an additional conservative condition, <=3h gaps and the existing closest-gap/
+  newest-run tie order. Deduplicate once per station/end/requested bucket.
+- Wet is >0.1mm per hour, dry/non-event <=0.1mm. Retain amount, wet-only and event
+  results separately; no composite. Empty buckets have no score. Partial coverage
+  is explicit. Never choose timestamp alignment or forecast pairs using errors.
+- The local report supports cautious future implementation, not a stable model
+  ranking. Production rainfall remains disabled; analysis artifacts stay ignored.
+
+
+## Production precipitation verification — 2026-09-22
+
+- Promote the validated read-only rainfall adapter into scoring/precipitation.py;
+  share its pair_rows path across overall, automatic and manual selected-run
+  scoring. It calls existing pair_forecasts rather than copying its pair order.
+- Keep benchmark's additional same precipitation-bucket check, strict availability
+  before interval start, canonical end leads, and sample-level WN retrieval.
+- Centralize >0.1mm/hour wet threshold; amount, wet-hour and POD/FAR/CSI results
+  accompany each other. Undefined rates are missing. No winner or weather score.
+- Integrate existing variable/station/period/lead patterns. Dynamic actual lead
+  ranges expose partial 48–72h coverage. Plot interval-end hourly amounts without
+  adding uncertainty work, accumulation scoring or probability calibration.
+- Temperature/wind, long-range and disagreement behavior remain unchanged.
+  No data/schema, collector, schedule or station-network changes.
+- Preserve existing benchmark document edits; clean-start commit condition was
+  not met, so leave validated work uncommitted. No push requested.

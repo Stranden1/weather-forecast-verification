@@ -23,7 +23,9 @@ Collection is limited to active stations registered in `observation_sources` for
 observation key and UPSERT path make repeated collection idempotent and merge
 precipitation without replacing temperature or wind.
 
-Precipitation scoring and dashboard charts remain disabled. A future scoring
-change must apply the canonical interval-end mapping, identical observed targets,
-comparable lead-time rules, and the existing collected-before-valid-time rule.
+Production scoring and dashboard views now use this canonical interval-end mapping.
+Both issue and local metric retrieval precede interval START, with comparable
+end leads and identical observations. Wet is strictly >0.1 mm/hour. All-hour
+MAE is accompanied by wet-hour and POD/FAR/CSI context; see SCORING.md for the
+complete eligibility, deduplication and metric definitions.
 

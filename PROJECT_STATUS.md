@@ -18,10 +18,10 @@ Streamlit dashboard are operational.
   precipitation observations.
 - Collects 360-hour WeatherNext forecasts for the shared station network,
   including means, percentiles, precipitation, wind components, and pressure.
-- Shows a compact Forecast vs Actual temperature/wind view with automatic fair
+- Shows a compact Forecast vs Actual temperature/wind/hourly precipitation view with automatic fair
   run pairing and optional advanced manual selection,
   WeatherNext p10–p90 uncertainty, elapsed Frost observations, errors, and MAE.
-- Shows station metadata/maps, overall temperature and wind accuracy, and
+- Shows station metadata/maps, overall temperature, wind and hourly precipitation accuracy, and
   WeatherNext collection status/history.
 - Shows compact collection health for Yr/MET, WeatherNext, and Frost using
   completed retrieval timestamps, age, and conservative OK/Delayed/Stale states.
@@ -45,7 +45,7 @@ Streamlit dashboard are operational.
 
 ## Validation
 
-All 59 unit/regression tests pass. Front-page automatic/manual/no-pair behavior,
+All 69 unit/regression tests pass. Front-page automatic/manual/no-pair behavior,
 compact health states and existing pages pass fixture UI and live render checks. The compact retrospective and collection-health views also passed
 fixture interaction tests and a live browser check. The additive verification
 table contains 4,400 historical points; registration preserved all prior data. Historical temperature ingestion was repeated
@@ -56,8 +56,8 @@ also pass. Existing dependency deprecation warnings are non-fatal.
 ## Known limits
 
 - Fair comparisons require shared exact-time observations and forecast leads within 3 hours in the same bucket; initial overlapping history is short.
-- Frost and WeatherNext rainfall are stored and the one-hour interval mapping is
-  validated, but rainfall scoring remains deliberately disabled.
+- Hourly precipitation scoring is enabled with canonical intervals and wet/event
+  context. Short leads currently have no fair samples; 48–72h coverage is partial.
 
 ## Frost hourly precipitation — 2026-09-16
 
@@ -171,3 +171,33 @@ source delays/failures and stale Yr warnings remain prominent; resolved recent g
 remain in details. Thresholds, logging, collectors, schema and history are unchanged.
 The existing dashboard process was restarted once to clear stale Python imports;
 no scheduled collection task was changed or restarted.
+
+
+## Exploratory precipitation benchmark — 2026-09-22
+
+Read-only analysis completed; precipitation production scoring remains disabled.
+The snapshot has 17,160 Frost rainfall hours at 29 stations. Fair 12–24/24–48/
+partial 48–72h sample counts are 3,116/4,244/3,359; 0–12h is empty under strict
+availability and same-bucket rules. Both issue and collection precede interval
+start; canonical interval mapping and <=3h lead gaps are preserved. Yr has lower
+all-hour MAE, WeatherNext lower wet-hour MAE and more hits but more false alarms.
+Dry hours dominate; only one week is paired. Data structure/alignment supports
+careful future implementation, not a stable winner claim. Full local evidence:
+work/precipitation-benchmark/REPORT.md. No production code or data changes.
+
+
+## Production precipitation — 2026-09-22
+
+Hourly precipitation is available in the existing Forecast vs Actual and Overall
+accuracy selectors. Automatic/manual comparisons share one fair precipitation
+matcher, reusing the established closest-lead infrastructure. Charts align Yr,
+WeatherNext mean and Frost to physical interval end; no rainfall uncertainty band.
+Wet-hour MAE, all-hour MAE, bias, POD, FAR and CSI appear with counts/dates and
+actual lead ranges. Dry-hour context is shown once per view; no winner/combined score.
+
+Read-only snapshot 2026-09-22 16:24 UTC: 0/3,232/4,417/3,501 shared pairs in
+0–12/12–24/24–48/partial 48–72h, 29 stations in each populated bucket. The original
+10,719 benchmark pairs reproduce exactly; two additional fixed-period pairs are
+newly filled observations. Temperature/wind/long-range outputs are unchanged.
+69 unit tests and expanded fixture UI checks pass. No database, collector,
+schedule, station or secret changes. Only the dashboard process was restarted.

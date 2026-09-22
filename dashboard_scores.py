@@ -43,6 +43,9 @@ def utc_now(now=None):
 def load_forecast_rows(con, metric, start=None, end=None, location_id=None):
     if metric not in VARIABLES:
         raise ValueError("Unsupported metric")
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import load_rows
+        return load_rows(con, start, end, location_id)
     where = [f"f.{metric} IS NOT NULL", "l.active=1", "r.provider IN ('MET','WeatherNext3-mean')", "f.lead_hours>=0"]
     params = []
     for operator, value in ((">=", start), ("<=", end)):
@@ -98,7 +101,11 @@ def pair_forecasts(rows, now=None, latest_only=False, deduplicate=True):
 def load_shared_pairs(con, metric, days=7, location_id=None, now=None):
     now = utc_now(now)
     start = None if days is None else now - pd.Timedelta(days=days)
-    pairs = pair_forecasts(load_forecast_rows(con, metric, start, now, location_id), now)
+    matcher = pair_forecasts
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import pair_rows
+        matcher = pair_rows
+    pairs = matcher(load_forecast_rows(con, metric, start, now, location_id), now)
     return _with_exact_observations(con, pairs, metric, now)
 
 
@@ -114,10 +121,17 @@ def _with_exact_observations(con, pairs, metric, now):
     observations.valid_at = pd.to_datetime(observations.valid_at, utc=True, format="mixed")
     grouped = observations.groupby(["location_id", "valid_at"]).actual_value.agg(["min", "max"]).reset_index()
     grouped = grouped[grouped["min"] == grouped["max"]].rename(columns={"min": "actual_value"})
-    return pairs.merge(grouped[["location_id", "valid_at", "actual_value"]], on=["location_id", "valid_at"], how="inner")
+    matched = pairs.merge(grouped[["location_id", "valid_at", "actual_value"]], on=["location_id", "valid_at"], how="inner")
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import clean_observed_pairs
+        matched = clean_observed_pairs(matched)
+    return matched
 
 
 def shared_accuracy(pairs, metric):
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import summary
+        return summary(pairs)
     return accuracy_board(paired_score_rows(pairs), metric)
 
 
@@ -245,7 +259,11 @@ def automatic_run_pair(con, location_id, metric="air_temperature", window="72 h"
     rows = load_forecast_rows(con, metric, location_id=location_id)
     starts = rows.groupby('run_id').valid_at.min()
     rows = rows[(rows.issued_at < rows.valid_at) & (rows.issued_at <= now) & (rows.retrieved_at <= now)]
-    pairs = pair_forecasts(rows, now, deduplicate=False)
+    matcher = pair_forecasts
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import pair_rows
+        matcher = pair_rows
+    pairs = matcher(rows, now, deduplicate=False)
     if hours is not None and not pairs.empty:
         starts_pair = pd.concat([pairs.met_run_id.map(starts), pairs.wn_run_id.map(starts)], axis=1).min(axis=1)
         pairs = pairs[pairs.valid_at <= starts_pair + pd.Timedelta(hours=hours)]
@@ -282,10 +300,13 @@ def automatic_run_pair(con, location_id, metric="air_temperature", window="72 h"
     return {'pair': result, 'reason': reason}
 
 
-def selected_run_pairs(timeline, met_run, wn_run, now=None):
+def selected_run_pairs(timeline, met_run, wn_run, now=None, metric="air_temperature"):
     """Expose the same operational fair matcher to selected-run UI summaries."""
     from forecast_comparison import past_rows
     now = utc_now(now)
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import selected_pairs
+        return selected_pairs(timeline, met_run, wn_run, now)
     frames = []
     for prefix, provider, run in [('met','MET',met_run), ('wn','WeatherNext3-mean',wn_run)]:
         frame = timeline[['valid_at',prefix+'_lead_hours',prefix+'_value']].rename(

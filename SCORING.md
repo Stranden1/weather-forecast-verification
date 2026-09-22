@@ -8,7 +8,7 @@ _Audited 2026-09-16; dashboard reads only, no schema or collector changes._
 | --- | --- | --- | --- | --- |
 | Temperature | Yes, °C | Mean + percentiles, °C | Present value, °C | Enabled at exact matching timestamps |
 | Wind speed | Yes, m/s at 10 m | Mean + percentiles, m/s at 10 m | Preceding 10-minute mean, m/s | Enabled at exact matching timestamps; gridded vs station representativeness remains a limitation |
-| Precipitation | Next-hour mm | Hourly mm in normalized samples | No collected values | Disabled; accumulation alignment not validated |
+| Precipitation | Next-hour mm, shifted to interval end for comparison | Hourly normalized mean, mm | Hourly sum ending at referenceTime | Enabled with amount, wet-hour and event metrics; see rules below |
 | Sea-level pressure | Not retained by current MET collector | hPa | Not collected | Disabled |
 | Wind direction / u,v | MET direction not retained | u/v means stored | Not collected | Disabled; any future direction scoring must use circular differences |
 | Cloud cover | Not retained | Not collected by current collector | Not collected | Disabled |
@@ -130,3 +130,85 @@ window. Manual mode can still inspect unfair pairs, whose shared MAE remains emp
 with an explanation. Overall Accuracy, Long-range temperature and Model disagreement
 results were compared with the committed implementation on the same live read-only
 snapshot and remained unchanged. Health changes are presentation only.
+
+
+## Production hourly precipitation — 2026-09-22
+
+Available in Forecast vs Actual and Overall accuracy through the existing variable
+selector. Temperature, wind and long-range temperature rules are unchanged.
+Model disagreement retains its temperature/wind scope. No schema/data migration.
+
+### Physical interval and shared eligibility
+
+A target T means the same physical hour [T−1h,T): Frost `referenceTime = T` for
+`sum(precipitation_amount PT1H)`; WeatherNext `end_time = T`; Yr next_1_hours
+`valid_at = T−1h`. Shift only Yr's comparison timestamp +1h, never stored history.
+Both lead times are measured to interval END, so Yr's native stored lead gains 1h.
+WeatherNext values come from normalized precipitation_1h mean samples in mm;
+sample-level retrieved_at (not a potentially earlier run timestamp) is authoritative.
+
+Both original issue and local metric retrieval must be strictly BEFORE interval
+START. No precipitation historical-availability exception. Invalid/nonfinite or
+negative amounts, wrong WeatherNext units, off-hour targets and inconsistent
+stored leads are excluded. Frost timestamps join exactly; identical duplicates
+count once and conflicting values are omitted. No interpolation or shifted-score
+optimization. Future observed intervals never enter verification.
+
+`scoring.precipitation.pair_rows` calls the existing operational `pair_forecasts`:
+same original operational bucket and maximum 3h lead gap. It additionally requires
+both canonical end leads in the same precipitation bucket: [0,12), [12,24),
+[24,48), [48,72) hours. Sort by smallest gap, then newest WeatherNext issue,
+newest Yr issue and stable run IDs; deduplicate once per station/end/rain bucket.
+This reproduces the conservative benchmark. Neither amounts/errors nor event
+outcomes select the pair. Automatic run selection uses this same eligibility,
+then the existing newest-useful-whole-run rule. Manual selected-run summaries
+use the same precipitation matcher and displayed chart window.
+
+### Amount and event metrics
+
+Amounts are mm over one hour (displayed mm/h). `WET_THRESHOLD = 0.1` is centralized
+in scoring/precipitation.py. A wet observation/prediction is strictly >0.1;
+exactly 0.1 is a dry/non-event value for this classification.
+
+- All-hour MAE: mean absolute forecast minus observed amount on shared targets.
+- Bias: mean forecast minus observed amount.
+- Wet-hour MAE: the same error, restricted to OBSERVED wet hours for both models.
+- Hit: observed wet and forecast wet. Miss: observed wet, forecast dry.
+- False alarm: observed dry, forecast wet. Correct dry: both dry.
+- POD = hits / (hits + misses): fraction of observed rainy hours detected.
+- FAR = false alarms / (hits + false alarms): fraction of predicted rainy hours
+  that were false; not the false-positive rate among observed dry hours.
+- CSI = hits / (hits + misses + false alarms): ignores correct-dry hours and
+  penalizes both misses and false alarms. It is a rain-event metric, not a
+  combined weather score or probability calibration measure.
+
+Undefined rates and empty wet/all-hour MAE are missing (—), never a perfect zero.
+Dry hours dominated the benchmark; always-zero rain had lower all-hour MAE than
+both providers while missing all rain. Therefore all-hour MAE is always shown
+with wet-hour and event context. No winner is displayed. WeatherNext ensemble
+mean thresholding does not estimate calibrated rain probabilities.
+
+### Display scope and limits
+
+Overall accuracy reuses station/all-stations, period and lead filters. It shows
+shared count, station count, exact matched dates, actual provider lead ranges,
+wet/dry counts, amount metrics and a compact POD/FAR/CSI table. Counts are in
+expandable details. Forecast vs Actual plots three hourly amounts at canonical
+interval ends; uncertainty bands are omitted for precipitation.
+
+The 0–12h bucket currently has no fair samples. The 48–72h bucket is PARTIAL:
+actual current Yr leads 50.34–56.50h and WeatherNext 48–54h. Display ranges are
+computed from selected matches, not hardcoded to 56h. Targets may recur across
+buckets; no significance claim follows from raw pair count. Roughly one week,
+29/50 stations, spatial gauge/grid differences and about 2.45h unequal leads
+remain important limitations. No 6h/24h accumulation or calibration is enabled.
+
+### Validation
+
+All 10,719 original saved benchmark pairs were reproduced, including run IDs,
+canonical targets, leads, predictions and actuals. A fixed overlap ending
+2026-09-22 10:00 UTC contains two additional pairs from newly filled Frost
+observations absent in the saved observation snapshot; no original pair changed.
+Live results and the unchanged temperature/wind/long-range audit are retained in
+work/precipitation-production/. Production browsing and audits use read-only
+connections; no collector, schedule, station or historical-data changes.

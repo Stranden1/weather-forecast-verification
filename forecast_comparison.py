@@ -9,7 +9,8 @@ MET_PROVIDER = "MET"
 WEATHERNEXT_PROVIDER = "WeatherNext3-mean"
 from scoring.scorer import BANDS as LEAD_BINS, LABELS as LEAD_LABELS
 
-VARIABLES = {"air_temperature": ("Temperature", "°C"), "wind_speed": ("Wind speed", "m/s")}
+VARIABLES = {"air_temperature": ("Temperature", "°C"), "wind_speed": ("Wind speed", "m/s"),
+             "precipitation_1h": ("Hourly precipitation", "mm/h")}
 
 
 def comparison_stations(con: sqlite3.Connection) -> list[dict]:
@@ -44,6 +45,9 @@ def load_timeline(con, location_id, met_run_id, wn_run_id, metric="air_temperatu
     """Exact valid-time observations only; never average future sub-hour readings."""
     if metric not in VARIABLES:
         raise ValueError("Unsupported metric")
+    if metric == 'precipitation_1h':
+        from scoring.precipitation import load_timeline as rainfall_timeline
+        return rainfall_timeline(con, location_id, met_run_id, wn_run_id)
     frames = []
     for prefix, run_id in (("met", met_run_id), ("wn", wn_run_id)):
         frame = pd.read_sql_query(f"""

@@ -348,3 +348,104 @@ Evidence is local under work/auto-pair/ (tests, live example, unchanged-score au
 and screenshot). Worktree was clean before this bounded task; only related source,
 tests and handoff documentation are included in its checkpoint. No push requested.
 Remaining: none for this task. Existing dependency deprecation warnings are non-fatal.
+
+
+## Read-only precipitation benchmark — 2026-09-22
+
+Complete: canonical interval-end verification on a read-only/query-only SQLite
+snapshot. No production code, dashboard, database, collector, schedule or secret
+change. Current Frost: 17,160 hourly values, 29 stations, 2,943 non-zero.
+Fair shared counts at 0–12/12–24/24–48/48–72h: 0/3,116/4,244/3,359.
+The final bucket only covers Yr 50.34–56.50h and WeatherNext 48–54h.
+Both forecasts issued and retrieved before interval start, leads to the same end,
+same existing AND requested buckets, gap <=3h; error-independent deduplication.
+There are 4,534 distinct station/hour targets across 10,719 bucket pairs.
+
+Yr all-hour MAE 0.171/0.167/0.162mm vs WeatherNext 0.186/0.185/0.180mm.
+WeatherNext wet-hour MAE and detection are better, with substantially more false
+alarms. Dry/non-event observations are 84–86%; always-zero MAE beats both models
+in this short sample. All-hour MAE alone is misleading. No numeric/duplicate/
+source/timestamp corruption found; station biases and timing sensitivity remain
+limitations. No justified change to the canonical one-hour mapping.
+
+13 existing alignment/fair-pair tests passed; all matched intervals verified with
+canonical helpers, scalar MAE and event counts reconciled. Full method, counts,
+amount/event tables, five cases, station and lag checks, readiness assessment and
+CSV evidence: work/precipitation-benchmark/REPORT.md (local ignored evidence).
+Ready for a separately requested implementation with explicit dates/counts and
+wet/event context; insufficient history for a stable general model ranking.
+Remaining: none for this analysis. No commit or push; only handoff docs changed.
+
+
+## Production hourly precipitation checkpoint — 2026-09-22
+
+Complete: first-class precipitation in Forecast vs Actual and Overall accuracy.
+The new bounded scoring/precipitation.py adapter reads existing tables, shifts
+Yr to physical interval end, uses WN sample-level retrievals, validates amounts/
+units/leads, and calls the existing pair_forecasts infrastructure. All rainfall
+summaries and automatic/manual selection share its eligibility. Both issue and
+retrieval strictly precede interval start; same existing + rainfall buckets,
+<=3h gap; closest leads/newest run ties; no error-dependent pair selection.
+
+Central wet threshold is >0.1mm/hour. Production exposes all-hour MAE, wet-hour
+MAE, bias and hit/miss/false-alarm/correct-dry counts, POD, FAR and CSI. Undefined
+rates are missing. The dashboard puts wet MAE/event skill in context, with a
+compact amount/event table, dry-hour note, actual dates/counts/stations/leads,
+empty 0–12h state and dynamic partial 48–72h label. Three forecast/actual amount
+series are aligned to the physical hour; rainfall uncertainty is omitted.
+
+Current all-history snapshot 2026-09-22 16:24 UTC, 29 stations per populated bucket:
+- 0–12h: no samples/scores.
+- 12–24h: 3,232 pairs, 507 wet; Yr/WN MAE 0.166894/0.181293mm,
+  wet MAE 0.704339/0.584580mm; POD 0.654832/0.923077,
+  FAR 0.492355/0.621971, CSI 0.400483/0.366484.
+- 24–48h: 4,417 pairs, 659 wet; Yr/WN MAE 0.162825/0.180188mm,
+  wet MAE 0.692868/0.563616mm; POD 0.664643/0.908953,
+  FAR 0.508418/0.644932, CSI 0.393885/0.342873.
+- Partial 48–72h: 3,501 pairs, 485 wet; Yr/WN MAE 0.158983/0.175437mm,
+  wet MAE 0.792784/0.618118mm; POD 0.569072/0.892784,
+  FAR 0.535354/0.665895, CSI 0.343711/0.321217.
+  Actual Yr 50.34–56.50h / WN 48–54h, not full 72h coverage.
+
+Validation: all 69 unit/regression tests pass, including 10 new rainfall tests;
+fixture UI checks cover rainfall automatic/manual, amount/event context, filters,
+empty and partial buckets plus all previous pages and zero fixture DB writes.
+Live AppTest covers rainfall chart/accuracy/buckets and long-range/disagreement
+with every production DB connection forced read-only and .env unchanged. Browser
+rendering of rainfall chart and compact aggregate/partial views passed. Dashboard
+process alone was restarted to load modules; scheduled collection was untouched.
+
+All 10,719 original benchmark pairs, run IDs, leads and values match production
+on the fixed overlap ending 22 Sep 10:00 UTC. Two additional pairs at that endpoint
+come from newly filled Frost observations at FV17 Våg and Nyrud, absent from the
+saved benchmark snapshot. Temperature/wind and long-range outputs were identical
+to HEAD on the same read-only snapshot. No DB/schema, collector, station, schedule
+or secret changes. Statistical limits remain: short correlated history, unequal
+leads and gauge/grid representation. No winner/composite/calibration added.
+
+Evidence: work/precipitation-production/ (current/fixed CSVs, benchmark identity,
+new-observation audit, test logs, live read-only UI audit and screenshots).
+Remaining: none for this requested implementation. The four benchmark handoff
+files were already modified at start; preserved and extended. Clean-start commit
+condition was not met: no commit, staging or push. Existing deprecation warnings
+are non-fatal. Application remains runnable.
+
+
+## Precipitation Git checkpoint review — 2026-09-23
+
+Reviewed all 13 modified/new files: hourly precipitation scoring, canonical
+Forecast vs Actual, Overall accuracy, POD/FAR/CSI, associated tests and benchmark/
+production documentation. No unrelated or suspicious changes found. No application
+behavior, live database, credentials, collector or scheduled-task changes in this
+checkpoint task.
+
+Revalidation: all 69 unit/regression tests passed; the expanded dashboard fixture
+interaction suite passed, including rainfall filters, automatic/manual selection,
+partial/empty buckets, previous views and unchanged fixture history. Secret and
+runtime-file scans passed. Existing deprecation warnings are non-fatal.
+
+The user now explicitly authorized committing this previously uncommitted work.
+Checkpoint message: `Checkpoint hourly precipitation verification`. All reviewed
+source/tests/docs are included; local database, secrets, logs, screenshots and
+analysis evidence remain ignored. Nothing remains for this checkpoint task.
+No push requested or performed. Earlier uncommitted notes record prior task states.

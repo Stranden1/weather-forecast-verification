@@ -104,4 +104,4 @@ class SharedAccuracyTests(unittest.TestCase):
 
     def test_unvalidated_metric_rejected(self):
         with self.assertRaises(ValueError):
-            load_shared_pairs(self.con,'precipitation_1h',now=self.now)
+            load_shared_pairs(self.con,'air_pressure_at_sea_level',now=self.now)
