@@ -449,3 +449,25 @@ Checkpoint message: `Checkpoint hourly precipitation verification`. All reviewed
 source/tests/docs are included; local database, secrets, logs, screenshots and
 analysis evidence remain ignored. Nothing remains for this checkpoint task.
 No push requested or performed. Earlier uncommitted notes record prior task states.
+
+
+## Optional accumulated precipitation checkpoint — 2026-09-23
+
+Completed: 6h fixed UTC and 24h UTC-day scoring in scoring/precipitation.py,
+with one run per provider, all exact aligned hours, strict pre-start issue
+and component retrieval, common start-lead buckets, <=3h lead gap and
+error-independent pair ordering. Central thresholds are >0.1/0.5/1.0 mm
+for 1h/6h/24h. Overall accuracy has a precipitation-only selector, default
+1h; Forecast vs Actual remains hourly. Counts, distinct periods, dates,
+amount/event metrics and actual lead ranges are shown.
+
+Fixed-snapshot production reproduction matches every benchmark pair and
+metric: 2,110 six-hour pairs / 796 distinct station periods, and 293
+daily pairs / 160 distinct station-days, 29 stations. The live read-only
+6h/24h dashboard render and fixture interaction checks passed. Focused
+aggregation tests cover complete boundaries, missing hours, run mixing,
+availability, threshold edges, metrics, lead pairing and read-only access.
+No database/schema, collector, station network, scheduled task or historical
+data change. The existing hourly checkpoint was pushed to origin/main
+before this work; the new implementation commit must remain local.
+Validation complete: all 76 regression tests, expanded fixture dashboard UI, live read-only 6h/24h render, fixed-snapshot pair/metric reproduction and git diff --check pass. No remaining implementation work. Create the local checkpoint commit; do not push the new commit.

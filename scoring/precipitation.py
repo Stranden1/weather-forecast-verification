@@ -8,6 +8,7 @@ import pandas as pd
 
 METRIC = 'precipitation_1h'
 WET_THRESHOLD = 0.1  # mm in a physical one-hour interval; wet is strictly greater.
+WET_THRESHOLDS = {1: WET_THRESHOLD, 6: 0.5, 24: 1.0}
 BANDS = [0, 12, 24, 48, 72]
 LABELS = ['0–12h', '12–24h', '24–48h', '48–72h']
 DRY_CONTEXT = ('Most observed hours are dry, so all-hour MAE can reward forecasts that '
@@ -122,13 +123,13 @@ def selected_pairs(timeline, met_run, wn_run, now):
     return pairs
 
 
-def metrics(pairs):
+def metrics(pairs, threshold=WET_THRESHOLD):
     """Shared amount/event metrics. Undefined rates/empty MAE are NaN, never zero."""
-    wet = pairs.actual_value > WET_THRESHOLD
+    wet = pairs.actual_value > threshold
     result = []
     for prefix, provider in [('met','Yr/MET'),('wn','WeatherNext')]:
         error = pairs[prefix+'_value']-pairs.actual_value
-        rain = pairs[prefix+'_value'] > WET_THRESHOLD
+        rain = pairs[prefix+'_value'] > threshold
         hits = int((rain & wet).sum()); misses = int((~rain & wet).sum())
         false = int((rain & ~wet).sum()); dry = int((~rain & ~wet).sum())
         ratio = lambda n,d: n/d if d else float('nan')
@@ -140,15 +141,96 @@ def metrics(pairs):
     return pd.DataFrame(result)
 
 
-def summary(pairs):
+def summary(pairs, accumulation_hours=1):
     """Four explicit buckets, including empty buckets and actual lead coverage."""
     result = []
     for label in LABELS:
         group = pairs[pairs.horizon == label]
-        for row in metrics(group).to_dict('records'):
+        for row in metrics(group, WET_THRESHOLDS[accumulation_hours]).to_dict('records'):
             row.update(horizon=label, stations=group.location_id.nunique(),
-                       period_start=group.valid_at.min(), period_end=group.valid_at.max(),
+                       period_start=(group.valid_at if accumulation_hours == 1 else group.period_start).min(), period_end=group.valid_at.max(),
                        yr_lead_min=group.met_lead_hours.min(), yr_lead_max=group.met_lead_hours.max(),
                        wn_lead_min=group.wn_lead_hours.min(), wn_lead_max=group.wn_lead_hours.max())
             result.append(row)
     return pd.DataFrame(result)
+
+
+
+
+def load_accumulated_pairs(con, accumulation_hours, days=None, location_id=None, now=None):
+    """Complete non-overlapping UTC periods, one run per provider.
+
+    Pair leads are to period START. Both issues and every component retrieval
+    precede that start. The existing hourly matcher remains independent.
+    """
+    if accumulation_hours not in (6, 24):
+        raise ValueError('Accumulation must be 6 or 24 hours')
+    from dashboard_scores import utc_now
+
+    now = utc_now(now)
+    cutoff = None if days is None else now - pd.Timedelta(days=days)
+    duration = pd.Timedelta(hours=accumulation_hours)
+    rows = load_rows(con, start=None if cutoff is None else cutoff - duration, end=now, location_id=location_id)
+    # An end at 06/12/18/00 belongs to the preceding physical period.
+    rows['period_start'] = (rows.valid_at - pd.Timedelta(nanoseconds=1)).dt.floor(f'{accumulation_hours}h')
+    rows = rows[(rows.valid_at > rows.period_start)
+                & (rows.valid_at <= rows.period_start + duration)
+                & (rows.issued_at < rows.period_start)
+                & (rows.retrieved_at < rows.period_start)]
+    if cutoff is not None:
+        rows = rows[rows.period_start + duration >= cutoff]
+    grouped = rows.groupby(['location_id', 'station_id', 'station', 'provider',
+                            'period_start', 'run_id', 'issued_at'], observed=True)
+    runs = grouped.agg(component_count=('valid_at', 'size'),
+                       unique_hours=('valid_at', 'nunique'),
+                       first_end=('valid_at', 'min'), last_end=('valid_at', 'max'),
+                       total=('value', 'sum'), latest_retrieval=('retrieved_at', 'max')).reset_index()
+    runs = runs[(runs.component_count == accumulation_hours)
+                & (runs.unique_hours == accumulation_hours)
+                & (runs.first_end == runs.period_start + pd.Timedelta(hours=1))
+                & (runs.last_end == runs.period_start + duration)].copy()
+    runs['lead_hours'] = (runs.period_start - runs.issued_at).dt.total_seconds() / 3600
+
+    observed = pd.read_sql_query('''SELECT o.location_id, o.observed_at AS valid_at,
+        o.precipitation_1h AS actual_value FROM observations o
+        JOIN locations l ON l.id=o.location_id WHERE l.active=1
+        AND o.precipitation_1h IS NOT NULL
+        AND (? IS NULL OR o.location_id=?)''', con, params=(location_id, location_id))
+    observed.valid_at = pd.to_datetime(observed.valid_at, utc=True, format='mixed', errors='coerce')
+    observed = clean_observed_pairs(observed)
+    grouped_obs = observed.groupby(['location_id', 'valid_at']).actual_value.agg(
+        ['min', 'max', 'size']).reset_index()
+    unique = grouped_obs[grouped_obs['min'] == grouped_obs['max']].rename(
+        columns={'min': 'actual_value'})
+    unique['period_start'] = (unique.valid_at - pd.Timedelta(nanoseconds=1)).dt.floor(f'{accumulation_hours}h')
+    unique = unique[(unique.valid_at <= now) & (unique.valid_at > unique.period_start)
+                    & (unique.valid_at <= unique.period_start + duration)]
+    if cutoff is not None:
+        unique = unique[unique.period_start + duration >= cutoff]
+    frost = unique.groupby(['location_id', 'period_start'], observed=True).agg(
+        component_count=('valid_at', 'size'), first_end=('valid_at', 'min'),
+        last_end=('valid_at', 'max'), actual_value=('actual_value', 'sum')).reset_index()
+    frost = frost[(frost.component_count == accumulation_hours)
+                  & (frost.first_end == frost.period_start + pd.Timedelta(hours=1))
+                  & (frost.last_end == frost.period_start + duration)]
+    keys = ['location_id', 'period_start']
+    parts = []
+    for provider, prefix in [('MET', 'met'), ('WeatherNext3-mean', 'wn')]:
+        part = runs[runs.provider == provider].drop(columns=['provider', 'station_id', 'station'])
+        parts.append(part.rename(columns={c: prefix+'_'+c for c in part.columns if c not in keys}))
+    pairs = frost[keys + ['actual_value']].merge(parts[0], on=keys).merge(parts[1], on=keys)
+    pairs['lead_gap'] = (pairs.met_lead_hours - pairs.wn_lead_hours).abs()
+    met_bucket = pd.cut(pairs.met_lead_hours, BANDS, labels=LABELS, right=False)
+    wn_bucket = pd.cut(pairs.wn_lead_hours, BANDS, labels=LABELS, right=False)
+    pairs = pairs[(pairs.lead_gap <= 3) & met_bucket.notna() & (met_bucket == wn_bucket)].copy()
+    pairs['horizon'] = met_bucket.loc[pairs.index]
+    pairs = pairs.sort_values(['lead_gap', 'wn_issued_at', 'met_issued_at',
+                               'met_run_id', 'wn_run_id'], ascending=[True, False, False, False, False])
+    pairs = pairs.drop_duplicates(['location_id', 'period_start', 'horizon']).reset_index(drop=True)
+    pairs['valid_at'] = pairs.period_start + duration
+    pairs['met_value'] = pairs.met_total
+    pairs['wn_value'] = pairs.wn_total
+    assert not pairs.duplicated(['location_id', 'period_start', 'horizon']).any()
+    assert (pairs.met_latest_retrieval < pairs.period_start).all()
+    assert (pairs.wn_latest_retrieval < pairs.period_start).all()
+    return pairs

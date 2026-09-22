@@ -33,7 +33,7 @@ from dashboard_scores import (load_shared_pairs, shared_accuracy, model_disagree
                               automatic_run_pair, selected_run_pairs)
 from scoring.scorer import paired_score_rows
 from scoring.precipitation import (METRIC as RAIN, LABELS as RAIN_LABELS,
-                                   WET_THRESHOLD, DRY_CONTEXT, metrics as rain_metrics)
+                                   WET_THRESHOLD, WET_THRESHOLDS, DRY_CONTEXT, metrics as rain_metrics)
 from collection_health import load_collection_health, yr_stale_warning
 from weathernext_status import load_weathernext_status
 
@@ -174,6 +174,59 @@ def precipitation_summary(pairs):
                    f"Wet observations and predictions are strictly >{WET_THRESHOLD} mm/h. Bias = forecast − observation. "
                    "WeatherNext ensemble mean; these are not rain probabilities. A target can recur across buckets.")
 
+
+def accumulated_precipitation_summary(pairs, hours):
+    """Compact verification of complete six-hour periods or UTC days."""
+    label = '6-hour periods' if hours == 6 else 'UTC days'
+    unit = 'mm/6h' if hours == 6 else 'mm/day'
+    if pairs.empty:
+        st.info(f"No fair shared complete {label} in this selection yet.")
+        st.caption("0 shared periods · 0 stations · Evaluation period: —")
+        return
+    stats = rain_metrics(pairs, WET_THRESHOLDS[hours]).set_index('provider')
+    distinct = pairs.drop_duplicates(['location_id', 'period_start']).shape[0]
+    st.caption(f"{len(pairs):,} shared period/lead pairs · {distinct:,} distinct station {label} · "
+               f"{pairs.location_id.nunique()} stations · "
+               f"Evaluation period (UTC): {pairs.period_start.min():%d %b %Y %H:%M} → "
+               f"{pairs.valid_at.max():%d %b %Y %H:%M}")
+    for lead, group in pairs.groupby('horizon', observed=True):
+        partial = ' · partial coverage' if (
+            lead == RAIN_LABELS[-1] and min(group.met_lead_hours.max(), group.wn_lead_hours.max()) < 71
+        ) else ''
+        st.caption(f"**{lead}{partial}**: actual leads to period start: "
+                   f"Yr {group.met_lead_hours.min():.1f}–{group.met_lead_hours.max():.1f} h · "
+                   f"WeatherNext {group.wn_lead_hours.min():.1f}–{group.wn_lead_hours.max():.1f} h")
+    left, right = st.columns(2)
+    with left:
+        st.markdown(f"**Accumulated amounts · {unit}**")
+        amounts = stats[['wet_mae','mae','bias']].rename(columns={
+            'wet_mae':'Wet-period MAE', 'mae':'MAE', 'bias':'Bias'})
+        st.dataframe(amounts.round(3), use_container_width=True, height=112, placeholder="—")
+    with right:
+        st.markdown(f"**Rain events · >{WET_THRESHOLDS[hours]} {unit}**")
+        events = (stats[['POD','FAR','CSI']].T * 100).rename(index={
+            'POD':'Rain detected · POD %', 'FAR':'False alarms · FAR %',
+            'CSI':'Event skill · CSI %'})
+        st.dataframe(events.round(1), use_container_width=True, height=140, placeholder="—")
+    st.caption(f"{int(stats.wet.iloc[0]):,} observed wet / {int(stats.dry.iloc[0]):,} dry {label} · "
+               "MAE: average amount error · Wet MAE: amount error on observed wet periods · "
+               "POD: observed rain detected · FAR: predicted rain that did not occur · "
+               "CSI: event skill ignoring correctly dry periods. Undefined rates are —.")
+    if hours == 24:
+        st.caption("Daily results are preliminary: few independent UTC days; the same day may appear in multiple lead buckets.")
+    else:
+        st.caption("A period may appear in multiple lead buckets; shared pair counts are not independent events.")
+    st.caption(DRY_CONTEXT)
+    with st.expander("Rain event counts and matching rules"):
+        st.dataframe(stats[['hits','misses','false_alarms','correct_dry']].rename(columns={
+            'hits':'Hits','misses':'Misses','false_alarms':'False alarms',
+            'correct_dry':'Correct dry'}), use_container_width=True)
+        st.caption(f"Fixed, non-overlapping UTC windows; all {hours} aligned Frost, Yr and WeatherNext "
+                   "hours required, with one complete run per provider. Both issues and all component "
+                   "retrievals precede the window start. Leads are to window start, in the same "
+                   "precipitation bucket and within 3 h. Closest leads then newest runs; forecast "
+                   "errors never select pairs. Missing hours are excluded, never zero-filled. "
+                   f"Wet is strictly >{WET_THRESHOLDS[hours]} {unit}. WeatherNext uses its ensemble mean.")
 
 def accuracy_chart(rows, metric):
     rows = rows.copy()
@@ -624,16 +677,23 @@ with accuracy_tab:
         accuracy_metric = c1.selectbox("Variable", list(VARIABLES), format_func=lambda m: VARIABLES[m][0], key="accuracy_variable")
         period = c2.selectbox("Period", ["24 h", "7 days", "30 days", "All available"], index=1, key="accuracy_period")
         station_id = c3.selectbox("Station", [None, *names], format_func=lambda sid: "All stations" if sid is None else names[sid], key="accuracy_station")
-        lead_options = RAIN_LABELS if accuracy_metric == RAIN else ["All buckets", *LEAD_LABELS]
+        lead_options = [*RAIN_LABELS, "All buckets"] if accuracy_metric == RAIN else ["All buckets", *LEAD_LABELS]
         lead_key = 'rain_horizon' if accuracy_metric == RAIN else 'accuracy_horizon'
         horizon = c4.selectbox("Lead time", lead_options, index=1 if accuracy_metric == RAIN else 0, key=lead_key)
+        accumulation_hours = 1
+        if accuracy_metric == RAIN:
+            accumulation = st.selectbox("Accumulation", ["1h", "6h", "24h"], key="rain_accumulation")
+            accumulation_hours = {"1h": 1, "6h": 6, "24h": 24}[accumulation]
         unit = VARIABLES[accuracy_metric][1]
         with connect() as con:
-            pairs = load_shared_pairs(con, accuracy_metric, {"24 h": 1, "7 days": 7, "30 days": 30, "All available": None}[period], station_id)
+            pairs = load_shared_pairs(con, accuracy_metric, {"24 h": 1, "7 days": 7, "30 days": 30, "All available": None}[period], station_id, accumulation_hours=accumulation_hours)
         if horizon != "All buckets":
             pairs = pairs[pairs.horizon == horizon]
         if accuracy_metric == RAIN:
-            precipitation_summary(pairs)
+            if accumulation_hours == 1:
+                precipitation_summary(pairs)
+            else:
+                accumulated_precipitation_summary(pairs, accumulation_hours)
         elif pairs.empty:
             st.info("No shared observations with comparable forecast leads in this selection yet.")
         else:

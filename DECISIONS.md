@@ -180,3 +180,20 @@ _Updated 2026-09-22_
   No data/schema, collector, schedule or station-network changes.
 - Preserve existing benchmark document edits; clean-start commit condition was
   not met, so leave validated work uncommitted. No push requested.
+
+
+## Optional accumulated precipitation — 2026-09-23
+
+- Keep canonical hourly scoring and Forecast vs Actual unchanged; offer
+  optional 6h/24h verification in Overall accuracy, with 1h default.
+- Use fixed UTC periods, all exact component hours, and one run per provider.
+  Exclude incomplete periods. Do not mix runs or fill absent hours with zero.
+- Measure both accumulated leads to period start. Both issues and every
+  sample retrieval must be before start. Require the same precipitation
+  start-lead bucket, a lead gap <=3h, and error-independent closest-lead/
+  newest-run ordering. Show actual lead ranges and distinct period counts.
+- Centralize strict wet thresholds >0.1 mm/hour, >0.5 mm/6h and >1 mm/day.
+  Keep MAE, bias, observed-wet MAE and event metrics separate; no winner score.
+- The local read-only benchmark is the validation reference. Its 2,110
+  six-hour and 293 daily pairs reproduce exactly at the fixed snapshot.
+  No schema, data, collector, station network or schedule change is needed.

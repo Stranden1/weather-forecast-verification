@@ -201,3 +201,19 @@ Read-only snapshot 2026-09-22 16:24 UTC: 0/3,232/4,417/3,501 shared pairs in
 newly filled observations. Temperature/wind/long-range outputs are unchanged.
 69 unit tests and expanded fixture UI checks pass. No database, collector,
 schedule, station or secret changes. Only the dashboard process was restarted.
+
+
+## Optional 6h/24h precipitation — 2026-09-23
+
+Overall accuracy now offers 1h (default), 6h UTC periods and 24h UTC-day
+precipitation verification. Complete Frost/Yr/WeatherNext hours and one
+available run per provider are required. The dashboard shows MAE, bias,
+observed-wet MAE, POD/FAR/CSI, actual lead ranges, dates and both shared
+pair and distinct-period counts. Forecast vs Actual stays hourly.
+
+The fixed 22 September 23:21 UTC benchmark reproduces exactly:
+2,110 six-hour period/lead pairs from 796 distinct station periods, and
+293 daily pairs from 160 distinct station-days, across 29 stations.
+The 6h 48–72h bucket is partial; no daily pair reaches it. These are
+preliminary correlated samples, not a provider ranking. No database,
+collector, station, schedule or historical-data change was made.

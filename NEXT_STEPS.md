@@ -71,3 +71,16 @@ calibration, probability scoring, new providers/stations remain outside scope.
 The worktree began with four uncommitted benchmark documentation updates; those
 are preserved. This task remains uncommitted under the clean-start checkpoint
 condition. No automatic push.
+
+
+## Optional accumulated precipitation complete — 2026-09-23
+
+Use Overall accuracy → Hourly precipitation → Accumulation to inspect
+1h, 6h or 24h. The hourly view remains default and Forecast vs Actual
+remains hourly. The 6h/24h views require complete fixed UTC periods and
+one available run per provider; compare shared counts, distinct periods,
+dates and actual leads before drawing conclusions. The current 24h
+sample has only 160 distinct station-days in the validated snapshot.
+Continue collecting independent rain events and model cycles. No further
+implementation is pending for this request; calibration, probabilities
+and new providers remain separate future work.

@@ -98,9 +98,12 @@ def pair_forecasts(rows, now=None, latest_only=False, deduplicate=True):
     return pairs.reset_index(drop=True)
 
 
-def load_shared_pairs(con, metric, days=7, location_id=None, now=None):
+def load_shared_pairs(con, metric, days=7, location_id=None, now=None, accumulation_hours=1):
     now = utc_now(now)
     start = None if days is None else now - pd.Timedelta(days=days)
+    if metric == 'precipitation_1h' and accumulation_hours != 1:
+        from scoring.precipitation import load_accumulated_pairs
+        return load_accumulated_pairs(con, accumulation_hours, days, location_id, now)
     matcher = pair_forecasts
     if metric == 'precipitation_1h':
         from scoring.precipitation import pair_rows
@@ -128,10 +131,10 @@ def _with_exact_observations(con, pairs, metric, now):
     return matched
 
 
-def shared_accuracy(pairs, metric):
+def shared_accuracy(pairs, metric, accumulation_hours=1):
     if metric == 'precipitation_1h':
         from scoring.precipitation import summary
-        return summary(pairs)
+        return summary(pairs, accumulation_hours)
     return accuracy_board(paired_score_rows(pairs), metric)
 
 

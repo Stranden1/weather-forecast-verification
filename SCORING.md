@@ -201,7 +201,7 @@ actual current Yr leads 50.34–56.50h and WeatherNext 48–54h. Display ranges 
 computed from selected matches, not hardcoded to 56h. Targets may recur across
 buckets; no significance claim follows from raw pair count. Roughly one week,
 29/50 stations, spatial gauge/grid differences and about 2.45h unequal leads
-remain important limitations. No 6h/24h accumulation or calibration is enabled.
+remain important limitations. Optional 6h/24h accumulation is documented below; calibration is not enabled.
 
 ### Validation
 
@@ -212,3 +212,45 @@ observations absent in the saved observation snapshot; no original pair changed.
 Live results and the unchanged temperature/wind/long-range audit are retained in
 work/precipitation-production/. Production browsing and audits use read-only
 connections; no collector, schedule, station or historical-data changes.
+
+
+
+
+## Production 6h/24h precipitation verification — 2026-09-23
+
+Overall accuracy offers precipitation accumulation 1h (default), 6h and 24h.
+Forecast vs Actual remains the canonical hourly chart. No change to hourly
+pairing, temperature/wind, retrospective temperature or Model disagreement.
+
+Six-hour windows are fixed UTC [00,06), [06,12), [12,18), [18,24);
+24-hour windows are UTC calendar days [00,24). The component end at the
+boundary belongs to the preceding period. All six or 24 exact physical hours
+must have unambiguous Frost, Yr and WeatherNext amounts. Missing hours are
+excluded, never zero-filled. Each provider must supply its complete period
+from one run. WeatherNext uses mean samples in mm and sample retrieval times.
+
+Both original issue and every component retrieval must be strictly before the
+period START. Both provider leads are measured to that start. Each lead must
+lie in the same precipitation bucket [0,12), [12,24), [24,48), [48,72) hours,
+with a difference no greater than 3h. Choose the closest lead gap, then the
+newest WeatherNext issue, newest Yr issue, and stable run IDs; forecast errors
+do not influence selection. A period can cross an hourly operational bucket
+internally. Period-level buckets do not relax or alter hourly scoring.
+
+Thresholds are centralized in scoring/precipitation.py: wet is strictly
+>0.1 mm/hour, >0.5 mm/6h or >1.0 mm/day for both observed and predicted
+amounts. Amount MAE, signed bias, observed-wet MAE, hits, misses, false alarms,
+correct dry, POD, FAR and CSI retain the hourly definitions; undefined rates
+display as missing. The dashboard shows actual lead ranges, evaluation dates,
+shared period/bucket counts, distinct station-period counts and station count.
+A selected time filter applies to completed period ends. The 48–72h 6h
+coverage is currently only Yr 50.34–50.50h / WeatherNext 48h; no complete
+24h samples reach that bucket.
+
+At the fixed 2026-09-22 23:21 UTC benchmark snapshot, production reproduces
+all 2,110 six-hour and 293 daily period/bucket pairs exactly, including run
+IDs, totals, start leads, bucket metrics and 796/160 distinct periods.
+See local work/precipitation-aggregation-benchmark/REPORT.md. These few
+correlated days, nonidentical lead ages and point-gauge/grid differences do
+not support a general provider ranking. The read-only +/-3h timing diagnostic
+is not production scoring.

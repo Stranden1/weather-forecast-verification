@@ -242,6 +242,17 @@ with tempfile.TemporaryDirectory() as folder:
     app.selectbox(key='accuracy_station').set_value(2).run()
     check(app)
     assert any('No fair shared hourly precipitation' in i.value for i in app.info)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='accuracy_station').set_value(None).run()
+    assert app.selectbox(key='rain_accumulation').value=='1h'
+    for accumulation in ('6h','24h'):
+        app.session_state['dashboard_tabs']='Overall accuracy'
+        app.selectbox(key='rain_accumulation').set_value(accumulation).run()
+        check(app)
+        assert any('No fair shared complete' in i.value for i in app.info)
+    app.session_state['dashboard_tabs']='Overall accuracy'
+    app.selectbox(key='rain_horizon').set_value('All buckets').run()
+    check(app)
     with database.connect() as con:
         assert before==list(con.iterdump()),'Dashboard changed fixture history'
     print('Expanded UI passed: automatic/manual/no-fair pairing, collapsed healthy state, resolved gaps, active Yr failures, verified retrospective horizons/periods/counts/empty filters, wind, shared accuracy filters/empty states, disagreement drill-through, zero DB writes; station/latest run, charts, run/window/station changes, future actuals hidden, collapsed admin, no DB writes.')

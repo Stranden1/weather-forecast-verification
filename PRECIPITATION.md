@@ -29,3 +29,26 @@ end leads and identical observations. Wet is strictly >0.1 mm/hour. All-hour
 MAE is accompanied by wet-hour and POD/FAR/CSI context; see SCORING.md for the
 complete eligibility, deduplication and metric definitions.
 
+
+
+## Optional 6h and 24h verification
+
+Overall accuracy offers 1h (default), fixed non-overlapping UTC 6h
+(00–06, 06–12, 12–18, 18–24) and UTC calendar-day 24h totals. Forecast
+vs Actual remains hourly. Every period requires all six or 24 aligned
+Frost/Yr/WeatherNext hours, with one complete run per provider. No partial
+sum or missing-hour zero fill is scored.
+
+Both issue and every component retrieval precede period start. Accumulated
+lead is measured from issue to period START for both providers; both leads
+must share a precipitation bucket and differ by no more than 3h. Closest
+lead gap, then newest runs and stable IDs choose pairs without consulting
+errors. Hourly interval-end leads and matching stay unchanged.
+
+Wet thresholds are strictly >0.1 mm/hour, >0.5 mm/6h and >1.0 mm/day,
+centralized in scoring/precipitation.py. The interface shows amount and
+observed-wet MAE, bias, POD/FAR/CSI, counts, UTC dates and actual lead
+ranges. The 24h sample is preliminary: the validated snapshot has 160
+distinct station-days (293 period/lead pairs); 6h has 796 distinct
+station-periods (2,110 pairs). See SCORING.md and the local benchmark
+work/precipitation-aggregation-benchmark/REPORT.md.
