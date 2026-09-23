@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yr vs WeatherNext</title>
+<meta name="description" content="Which forecast is more accurate in Norway: Yr or Google's AI model WeatherNext? Checked every day against real weather observations.">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="wrap hero">
+  <p class="eyebrow">Forecast scorecard · Norway</p>
+  <h1>Yr vs WeatherNext</h1>
+  <p class="lede">Every six hours we save what <b class="yr">Yr</b> and Google's AI model
+    <b class="wn">WeatherNext</b> predict for 50 weather stations. Once the weather has happened,
+    we check both forecasts against the measurements. Lower error is better.</p>
+  <p class="fresh" id="fresh">Loading…</p>
+</header>
+
+<main class="wrap">
+  <div class="controls" role="toolbar" aria-label="Filters">
+    <div class="seg" id="var-seg" role="radiogroup" aria-label="Weather variable"></div>
+    <div class="seg" id="period-seg" role="radiogroup" aria-label="Period">
+      <button data-v="all" aria-pressed="true">All time</button>
+      <button data-v="last30" aria-pressed="false">Last 30 days</button>
+    </div>
+  </div>
+
+  <section class="tiles" id="tiles" aria-live="polite"></section>
+
+  <section class="card">
+    <h2>Error by how far ahead</h2>
+    <p class="sub">Average error (MAE) for forecasts made this far before the weather happened.
+      Both forecasts are taken from the same moment, so each model gets the same head start.</p>
+    <div class="chart"><canvas id="horizon-chart" aria-label="Average error by forecast horizon"></canvas></div>
+    <details class="table-view"><summary>Show as table</summary><div id="horizon-table"></div></details>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Over time</h2>
+        <p class="sub">Daily average error, with a 7-day rolling line. Patterns appear as weeks and seasons pass.</p></div>
+      <label class="pick">Forecast made <select id="trend-h"></select> ahead</label>
+    </div>
+    <div class="chart"><canvas id="trend-chart" aria-label="Daily error over time"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Who wins where</h2>
+        <p class="sub">Blue: Yr has the smaller error at that station. Orange: WeatherNext does. Grey: about equal. Select a station for details.</p></div>
+      <label class="pick">Forecast made <select id="map-h"></select> ahead</label>
+    </div>
+    <div class="map-grid">
+      <div id="map" role="region" aria-label="Station map"></div>
+      <div id="station-panel" class="station-panel"><p class="muted">Select a station on the map.</p></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Patterns to watch</h2>
+    <p class="sub">How the error changes with the weather and the terrain, for forecasts made
+      <span id="pat-h-label"></span> ahead.</p>
+    <label class="pick inline">Forecast made <select id="pat-h"></select> ahead</label>
+    <div id="patterns"></div>
+    <div class="two">
+      <div id="calibration"></div>
+      <div id="rain"></div>
+    </div>
+  </section>
+
+  <section class="card about">
+    <h2>How to read this fairly</h2>
+    <ul>
+      <li><b>Same moment, same head start.</b> Both forecasts are saved in the same run. "24 h ahead" means
+        what you could have seen on Yr and WeatherNext 24 hours before the weather happened.</li>
+      <li><b>Yr has a home advantage.</b> For the first 2–3 days, Yr's forecasts are corrected using
+        measurements from Norwegian weather stations, including many of these ones. WeatherNext is not.
+        That's fair if you ask "which is best for Norway today?", not if you ask "which model is better in general?".</li>
+      <li><b>WeatherNext averages many possible outcomes.</b> Its average (solid orange) smooths out extremes,
+        which tends to lower the average error. The dashed line shows its median instead.</li>
+      <li><b>"Too close to call"</b> means the 95% uncertainty range of the difference still includes zero.
+        Days are the unit: errors from nearby stations on the same day are not independent.</li>
+      <li><b>Station measurements vs forecast grids.</b> A forecast describes an area; a station measures one spot.
+        Both models face the same challenge.</li>
+    </ul>
+    <p class="attrib" id="attrib"></p>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <span>Open source · updated automatically every 6 hours</span>
+</footer>
+
+<script src="vendor/chart.umd.js"></script>
+<script src="vendor/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -56,3 +56,8 @@ Desktop.ini
 .DS_Store
 .vscode/
 .idea/
+
+# Cloud pipeline: working state lives on the `state` branch; site JSON is built in CI
+/state/
+/site/data/
+/site/data_demo/
