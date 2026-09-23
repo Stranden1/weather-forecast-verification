@@ -1,6 +1,6 @@
 # Decisions
 
-_Updated 2026-09-22_
+_Updated 2026-09-23_
 
 - SQLite remains the local source of truth; WeatherNext extends the existing
   forecast model rather than introducing a separate datastore.
@@ -197,3 +197,16 @@ _Updated 2026-09-22_
 - The local read-only benchmark is the validation reference. Its 2,110
   six-hour and 293 daily pairs reproduce exactly at the fixed snapshot.
   No schema, data, collector, station network or schedule change is needed.
+
+## WeatherNext dashboard status performance — 2026-09-23
+
+Routine dashboard reruns read the latest stored model run and finalized collection
+outcomes without counting the WeatherNext sample table. Collection health for
+Yr, Frost and WeatherNext remains separately computed from source-level log
+outcomes on every rerun. Stored or backfilled forecasts alone do not establish
+a successful collection.
+
+Exact WeatherNext forecast/statistic counts are requested explicitly in the
+status expander. Their displayed snapshot includes a check time, and is cleared
+after a new scheduled attempt, a newer run, or a successful manual WeatherNext
+fetch. No TTL, schema change or collector-side summary is needed.

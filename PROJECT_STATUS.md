@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-09-22_
+_Updated 2026-09-23_
 
 ## Summary
 
@@ -217,3 +217,13 @@ The fixed 22 September 23:21 UTC benchmark reproduces exactly:
 The 6h 48–72h bucket is partial; no daily pair reaches it. These are
 preliminary correlated samples, not a provider ranking. No database,
 collector, station, schedule or historical-data change was made.
+
+## WeatherNext status rerun optimization — 2026-09-23
+
+The compact dashboard status now avoids the full WeatherNext sample count on
+routine interactions. Exact stored-data counts remain available through
+**Refresh stored-data counts** in WeatherNext system status. Log-based collection
+health is uncached and unchanged. On the same live data, Station network reruns
+fell from about 5.5 seconds to 0.23 seconds; the explicit count still takes
+about 5 seconds when requested. Scoring, collectors, schema and schedule are
+unchanged.

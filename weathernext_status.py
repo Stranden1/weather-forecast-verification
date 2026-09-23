@@ -61,23 +61,14 @@ def _weather_next_log_entries(log_path: Path, limit: int = 15) -> list[dict]:
     return list(entries)
 
 
-def load_weathernext_status(
-    con: sqlite3.Connection, log_path: Path, log_limit: int = 15
-) -> tuple[dict, list[dict]]:
+def load_weathernext_counts(con: sqlite3.Connection) -> dict:
+    """Exact stored-data diagnostics; call only when explicitly requested."""
     tables = {
         row[0]
         for row in con.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
     }
-    has_samples = "weathernext_samples" in tables
-
-    active_stations = con.execute(
-        "SELECT COUNT(*) FROM locations WHERE active=1"
-    ).fetchone()[0]
-    latest_run = con.execute(
-        "SELECT MAX(issued_at) FROM forecast_runs WHERE provider=?", (PROVIDER,)
-    ).fetchone()[0]
     forecast_points = con.execute(
         """
         SELECT COUNT(*)
@@ -90,7 +81,7 @@ def load_weathernext_status(
 
     statistic_values = 0
     stored_at = None
-    if has_samples:
+    if "weathernext_samples" in tables:
         statistic_values, stored_at = con.execute(
             """
             SELECT COUNT(*), MAX(s.retrieved_at)
@@ -100,6 +91,24 @@ def load_weathernext_status(
             """,
             (PROVIDER,),
         ).fetchone()
+    return {
+        "forecast_points": forecast_points,
+        "statistic_values": statistic_values,
+        "stored_at": stored_at,
+    }
+
+
+def load_weathernext_status(
+    con: sqlite3.Connection, log_path: Path, log_limit: int = 15,
+    include_counts: bool = False,
+) -> tuple[dict, list[dict]]:
+    """Cheap collection summary; exact stored counts are optional diagnostics."""
+    active_stations = con.execute(
+        "SELECT COUNT(*) FROM locations WHERE active=1"
+    ).fetchone()[0]
+    latest_run = con.execute(
+        "SELECT MAX(issued_at) FROM forecast_runs WHERE provider=?", (PROVIDER,)
+    ).fetchone()[0]
 
     entries = _weather_next_log_entries(log_path, log_limit)
     attempts = [entry for entry in entries if "disabled" not in entry["detail"].lower()]
@@ -112,18 +121,21 @@ def load_weathernext_status(
     elif latest_success:
         collector_status = latest_success["status"]
     elif latest_run:
-        collector_status = "up to date"
+        # A stored run can be a historical backfill, not a healthy collection.
+        collector_status = "collection unverified"
     else:
         collector_status = "waiting for new run"
 
     summary = {
         "latest_run": latest_run,
-        "last_attempt": latest_attempt["timestamp"] if latest_attempt else stored_at,
-        "last_success": latest_success["timestamp"] if latest_success else stored_at,
+        "last_attempt": latest_attempt["timestamp"] if latest_attempt else None,
+        "last_success": latest_success["timestamp"] if latest_success else None,
         "active_stations": active_stations,
-        "forecast_points": forecast_points,
-        "statistic_values": statistic_values,
+        "forecast_points": None,
+        "statistic_values": None,
         "new_values": latest_attempt["new_values"] if latest_attempt else None,
         "collector_status": collector_status,
     }
+    if include_counts:
+        summary.update(load_weathernext_counts(con))
     return summary, list(reversed(entries))

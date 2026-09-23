@@ -1,6 +1,6 @@
 # Next steps
 
-_Updated 2026-09-22_
+_Updated 2026-09-23_
 
 The temperature/wind dashboard, fair Overall Accuracy and Model Disagreement are
 complete. A newer WeatherNext run (15 September 18:00 UTC) is present in the live
@@ -84,3 +84,14 @@ sample has only 160 distinct station-days in the validated snapshot.
 Continue collecting independent rain events and model cycles. No further
 implementation is pending for this request; calibration, probabilities
 and new providers remain separate future work.
+
+## Performance checkpoint — 2026-09-23
+
+The WeatherNext status full scan has been removed from routine dashboard
+reruns. Exact counts are available on request in the status expander; source
+health remains live. The validated 6h/24h precipitation commit was pushed
+before this optimization. The optimization commit remains local.
+
+The next separate performance task is all-station precipitation query access.
+Long-range query scoping follows after that. Keep both separate from this
+status-only change and preserve all scoring rules.

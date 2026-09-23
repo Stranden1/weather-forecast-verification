@@ -471,3 +471,32 @@ No database/schema, collector, station network, scheduled task or historical
 data change. The existing hourly checkpoint was pushed to origin/main
 before this work; the new implementation commit must remain local.
 Validation complete: all 76 regression tests, expanded fixture dashboard UI, live read-only 6h/24h render, fixed-snapshot pair/metric reproduction and git diff --check pass. No remaining implementation work. Create the local checkpoint commit; do not push the new commit.
+
+## WeatherNext dashboard status optimization — 2026-09-23
+
+Completed: pushed the pre-existing validated 6h/24h precipitation commit
+`51839a8` unchanged. Split WeatherNext's cheap log/latest-run summary from
+exact sample/forecast counts. Routine Streamlit reruns request only the summary;
+the status expander offers explicit count refresh with a check time. Counts in
+the current session clear after a scheduled attempt, newer run or successful
+manual WeatherNext fetch. No cache TTL is needed. Source-level collection
+health remains uncached; stored backfills without a finalized success are
+labelled collection unverified.
+
+Read-only live timings: old status calls 5.27–5.36 s versus new summary
+0.12–0.13 s; Station network reruns 5.48 s versus 0.22–0.23 s.
+Forecast vs Actual initial render 6.82 s versus 1.42 s. Explicit exact counts
+still take about 5.10 s and only run on request. The live location, run,
+forecast, observation and WeatherNext sample row counts were unchanged across
+profiling. Evidence: ignored work/architecture-review/status-before.json and
+status-after.json.
+
+Validation: 79 unit tests pass, including focused cheap-summary/no-backfill
+tests; disposable dashboard interaction and zero-write checks pass. Live
+read-only AppTest rendered Forecast vs Actual, Overall Accuracy, Long-range,
+Model Disagreement and precipitation 1h/6h/24h without errors. Background
+collection tests pass; the scheduled task was not restarted or changed.
+
+Remaining: no work for this bounded status task after its local checkpoint
+commit. All-station rain and long-range query costs remain separate future
+optimization tasks. Do not push the new local optimization commit automatically.

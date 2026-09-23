@@ -42,7 +42,7 @@ class WeatherNextStatusTests(unittest.TestCase):
             "2026-09-15T11:00:00+00:00  OK  WeatherNext=42 new values; run=2026-09-15T06:00:00Z\n",
             encoding="utf-8",
         )
-        status, entries = load_weathernext_status(self.con, self.log_path)
+        status, entries = load_weathernext_status(self.con, self.log_path, include_counts=True)
         self.assertEqual(status["latest_run"], "2026-09-15T06:00:00Z")
         self.assertEqual(status["active_stations"], 2)
         self.assertEqual(status["forecast_points"], 2)
@@ -61,6 +61,54 @@ class WeatherNextStatusTests(unittest.TestCase):
         self.assertEqual(status["collector_status"], "error")
         self.assertIsNone(status["new_values"])
         self.assertEqual(status["last_success"], "2026-09-15T11:00:00+00:00")
+
+
+    def test_lightweight_summary_skips_large_tables(self):
+        self.log_path.write_text(
+            "2026-09-15T11:00:00+00:00  OK  WeatherNext=42 new values; run=2026-09-15T06:00:00Z\n",
+            encoding="utf-8",
+        )
+        statements = []
+        self.con.set_trace_callback(statements.append)
+        try:
+            status, _ = load_weathernext_status(
+                self.con, self.log_path, include_counts=False
+            )
+        finally:
+            self.con.set_trace_callback(None)
+        self.assertEqual(status["collector_status"], "up to date")
+        self.assertEqual(status["latest_run"], "2026-09-15T06:00:00Z")
+        self.assertIsNone(status["forecast_points"])
+        self.assertIsNone(status["statistic_values"])
+        self.assertFalse(any("weathernext_samples" in sql for sql in statements))
+        self.assertFalse(any("FROM forecasts" in sql for sql in statements))
+
+    def test_lightweight_summary_sees_new_failure_without_cached_health(self):
+        self.log_path.write_text(
+            "2026-09-15T11:00:00+00:00  OK  WeatherNext=2 new values; run=2026-09-15T06:00:00Z\n",
+            encoding="utf-8",
+        )
+        healthy, _ = load_weathernext_status(
+            self.con, self.log_path, include_counts=False
+        )
+        self.assertEqual(healthy["collector_status"], "up to date")
+        with self.log_path.open("a", encoding="utf-8") as handle:
+            handle.write(
+                "2026-09-15T12:00:00+00:00  PARTIAL ERROR  WeatherNext ERROR RuntimeError: quota\n"
+            )
+        failed, _ = load_weathernext_status(
+            self.con, self.log_path, include_counts=False
+        )
+        self.assertEqual(failed["collector_status"], "error")
+        self.assertEqual(failed["last_success"], healthy["last_success"])
+        self.assertIsNone(failed["new_values"])
+
+    def test_stored_backfill_without_success_is_not_healthy(self):
+        status, _ = load_weathernext_status(
+            self.con, self.log_path, include_counts=False
+        )
+        self.assertEqual(status["collector_status"], "collection unverified")
+        self.assertIsNone(status["last_success"])
 
 
 if __name__ == "__main__":

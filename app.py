@@ -35,7 +35,7 @@ from scoring.scorer import paired_score_rows
 from scoring.precipitation import (METRIC as RAIN, LABELS as RAIN_LABELS,
                                    WET_THRESHOLD, WET_THRESHOLDS, DRY_CONTEXT, metrics as rain_metrics)
 from collection_health import load_collection_health, yr_stale_warning
-from weathernext_status import load_weathernext_status
+from weathernext_status import load_weathernext_status, load_weathernext_counts
 
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
@@ -118,7 +118,7 @@ with connect() as con:
         con,
     )
     weathernext_status, weathernext_log = load_weathernext_status(
-        con, BACKGROUND_LOG_PATH
+        con, BACKGROUND_LOG_PATH, include_counts=False
     )
 collection_health = load_collection_health(BACKGROUND_LOG_PATH)
 
@@ -819,11 +819,33 @@ with disagreement_tab:
 with st.expander("WeatherNext system status"):
     st.caption(
         f"{weathernext_status['collector_status'].title()} · "
-        f"Run {display_timestamp(weathernext_status['latest_run'])} · "
-        f"{weathernext_status['forecast_points']:,} points · "
-        f"{weathernext_status['statistic_values']:,} values"
+        f"Run {display_timestamp(weathernext_status['latest_run'])}"
     )
     st.caption(f"Last attempt: {display_timestamp(weathernext_status['last_attempt'])} · Last success: {display_timestamp(weathernext_status['last_success'])} · Latest additions: {weathernext_status['new_values'] if weathernext_status['new_values'] is not None else '—'}")
+    counts_detail = st.session_state.get("weathernext_counts")
+    if counts_detail and (
+        counts_detail["latest_run"] != weathernext_status["latest_run"]
+        or counts_detail["last_attempt"] != weathernext_status["last_attempt"]
+    ):
+        st.session_state.pop("weathernext_counts", None)
+    if st.button("Refresh stored-data counts"):
+        with connect() as con:
+            st.session_state["weathernext_counts"] = {
+                **load_weathernext_counts(con),
+                "checked_at": pd.Timestamp.now(tz="UTC").isoformat(),
+                "latest_run": weathernext_status["latest_run"],
+                "last_attempt": weathernext_status["last_attempt"],
+            }
+    counts_detail = st.session_state.get("weathernext_counts")
+    if counts_detail:
+        st.caption(
+            f"Stored forecasts: {counts_detail['forecast_points']:,} points · "
+            f"{counts_detail['statistic_values']:,} statistic values · "
+            f"Latest stored sample {display_timestamp(counts_detail['stored_at'])} · "
+            f"Checked {display_timestamp(counts_detail['checked_at'])}"
+        )
+    else:
+        st.caption("Stored-data counts are available on request.")
 with st.expander("Collection logs"):
     if not weathernext_log:
         st.caption("No WeatherNext background collection entries yet.")
@@ -929,6 +951,7 @@ with st.expander("Admin / Manual controls", expanded=False):
         st.markdown("**Google WeatherNext 3**")
         st.caption("Uses the same active Frost stations. Fetches the latest complete 360-hour run; this can take several minutes.")
         if st.button("Fetch WeatherNext"):
+            st.session_state.pop("weathernext_counts", None)
             try:
                 from collectors.weathernext import collect_all as collect_weathernext
                 with st.spinner("Fetching WeatherNext temperature, wind, precipitation and pressure..."):
