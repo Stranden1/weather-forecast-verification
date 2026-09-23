@@ -103,8 +103,15 @@ matcher or scoring rewrite.
 
 ## Cloud pipeline — next (2026-09-23)
 
-Follow the unchecked steps in `PLAN_WEBPAGE.md`. The secret scan, tests and local
-commits are done. Remaining: push, make the repo public, enable Pages, add secrets
-and the Earth Engine service account (`SETUP_CLOUD.md`), trigger the workflow,
-then run `cloud/migrate_sqlite.py` for the existing history. Stop the Windows task only after about a week in parallel.
+Deployed 2026-09-23; history migrated up to 2026-09-22. Open items:
+- **User:** grant the `weather-bot` service account *Service Usage Consumer* on
+  project weatherapp-508323 (IAM). Until then the cloud collects no WeatherNext.
+- Cloud-scored days start 2026-09-23. Horizons ≥72 h are thin for ~10 days, and
+  WeatherNext is missing until the IAM fix, while the PC collector has both. Decide
+  whether to replace those transition day files once from `weather.db` (this would be
+  an exception to "written once").
+- `run.py` prints and stores only the first 20 errors, so Yr errors can hide
+  WeatherNext/Frost errors. The workflow also stays green when a source returns 0 rows.
+  Consider a per-source error summary and `--strict` once all sources work.
+- Setting secrets by piping from PowerShell 5.1 adds a BOM; use `gh secret set --body`. Stop the Windows task only after about a week in parallel.
 Do not spend more effort on local rain-query speed; the new design replaces it.

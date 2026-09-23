@@ -85,16 +85,22 @@ app can stay as a private deep-dive tool.
 - [x] 2. Static webpage: `site/` (vendored Chart.js + Leaflet, light/dark, mobile). Previewed with demo data.
 - [x] 3. Workflows: `collect.yml` (every 6 h) and `tests.yml`.
 - [x] 4. Migration script: `cloud/migrate_sqlite.py` (read-only on weather.db).
-- [ ] 5. **User/Claude Code, locally:** check Git history for secrets, then make the repo public
-       and enable Pages (SETUP_CLOUD.md steps 1–2). *2026-09-23: history and the new files
-       scanned, no secrets found; making the repo public and enabling Pages are still to do.*
-- [ ] 6. **User:** add secrets and the Earth Engine service account (SETUP_CLOUD.md steps 3–4).
-- [ ] 7. **Claude Code, locally:** run `python -m unittest discover -s cloud/tests -t .`, commit
+- [x] 5. **User/Claude Code, locally:** check Git history for secrets, then make the repo public
+       and enable Pages (SETUP_CLOUD.md steps 1–2). *2026-09-23: no secrets found; public; Pages
+       source = GitHub Actions.*
+- [x] 6. **User:** add secrets and the Earth Engine service account (SETUP_CLOUD.md steps 3–4).
+       *All four secrets set. WeatherNext still fails: the service account lacks
+       `roles/serviceusage.serviceUsageConsumer` on the project (see NEXT_STEPS).*
+- [x] 7. **Claude Code, locally:** run `python -m unittest discover -s cloud/tests -t .`, commit
        `cloud/ site/ .github/ history/.gitkeep PLAN_WEBPAGE.md SETUP_CLOUD.md`, push.
-       *2026-09-23: tests pass (8), committed; workflows moved to `.github/workflows/`; not pushed.*
-- [ ] 8. Run the workflow manually once; check the log and the `state` branch.
-- [ ] 9. **Claude Code, locally:** run the migration with `--until` = first cloud day; check a
-       few days against the Streamlit app; commit `history/`.
+       *2026-09-23: 8 tests pass locally and in CI; pushed.*
+- [x] 8. Run the workflow manually once; check the log and the `state` branch.
+       *First run 2026-09-23 20:30 UTC. Run 2 (20:33): yr=1400, wn=0, obs=3530.*
+- [x] 9. **Claude Code, locally:** run the migration with `--until` = first cloud day; check a
+       few days against the Streamlit app; commit `history/`. *`--until 2026-09-23`: 18 days
+       (09-05..09-22), 50 stations, 97,581 rows, 2.2 MB. Sanity-checked (temperature MAE
+       0.8–1.3 °C rising with horizon, leads within ±3 h); not compared day-by-day with
+       Streamlit, whose pairing rules differ by design.*
 - [ ] 10. After ~1 week of parallel running: compare, then remove the Windows task.
 - [ ] 11. Later: read WeatherNext real-time terms → decide `WX_PUBLISH_FORECAST_VALUES`.
 - [ ] 12. Later: consolidate handoff docs (current-state PROJECT_STATUS, open-items NEXT_STEPS, CHANGELOG).

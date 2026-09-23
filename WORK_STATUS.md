@@ -10,9 +10,15 @@ Scanned all Git history and all uncommitted files for secrets. No `.env` values
 or keys were found, and `.env` has never been committed. The EE key is used only
 in memory. Moved the workflows from `cloud/github-workflows/` to
 `.github/workflows/`. `cloud/tests` pass (8). Committed the pipeline code, then the
-docs, as separate commits. Nothing pushed; `data/weather.db` untouched.
-Remaining: push, then SETUP_CLOUD.md steps 1–6 (make public, Pages, secrets,
-first run, migration).
+docs, as separate commits.
+
+Deployed the same day: pushed, made the repo public, Pages source set to GitHub Actions,
+all four secrets set. The first manual run collected no Yr data because the secrets had a
+BOM from a PowerShell pipe; after they were set again, run 2 gave yr=1400, obs=3530,
+wn=0. WeatherNext is blocked by a missing IAM role (user action, see NEXT_STEPS).
+The migration (`--until 2026-09-23`, read-only) wrote 18 day files for 09-05..09-22.
+`weather.db` was only read. The Windows task is unchanged and should keep running
+in parallel.
 
 ## Forecast vs Actual history window investigation — 2026-09-23
 
