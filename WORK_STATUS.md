@@ -19,6 +19,34 @@ and how Manual runs can inspect older forecasts. No scoring, pairing, query,
 database, or scientific behavior changed. The full regression suite and dashboard
 fixture interaction check passed. Separate checkpoint commit created; no push.
 
+## All-station precipitation optimization — 2026-09-23
+
+Completed the first bounded query optimization. Baseline on a fixed 7-day,
+all-station snapshot took 6.60/8.71 s for 1h, 8.74/8.58 s for 6h, and
+8.51/8.60 s for 24h (first/repeat calls). Query timing showed the WeatherNext
+sample read dominated (5.7–7.7 s); `EXPLAIN QUERY PLAN` showed a full scan of
+the 12.1m-row `weathernext_samples` table. A disposable SQLite copy confirmed a
+partial expression index on `julianday(valid_at), run_id`, restricted to hourly
+precipitation means in mm, serves a bounded search while retaining the existing
+forecast primary-key lookup.
+
+Retained that additive index and the equivalent `julianday(s.valid_at)` bound in
+the WeatherNext sample SQL. The index was created transactionally in the
+authoritative DB; `weathernext_samples` stayed at 12,122,400 rows and the query
+plan uses the new index. Pair CSVs and metric records are identical for all
+three modes: 12,225 hourly pairs, 2,255 six-hour pairs, and 351 daily pairs.
+Production first/repeat timings: 3.94/6.05 s (1h), 6.01/5.86 s (6h), and
+5.89/5.97 s (24h), about 31–35% lower on average. The audit's ~7.9 s baseline
+is reduced but the 1.5 s target is not met.
+
+Two further candidates were rejected after disposable-copy tests: a wider
+covering sample index and a forecast-time expression index driving the join.
+Neither materially improved the read. Three implementation attempts were used;
+stop here rather than risk restructuring pair/scoring logic. Full suite: 79
+tests passed. Expanded fixture UI passed with zero DB writes. No collectors,
+stations, scoring rules, history, schedule, or secrets changed. Local checkpoint
+commit created, not pushed.
+
 ## Completed
 
 - Added concise project handoff documents: `PROJECT_STATUS.md`, `NEXT_STEPS.md`,

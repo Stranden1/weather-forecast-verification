@@ -38,6 +38,9 @@ SCHEMA = '''CREATE TABLE IF NOT EXISTS weathernext_samples (
 
 def migrate(con):
     con.execute(SCHEMA)
+    con.execute("""CREATE INDEX IF NOT EXISTS idx_weathernext_rain_valid
+        ON weathernext_samples(julianday(valid_at),run_id)
+        WHERE metric='precipitation_1h' AND statistic='mean' AND unit='mm'""")
     # Additive upgrade if the early trial schema was already installed.
     columns = {r[1] for r in con.execute('PRAGMA table_info(weathernext_samples)')}
     if 'unit' not in columns:

@@ -210,3 +210,13 @@ Exact WeatherNext forecast/statistic counts are requested explicitly in the
 status expander. Their displayed snapshot includes a check time, and is cleared
 after a new scheduled attempt, a newer run, or a successful manual WeatherNext
 fetch. No TTL, schema change or collector-side summary is needed.
+
+## All-station precipitation query — 2026-09-23
+
+Use a partial SQLite expression index on
+`weathernext_samples(julianday(valid_at), run_id)` for precipitation mean samples
+in mm, with matching `julianday(s.valid_at)` bounds in the read query. This keeps
+mixed timestamp comparison semantics and changes the plan from a whole-table scan
+to a bounded sample-index search. The additive index changes no data or scoring.
+Tested covering-index and forecast-driven alternatives did not improve the path;
+do not broaden this into a matcher rewrite without separate evidence and validation.

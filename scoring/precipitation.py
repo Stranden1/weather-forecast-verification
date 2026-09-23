@@ -39,7 +39,10 @@ def load_rows(con, start=None, end=None, location_id=None, run_ids=None):
             where += ["s.metric='precipitation_1h'", "s.statistic='mean'", "s.unit='mm'"]
         for op, bound in [('>=', start), ('<=', end)]:
             if bound is not None:
-                where.append(f'({target}) {op} julianday(?)')
+                # Bound WeatherNext samples before the forecast join; julianday
+                # preserves mixed timestamp semantics and matches its partial index.
+                time_expr = 'julianday(s.valid_at)' if not met else target
+                where.append(f'({time_expr}) {op} julianday(?)')
                 params.append(pd.Timestamp(bound).isoformat())
         if location_id is not None:
             where.append('r.location_id=?'); params.append(location_id)

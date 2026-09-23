@@ -230,3 +230,11 @@ health is uncached and unchanged. On the same live data, Station network reruns
 fell from about 5.5 seconds to 0.23 seconds; the explicit count still takes
 about 5 seconds when requested. Scoring, collectors, schema and schedule are
 unchanged.
+
+## All-station precipitation query — 2026-09-23
+
+An additive partial expression index for WeatherNext hourly-mean samples now
+supports bounded precipitation reads. On a fixed 7-day snapshot, average 1h/6h/
+24h runtimes fell from 7.7/8.7/8.6 s to 5.0/5.9/5.9 s, with every pair row and
+metric unchanged. Query cost remains significant; broader matching/scoring
+changes were outside this bounded optimization. The index changed no stored rows.
