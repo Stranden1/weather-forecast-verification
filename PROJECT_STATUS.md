@@ -55,6 +55,9 @@ also pass. Existing dependency deprecation warnings are non-fatal.
 
 ## Known limits
 
+- Forecast vs Actual's 72 h / 7 days span starts at the selected runs' earliest
+  forecast time. Automatic pairing chooses the newest fair pair; older actual
+  history requires selecting older forecast runs in Manual runs.
 - Fair comparisons require shared exact-time observations and forecast leads within 3 hours in the same bucket; initial overlapping history is short.
 - Hourly precipitation scoring is enabled with canonical intervals and wet/event
   context. Short leads currently have no fair samples; 48–72h coverage is partial.

@@ -312,6 +312,7 @@ with forecast_tab:
 
             comparison_mode = select_mode.selectbox("Comparison", ["Automatic fair pair", "Manual runs"], key="comparison_mode")
             view_window = select_window.selectbox("Chart window", ["72 h", "7 days", "Full run"])
+            st.caption("Chart window starts at the selected runs’ earliest forecast time. Automatic mode chooses the newest fair pair; its observations only cover elapsed forecast hours. Choose Manual runs and older runs to inspect earlier forecast history.")
             now = pd.Timestamp.now(tz="UTC")
             automatic = comparison_mode == "Automatic fair pair"
             with connect() as con:

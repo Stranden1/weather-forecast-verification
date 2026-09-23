@@ -87,6 +87,7 @@ with tempfile.TemporaryDirectory() as folder:
     assert [t.label for t in app.tabs][:3]==['Forecast vs Actual','Station network','Overall accuracy']
     assert app.selectbox(key='forecast_actual_station').value==1
     assert app.selectbox(key='comparison_mode').value=='Automatic fair pair'
+    assert any('Chart window starts at the selected runs’ earliest forecast time' in c.value for c in app.caption)
     assert app.selectbox(key='met_run_1').disabled
     assert app.selectbox(key='met_run_1').value==2
     assert any(b.label=='Fetch WeatherNext' for b in app.button)

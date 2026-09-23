@@ -1,5 +1,24 @@
 # WeatherNext integration checkpoint — 2026-09-15
 
+## Forecast vs Actual history window investigation — 2026-09-23
+
+Completed a read-only reproduction for Trondheim-Voll. Forecast vs Actual offers
+72 h, 7 days, and Full run; it has no 24 h option. The selected run query is
+bounded by run IDs, not a requested historical observation window. Both forecast
+series and Frost observations are joined over the selected runs' valid timestamps,
+then 72 h/7 days clips the chart from the earliest valid timestamp. The reproduced
+automatic pair was the newest fair observed pair (Yr issue 22 Sep 21:31 UTC,
+WeatherNext issue 23 Sep 00:00). Forecast rows spanned 22 Sep 22:00–8 Oct 00:00;
+the plotted 72 h and 7 day extents ended 25 Sep 22:00 and 29 Sep 22:00. Frost
+observations available in the pair ended 23 Sep 16:00. Older observations have
+no forecast points in these selected runs, so this is not a query or x-axis loss.
+Run coverage and newest-pair selection explain the short historical portion.
+
+Added a concise UI caption explaining the span origin, limited elapsed history,
+and how Manual runs can inspect older forecasts. No scoring, pairing, query,
+database, or scientific behavior changed. The full regression suite and dashboard
+fixture interaction check passed. Separate checkpoint commit created; no push.
+
 ## Completed
 
 - Added concise project handoff documents: `PROJECT_STATUS.md`, `NEXT_STEPS.md`,
