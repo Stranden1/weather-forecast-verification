@@ -92,8 +92,10 @@ reruns. Exact counts are available on request in the status expander; source
 health remains live. The validated 6h/24h precipitation commit was pushed
 before this optimization. The optimization commit remains local.
 
-All-station precipitation query access is optimized with exact pair and metric
-reproduction; its remaining 5–6 s cost is above the target. Next, profile and
-scope the long-range temperature query while preserving verified-history and
-fair-lead behavior. Keep its validation and checkpoint separate, and preserve
-all scoring rules.
+All-station precipitation and long-range temperature query optimizations are
+complete with exact pair and metric reproduction. Long-range is now about 1.5 s
+all-station/all-history; all-station rainfall remains about 5–6 s. The next
+performance task, if requested, is a separate all-station precipitation query
+optimization targeting narrower candidate reads while preserving exact pair
+identity and all scoring rules. Do not broaden the previous changes into a
+matcher or scoring rewrite.

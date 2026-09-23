@@ -40,7 +40,8 @@ def utc_now(now=None):
     return value.tz_localize("UTC") if value.tzinfo is None else value.tz_convert("UTC")
 
 
-def load_forecast_rows(con, metric, start=None, end=None, location_id=None):
+def load_forecast_rows(con, metric, start=None, end=None, location_id=None,
+                       lead_min=None, lead_max=None):
     if metric not in VARIABLES:
         raise ValueError("Unsupported metric")
     if metric == 'precipitation_1h':
@@ -55,6 +56,12 @@ def load_forecast_rows(con, metric, start=None, end=None, location_id=None):
     if location_id is not None:
         where.append("r.location_id=?")
         params.append(location_id)
+    if lead_min is not None:
+        where.append("f.lead_hours>=?")
+        params.append(lead_min)
+    if lead_max is not None:
+        where.append("f.lead_hours<=?")
+        params.append(lead_max)
     rows = pd.read_sql_query(f"""
         SELECT r.location_id, l.station_id, COALESCE(l.station_name,l.name) AS station,
                r.id AS run_id, r.provider, r.issued_at, r.retrieved_at,
@@ -190,21 +197,28 @@ def load_long_range_temperature(con, days=None, location_id=None, now=None):
     """
     now = utc_now(now)
     start = None if days is None else now - pd.Timedelta(days=days)
-    rows = load_forecast_rows(con, 'air_temperature', start, now, location_id)
+    rows = load_forecast_rows(con, 'air_temperature', start, now, location_id,
+                              lead_min=69, lead_max=219)
     rows = rows[rows.lead_hours.between(69, 219)].copy()
     rows['available_at'] = rows.retrieved_at
     if con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='weathernext_verified_history'").fetchone():
         from collectors.weathernext import FIELDS
+        # Keep the small verification manifest as the outer loop. Letting
+        # SQLite start from all WeatherNext runs makes it walk sample history
+        # before it reaches these 4.4k certified points.
         verified = pd.read_sql_query("""
             SELECT v.run_id, v.valid_at, v.original_available_at
             FROM weathernext_verified_history v
-            JOIN forecast_runs r ON r.id=v.run_id AND r.issued_at=v.issued_at
-            JOIN forecasts f ON f.run_id=v.run_id AND f.valid_at=v.valid_at
+            CROSS JOIN forecast_runs r
+            CROSS JOIN forecasts f
+            CROSS JOIN weathernext_samples s
+            WHERE r.id=v.run_id AND r.issued_at=v.issued_at
+                AND f.run_id=v.run_id AND f.valid_at=v.valid_at
                 AND f.lead_hours=v.lead_hours AND f.air_temperature=v.mean_value
-            JOIN weathernext_samples s ON s.run_id=v.run_id AND s.valid_at=v.valid_at
+                AND s.run_id=v.run_id AND s.valid_at=v.valid_at
                 AND s.metric='air_temperature' AND s.statistic='mean'
                 AND s.asset_id=v.asset_id AND s.value=v.mean_value AND s.unit='degC'
-            WHERE r.provider='WeatherNext3-mean' AND v.source_collection=?
+                AND r.provider='WeatherNext3-mean' AND v.source_collection=?
                 AND julianday(v.original_available_at)>=julianday(v.issued_at)
                 AND julianday(v.original_available_at)<=julianday(v.valid_at)
         """, con, params=(FIELDS['air_temperature'][0],))
@@ -215,13 +229,21 @@ def load_long_range_temperature(con, days=None, location_id=None, now=None):
     # Stored leads must agree with original timestamps; malformed rows fail closed.
     derived = (rows.valid_at - rows.issued_at).dt.total_seconds() / 3600
     rows = rows[(derived - rows.lead_hours).abs() < 1e-7]
-    observed = pd.read_sql_query("""
+    observation_where = [
+        "air_temperature IS NOT NULL",
+        "julianday(observed_at)<=julianday(?)",
+    ]
+    observation_params = [now.isoformat()]
+    if start is not None:
+        observation_where.append("julianday(observed_at)>=julianday(?)")
+        observation_params.append(start.isoformat())
+    if location_id is not None:
+        observation_where.append("location_id=?")
+        observation_params.append(location_id)
+    observed = pd.read_sql_query(f"""
         SELECT location_id, observed_at AS valid_at, air_temperature AS actual
-        FROM observations WHERE air_temperature IS NOT NULL
-          AND julianday(observed_at)<=julianday(?)
-          AND (? IS NULL OR julianday(observed_at)>=julianday(?))
-    """, con, params=(now.isoformat(), None if start is None else start.isoformat(),
-                      None if start is None else start.isoformat()))
+        FROM observations WHERE {' AND '.join(observation_where)}
+    """, con, params=observation_params)
     observed.valid_at = pd.to_datetime(observed.valid_at, utc=True, format='mixed')
     grouped = observed.groupby(['location_id', 'valid_at']).actual.agg(['min', 'max']).reset_index()
     observed = grouped[grouped['min'] == grouped['max']].rename(columns={'min':'actual'})[['location_id','valid_at','actual']]

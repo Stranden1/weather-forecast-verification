@@ -43,9 +43,39 @@ Two further candidates were rejected after disposable-copy tests: a wider
 covering sample index and a forecast-time expression index driving the join.
 Neither materially improved the read. Three implementation attempts were used;
 stop here rather than risk restructuring pair/scoring logic. Full suite: 79
-tests passed. Expanded fixture UI passed with zero DB writes. No collectors,
-stations, scoring rules, history, schedule, or secrets changed. Local checkpoint
-commit created, not pushed.
+tests passed. Expanded fixture UI passed with zero DB writes. No collection
+behavior, stations, scoring rules, history, schedule, or secrets changed. Local
+checkpoint commit created, not pushed.
+
+## Long-range temperature query optimization — 2026-09-23
+
+Completed three bounded iterations against fixed all-history, 7-day, 24-hour,
+and Trondheim-Voll snapshots. Baselines were 7.06/7.58/5.74 s for all-station
+all-history/7-day/24-hour and 6.11/5.18 s for Trondheim-Voll all-history/7-day.
+The verified-history query returned 4,400 rows but SQLite began from all provider
+runs and walked the 12.1m-row sample table. A `CROSS JOIN` loop-order constraint
+starts at the 4,400-row manifest and uses existing run/time primary-key probes;
+its exact result is unchanged and its query time fell from 2.6–4.9 s to 13–29 ms.
+
+The existing inclusive 69–219 h stored-lead filter is now also applied in SQL
+before Pandas materialization. This preserves the post-load filter and timestamp
+consistency check. The Frost observation read now adds the selected station and
+date bounds directly in SQL, removing its prior all-station read for a single
+station. For all five fixed combinations, every paired row and all four horizon
+summary records match the saved pre-change output exactly. Final first-pass
+fixed-snapshot times: 1.51 s (all history), 1.13 s (7 days), 0.73 s (24 h),
+0.15 s (Trondheim-Voll all history), 0.13 s (Trondheim-Voll 7 days). A broader
+read-only profile later measured 2.88 s all-station/all-history and 0.15 s for
+one station; no cache is used.
+
+Validation: full suite 79 tests; expanded fixture dashboard interaction and
+zero-write checks; production read-only profiles for Forecast vs Actual,
+automatic pairing, Overall Accuracy, precipitation 1h/6h/24h, Long-range,
+Model Disagreement, collection health and WeatherNext status. No database rows,
+scoring rules, station network, collectors, scheduling, or secrets changed for
+this target. The precipitation target's one additive index is documented above.
+Checkpoint commit created locally, not pushed. Remaining largest bottleneck is
+all-station precipitation at about 5.6 s; further query work should be separate.
 
 ## Completed
 

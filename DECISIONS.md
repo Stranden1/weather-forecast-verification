@@ -220,3 +220,13 @@ mixed timestamp comparison semantics and changes the plan from a whole-table sca
 to a bounded sample-index search. The additive index changes no data or scoring.
 Tested covering-index and forecast-driven alternatives did not improve the path;
 do not broaden this into a matcher rewrite without separate evidence and validation.
+
+## Long-range temperature query performance — 2026-09-23
+
+For retrospective scoring, filter the existing inclusive 69–219 h lead range in
+SQL before Pandas materialization, while retaining the later timestamp-derived
+lead consistency check. Keep verified-history as the outer loop with SQLite
+`CROSS JOIN` ordering so each manifest point probes existing primary keys rather
+than scanning all WeatherNext runs/samples. Scope Frost reads by the selected
+station and date range. These changes preserve eligibility and matching; exact
+fixed-snapshot pairs and scores were checked. No cache or index was needed.

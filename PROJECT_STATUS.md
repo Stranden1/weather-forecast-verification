@@ -238,3 +238,10 @@ supports bounded precipitation reads. On a fixed 7-day snapshot, average 1h/6h/
 24h runtimes fell from 7.7/8.7/8.6 s to 5.0/5.9/5.9 s, with every pair row and
 metric unchanged. Query cost remains significant; broader matching/scoring
 changes were outside this bounded optimization. The index changed no stored rows.
+
+Long-range temperature now constrains the 69–219 h candidate leads in SQL,
+starts verified-history validation from the small manifest, and scopes Frost
+targets to the selected station and date range. Fixed-snapshot all-history,
+7-day, and 24-hour runtimes are 1.51/1.13/0.73 s; Trondheim-Voll all-history
+and 7-day are 0.15/0.13 s. Every candidate pair and horizon score matched the
+pre-optimization snapshot exactly. No cache or scientific-rule change was added.
