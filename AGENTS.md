@@ -20,3 +20,11 @@ Read `WORK_STATUS.md` and `WEATHERNEXT.md` before resuming this integration.
 Keep a concrete completion/remaining-work checkpoint in `WORK_STATUS.md`.
 At the end of future substantial tasks, also update `PROJECT_STATUS.md`,
 `NEXT_STEPS.md`, and `DECISIONS.md` when their contents are affected.
+
+## Cloud pipeline (added 2026-09-23)
+
+A separate compact pipeline lives in `cloud/`, `site/`, `history/` and
+`.github/workflows/`. It does not use or modify `data/weather.db` (the one-off
+`cloud/migrate_sqlite.py` only reads it). Read `PLAN_WEBPAGE.md` before changing it.
+`history/` day files are written once and never edited. Several assistants
+(ChatGPT/Codex and Claude) work here: check `git status` first and work one at a time.

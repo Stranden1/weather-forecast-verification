@@ -1,5 +1,19 @@
 # WeatherNext integration checkpoint — 2026-09-15
 
+## Cloud pipeline commit and secret scan — 2026-09-23 (Claude)
+
+Fixed the Codex sandbox "setup refresh had errors": `.git` was owned by
+`CodexSandboxOffline`, so the non-elevated setup could not add its deny ACE.
+The user reset the owner of `.git` to their own account.
+
+Scanned all Git history and all uncommitted files for secrets. No `.env` values
+or keys were found, and `.env` has never been committed. The EE key is used only
+in memory. Moved the workflows from `cloud/github-workflows/` to
+`.github/workflows/`. `cloud/tests` pass (8). Committed the pipeline code, then the
+docs, as separate commits. Nothing pushed; `data/weather.db` untouched.
+Remaining: push, then SETUP_CLOUD.md steps 1–6 (make public, Pages, secrets,
+first run, migration).
+
 ## Forecast vs Actual history window investigation — 2026-09-23
 
 Completed a read-only reproduction for Trondheim-Voll. Forecast vs Actual offers

@@ -245,3 +245,15 @@ targets to the selected station and date range. Fixed-snapshot all-history,
 7-day, and 24-hour runtimes are 1.51/1.13/0.73 s; Trondheim-Voll all-history
 and 7-day are 0.15/0.13 s. Every candidate pair and horizon score matched the
 pre-optimization snapshot exactly. No cache or scientific-rule change was added.
+
+
+## Cloud pipeline and public webpage — 2026-09-23 (Claude)
+
+New, parallel, not yet deployed. `cloud/` collects only the forecast hours needed
+for 6 h–10 day verification horizons, scores each finished UTC day once into
+`history/YYYY/YYYY-MM-DD.csv.gz` (~20 MB/year) and discards the rest. Yr and
+WeatherNext are paired from the same collection run (same lead). `site/` is a
+static scorecard for GitHub Pages; `.github/workflows/collect.yml` runs every 6 h.
+8 unit tests pass; the page was checked in light/dark/mobile with demo data and
+with an empty first run. The local app, Windows task and `data/weather.db` are
+unchanged. Setup and remaining steps: `SETUP_CLOUD.md`, `PLAN_WEBPAGE.md`.

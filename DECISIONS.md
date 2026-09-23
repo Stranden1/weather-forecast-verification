@@ -230,3 +230,20 @@ lead consistency check. Keep verified-history as the outer loop with SQLite
 than scanning all WeatherNext runs/samples. Scope Frost reads by the selected
 station and date range. These changes preserve eligibility and matching; exact
 fixed-snapshot pairs and scores were checked. No cache or index was needed.
+
+## Compact cloud pipeline — 2026-09-23 (Claude)
+
+- Goal: long-term public "who is more accurate" without ~100 GB/year of raw data.
+- Store only forecast hours within ±3 h of horizons 6/12/24/48/72/120/168/240 h;
+  score each UTC day once (6 h after it ends) and delete its snapshots.
+- Pair Yr and WeatherNext from the SAME collection run; lead = target − fetch
+  time for both. Closest run to each horizon; runs with both providers preferred;
+  ties to the later run. Errors never influence selection.
+- WeatherNext: newest hourly init (≤48 h) for short targets, newest synoptic
+  otherwise; mean, p10, p50, p90. Score mean and median.
+- Yr from the `complete` endpoint (p10/p90, rain min/max/probability).
+- Hourly rain only for 6 h–48 h horizons; interval-end keys as in PRECIPITATION.md.
+- Verdicts: 95% block bootstrap by day on the MAE difference; none before 7 days.
+- Working state on a force-pushed `state` branch; permanent `history/` on main;
+  site JSON built in CI and never committed.
+- Publish WeatherNext error statistics only until its real-time terms are read.

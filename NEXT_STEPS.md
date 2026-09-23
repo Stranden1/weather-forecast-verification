@@ -99,3 +99,12 @@ performance task, if requested, is a separate all-station precipitation query
 optimization targeting narrower candidate reads while preserving exact pair
 identity and all scoring rules. Do not broaden the previous changes into a
 matcher or scoring rewrite.
+
+
+## Cloud pipeline — next (2026-09-23)
+
+Follow the unchecked steps in `PLAN_WEBPAGE.md`. The secret scan, tests and local
+commits are done. Remaining: push, make the repo public, enable Pages, add secrets
+and the Earth Engine service account (`SETUP_CLOUD.md`), trigger the workflow,
+then run `cloud/migrate_sqlite.py` for the existing history. Stop the Windows task only after about a week in parallel.
+Do not spend more effort on local rain-query speed; the new design replaces it.
