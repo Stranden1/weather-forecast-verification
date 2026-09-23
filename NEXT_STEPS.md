@@ -104,8 +104,11 @@ matcher or scoring rewrite.
 ## Cloud pipeline — next (2026-09-23)
 
 Deployed 2026-09-23; history migrated up to 2026-09-22. Open items:
-- **User:** grant the `weather-bot` service account *Service Usage Consumer* on
-  project weatherapp-508323 (IAM). Until then the cloud collects no WeatherNext.
+- The *Service Usage Consumer* role is granted (2026-09-23). WeatherNext now fails with
+  "ImageCollection asset ... not found (does not exist or caller does not have access)".
+  The service account is not allowlisted for WeatherNext data, although the user's
+  own account is. **User:** request access for the service account via the WeatherNext
+  Data Request form or weathernext@google.com (usually 5–7 business days).
 - Cloud-scored days start 2026-09-23. Horizons ≥72 h are thin for ~10 days, and
   WeatherNext is missing until the IAM fix, while the PC collector has both. Decide
   whether to replace those transition day files once from `weather.db` (this would be
