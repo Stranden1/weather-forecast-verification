@@ -1,5 +1,20 @@
 # WeatherNext integration checkpoint — 2026-09-15
 
+## Cloud pipeline improvements — 2026-09-24 (Claude)
+
+Added the naive "same as before" baseline and skill score, a pinball score and range
+width for the uncertainty ranges, and a health line under the page title. Details are
+in PLAN_WEBPAGE.md → "Improvements". New: `cloud/health.py` and
+`cloud/tests/test_improvements.py` (16 tests; 24 in total pass). Checked the page with
+`python -m cloud.demo` (`site/index.html?demo`) and with the real history. Existing
+`history/` files are untouched. Committed locally; **not pushed** (waiting for the user's OK).
+
+Found uncommitted work by another assistant in `cloud/migrate_sqlite.py` and
+`cloud/tests/test_pipeline.py`: a `--from … --fill-missing-wn` option that replaces
+cloud day files without WeatherNext with the PC copy. It was not documented, and its
+test passes. It is kept and committed as its own commit, separate from this work,
+so the user can review or drop it before pushing.
+
 ## Cloud pipeline commit and secret scan — 2026-09-23 (Claude)
 
 Fixed the Codex sandbox "setup refresh had errors": `.git` was owned by

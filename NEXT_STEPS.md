@@ -113,8 +113,11 @@ Deployed 2026-09-23; history migrated up to 2026-09-22. Open items:
   WeatherNext is missing until the IAM fix, while the PC collector has both. Decide
   whether to replace those transition day files once from `weather.db` (this would be
   an exception to "written once").
-- `run.py` prints and stores only the first 20 errors, so Yr errors can hide
-  WeatherNext/Frost errors. The workflow also stays green when a source returns 0 rows.
-  Consider a per-source error summary and `--strict` once all sources work.
+- Done 2026-09-24: `run.py` stores and prints a per-source summary, and the page's health
+  line shows each source. The workflow still stays green when a source returns 0 rows;
+  consider `--strict` once all sources work.
+- After pushing the 2026-09-24 improvements: baselines start filling in as the state
+  builds up 12 days of observations. The 10-day horizon gets its first baselines about
+  10 days after deployment.
 - Setting secrets by piping from PowerShell 5.1 adds a BOM; use `gh secret set --body`. Stop the Windows task only after about a week in parallel.
 Do not spend more effort on local rain-query speed; the new design replaces it.

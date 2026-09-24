@@ -73,6 +73,31 @@ error statistics, not WeatherNext forecast values (`WX_PUBLISH_FORECAST_VALUES=0
   lowland / hills / mountain; uncertainty honesty (inside p10–p90 ≈ 80%?); rain detection.
 - How to read this fairly + attribution.
 
+## Improvements — 2026-09-24
+
+1. **Naive baseline ("same as before").** Each new scored row gets `base_t`, `base_w`,
+   `base_p`: the Frost observation at the same station at target − 24·⌈h/24⌉ h
+   (6/12/24 h → 1 day back, 48 h → 2 days, … 240 h → 10 days). `base_p` only on rain
+   horizons. The working state now keeps 12 days of observations (`OBS_KEEP_DAYS`);
+   Frost is still re-fetched for only the last 4 days (`OBS_FETCH_DAYS`).
+   `migrate_sqlite.py` uses the same code. Skill per horizon = 1 − MAE_model / MAE_naive,
+   computed only on rows that have a baseline; existing `history/` files have none and
+   are left out. Shown in the tiles, the horizon chart (dotted line) and the table.
+   Note: at the +3 h edge of a horizon window (e.g. lead 26 h for "1 day"), the
+   baseline observation can be up to 3 h after the fetch. This slightly favours the
+   naive guess, so the skill scores err on the conservative side.
+2. **Uncertainty ranges.** A pinball (quantile) score over p10/p50/p90 and the mean
+   p10–p90 width, next to "inside range". Yr's main value stands in for its p50.
+   Both are computed on the forecasts where both services gave a full range, so the
+   comparison is like for like. Lower is better for both.
+3. **Health line** under the title from `site/data/health.json`, built at export from the
+   run log. It shows the last run, a status per source (✓ / failed / partly working /
+   no new data / waiting for access / paused) and runs in the last 48 h against those
+   expected. A failed or stale run (> 9 h) is shown in a warning style with a
+   "Check:" label, never colour alone. Each run record now keeps rows, error count
+   and first error per source, so one source's errors can't hide another's.
+   Raw error messages stay out of the published JSON.
+
 ## Existing local app
 
 Unchanged. `app.py`, the Windows task and `data/weather.db` keep working. Run
@@ -104,3 +129,6 @@ app can stay as a private deep-dive tool.
 - [ ] 10. After ~1 week of parallel running: compare, then remove the Windows task.
 - [ ] 11. Later: read WeatherNext real-time terms → decide `WX_PUBLISH_FORECAST_VALUES`.
 - [ ] 12. Later: consolidate handoff docs (current-state PROJECT_STATUS, open-items NEXT_STEPS, CHANGELOG).
+- [x] 13. Naive baseline + skill, pinball score + range width, health line (see "Improvements").
+       *2026-09-24: 24 cloud tests pass; checked with demo data (light/dark, mobile 375 px, a
+       failing-run health file) and with the real history (degrades cleanly). Committed, not pushed.*

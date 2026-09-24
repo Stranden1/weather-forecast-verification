@@ -257,3 +257,6 @@ static scorecard for GitHub Pages; `.github/workflows/collect.yml` runs every 6 
 8 unit tests pass; the page was checked in light/dark/mobile with demo data and
 with an empty first run. The local app, Windows task and `data/weather.db` are
 unchanged. Setup and remaining steps: `SETUP_CLOUD.md`, `PLAN_WEBPAGE.md`.
+
+2026-09-24: added the naive baseline and skill score, the pinball score and range width,
+and a health line on the page (24 cloud tests). Committed, not pushed.
