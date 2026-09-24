@@ -5,9 +5,12 @@
 Added the naive "same as before" baseline and skill score, a pinball score and range
 width for the uncertainty ranges, and a health line under the page title. Details are
 in PLAN_WEBPAGE.md → "Improvements". New: `cloud/health.py` and
-`cloud/tests/test_improvements.py` (16 tests; 24 in total pass). Checked the page with
+`cloud/tests/test_improvements.py` (17 tests; 25 in total pass). Checked the page with
 `python -m cloud.demo` (`site/index.html?demo`) and with the real history. Existing
-`history/` files are untouched. Committed locally; **not pushed** (waiting for the user's OK).
+`history/` files are untouched. Review changes: baseline offset from the actual lead,
+skill as a percentage, Days/Forecasts columns removed from the horizon table. No
+history files had been written since the baseline change, so none were regenerated.
+Pushed after the user's OK.
 
 Found uncommitted work by another assistant in `cloud/migrate_sqlite.py` and
 `cloud/tests/test_pipeline.py`: a `--from … --fill-missing-wn` option that replaces

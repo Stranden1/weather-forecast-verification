@@ -26,10 +26,14 @@ SCORED_COLUMNS = (["target", "station", "h", "lead_h", "fetched_at", "yr_issued"
 BASELINE_LOOKBACK_DAYS = 11
 
 
-def baseline_offset_hours(h) -> np.ndarray:
+def baseline_offset_hours(lead_h) -> np.ndarray:
     """Naive "same as before": the observation at the same time of day on the
-    latest day already observed at fetch time, i.e. target - 24*ceil(h/24) h."""
-    return 24 * np.ceil(np.asarray(h, dtype=float) / 24)
+    latest day already observed at fetch time, i.e. target - 24*ceil(lead/24) h.
+
+    Uses the actual lead, not the nominal horizon, so the naive value is never
+    measured after the forecast was fetched (e.g. lead 26.5 h for "1 day" -> 48 h back).
+    """
+    return 24 * np.ceil(np.asarray(lead_h, dtype=float) / 24)
 
 
 def obs_window(obs: pd.DataFrame, day: date) -> pd.DataFrame:
@@ -41,7 +45,7 @@ def obs_window(obs: pd.DataFrame, day: date) -> pd.DataFrame:
 
 def add_baseline(scored: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
     back = (pd.to_datetime(scored.target, utc=True)
-            - pd.to_timedelta(baseline_offset_hours(scored.h), unit="h"))
+            - pd.to_timedelta(baseline_offset_hours(scored.lead_h), unit="h"))
     scored = scored.assign(base_key=back.dt.strftime("%Y-%m-%dT%H:%M:%SZ"))
     o = obs.rename(columns={"time": "base_key", "t": "base_t", "w": "base_w", "p": "base_p"})
     o = o.drop_duplicates(["station", "base_key"], keep="last")

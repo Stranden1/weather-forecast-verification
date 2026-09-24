@@ -76,16 +76,16 @@ error statistics, not WeatherNext forecast values (`WX_PUBLISH_FORECAST_VALUES=0
 ## Improvements — 2026-09-24
 
 1. **Naive baseline ("same as before").** Each new scored row gets `base_t`, `base_w`,
-   `base_p`: the Frost observation at the same station at target − 24·⌈h/24⌉ h
-   (6/12/24 h → 1 day back, 48 h → 2 days, … 240 h → 10 days). `base_p` only on rain
-   horizons. The working state now keeps 12 days of observations (`OBS_KEEP_DAYS`);
+   `base_p`: the Frost observation at the same station at target − 24·⌈lead/24⌉ h,
+   using the row's actual lead, so the value was already measured at fetch time
+   (lead 6–24 h → 1 day back, 26.5 h → 2 days, … 243 h → 11 days). `base_p` only on
+   rain horizons. The working state now keeps 12 days of observations (`OBS_KEEP_DAYS`);
    Frost is still re-fetched for only the last 4 days (`OBS_FETCH_DAYS`).
    `migrate_sqlite.py` uses the same code. Skill per horizon = 1 − MAE_model / MAE_naive,
    computed only on rows that have a baseline; existing `history/` files have none and
-   are left out. Shown in the tiles, the horizon chart (dotted line) and the table.
-   Note: at the +3 h edge of a horizon window (e.g. lead 26 h for "1 day"), the
-   baseline observation can be up to 3 h after the fetch. This slightly favours the
-   naive guess, so the skill scores err on the conservative side.
+   are left out. Shown as "36% better / 12% worse than a naive guess" in the tiles and
+   the table, and as a dotted line in the horizon chart. The table dropped its Days
+   and Forecasts columns so it fits at desktop width.
 2. **Uncertainty ranges.** A pinball (quantile) score over p10/p50/p90 and the mean
    p10–p90 width, next to "inside range". Yr's main value stands in for its p50.
    Both are computed on the forecasts where both services gave a full range, so the
@@ -130,5 +130,7 @@ app can stay as a private deep-dive tool.
 - [ ] 11. Later: read WeatherNext real-time terms → decide `WX_PUBLISH_FORECAST_VALUES`.
 - [ ] 12. Later: consolidate handoff docs (current-state PROJECT_STATUS, open-items NEXT_STEPS, CHANGELOG).
 - [x] 13. Naive baseline + skill, pinball score + range width, health line (see "Improvements").
-       *2026-09-24: 24 cloud tests pass; checked with demo data (light/dark, mobile 375 px, a
-       failing-run health file) and with the real history (degrades cleanly). Committed, not pushed.*
+       *2026-09-24: checked with demo data (light/dark, mobile 375 px, a failing-run health
+       file) and with the real history (degrades cleanly). After review: baseline offset
+       from the actual lead, skill shown as a percentage, horizon table trimmed. 25 cloud
+       tests pass; pushed. No history files had been written with the earlier offset.*

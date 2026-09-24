@@ -18,7 +18,10 @@
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmt = (x, d = 2) => x == null ? "–" : Number(x).toFixed(d);
-  const signed = x => x == null ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(2);
+  // Skill 0.36 -> "36% better", -0.12 -> "12% worse" (than the naive guess).
+  const skillPct = x => { if (x == null) return "–"; const p = Math.round(Math.abs(x) * 100);
+    return p === 0 ? "same" : `${p}% ${x > 0 ? "better" : "worse"}`; };
+  const skillSentence = x => skillPct(x) === "same" ? "About the same as a naive guess" : `${skillPct(x)} than a naive guess`;
   const unit = () => D.meta.variables[S.v].unit;
   const hs = () => (S.v === "p" ? D.meta.precip_horizons : D.meta.horizons);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -80,7 +83,7 @@
     const ci = s.ci_lo != null ? `95% range of the difference: ${fmt(s.ci_lo)} to ${fmt(s.ci_hi)} ${unit()}` :
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
     const skill = p => s.base?.[`skill_${p}`] == null ? "" :
-      `<div class="d">Skill vs naive guess ${signed(s.base[`skill_${p}`])} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
+      `<div class="d">${skillSentence(s.base[`skill_${p}`])} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
     el.innerHTML = `
       <div class="tile"><p class="k"><span class="dot yr"></span>Yr · 1 day ahead</p>
         <div class="v">${fmt(s.mae_yr)} <small>${unit()} avg. error</small></div>
@@ -108,16 +111,16 @@
       ds.push(line("Naive guess (same as before)", base, css("--ink-3"), { borderDash: [2, 3], pointStyle: "rect", pointRadius: 3 }));
     chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
-      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th><th>Difference</th><th>95% range</th><th>Days</th><th>Forecasts</th><th>Verdict</th>
-        <th>Naive guess</th><th>Skill Yr</th><th>Skill WeatherNext</th></tr>
+      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th><th>Difference</th><th>95% range</th><th>Verdict</th>
+        <th>Naive guess</th><th>Yr vs naive</th><th>WeatherNext vs naive</th></tr>
       ${H.map(h => { const s = b[h][S.period]; const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
         return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(s.mae_wn)}</td><td>${fmt(s.mae_wn50)}</td>
         <td>${fmt(s.diff)}</td><td>${s.ci_lo == null ? "–" : fmt(s.ci_lo) + " to " + fmt(s.ci_hi)}</td>
-        <td>${s.days}</td><td>${s.n.toLocaleString()}</td><td><span class="badge ${cls}">${vt}</span></td>
-        <td>${fmt(s.base?.mae)}</td><td>${signed(s.base?.skill_yr)}</td><td>${signed(s.base?.skill_wn)}</td></tr>`; }).join("")}
+        <td><span class="badge ${cls}">${vt}</span></td>
+        <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(s.base?.skill_wn)}</td></tr>`; }).join("")}
       </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
       Naive guess = the value measured at the same time of day on the latest day already known when the forecast was made.
-      Skill = 1 − forecast error ÷ naive error, using only forecasts that have a naive value; positive means better than the naive guess.</p>`;
+      "36% better" means the forecast's average error was 36% smaller than the naive guess's, counting only forecasts that have a naive value.</p>`;
   }
 
   function rolling(arr, k = 7) {

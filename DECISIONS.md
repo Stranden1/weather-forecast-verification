@@ -250,9 +250,10 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
 
 ## Cloud pipeline scoring additions — 2026-09-24 (Claude)
 
-- Naive baseline = observation at target − 24·⌈h/24⌉ h (the user's definition, fixed per
-  horizon rather than per actual lead). Skill = 1 − MAE_model / MAE_naive, on rows with a
-  baseline only; no skill value when the naive MAE is 0.
+- Naive baseline = observation at target − 24·⌈lead/24⌉ h, using the actual lead (review
+  decision), so it is always measured at or before fetch time. Skill = 1 − MAE_model /
+  MAE_naive, on rows with a baseline only; no skill value when the naive MAE is 0. The
+  page shows skill as "N% better/worse than a naive guess".
 - Existing `history/` day files are not rewritten to add baselines (written once).
 - Pinball score and p10–p90 width are compared on rows where both providers have all
   three quantiles; Yr's main value is its p50. The "inside range" hit rate stays per provider.

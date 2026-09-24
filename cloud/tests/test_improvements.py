@@ -31,8 +31,8 @@ def ob(time, t=None, w=None, p=None, station="SN1"):
 
 class BaselineTest(unittest.TestCase):
     def test_offsets_round_up_to_whole_days(self):
-        got = score.baseline_offset_hours([6, 12, 24, 48, 72, 120, 168, 240]).tolist()
-        self.assertEqual(got, [24, 24, 24, 48, 72, 120, 168, 240])
+        got = score.baseline_offset_hours([6, 12, 24, 26.5, 48, 72, 120, 168, 240, 243]).tolist()
+        self.assertEqual(got, [24, 24, 24, 48, 48, 72, 120, 168, 240, 264])
 
     def test_score_targets_takes_observation_from_latest_known_day(self):
         target = datetime(2026, 10, 12, 12, tzinfo=UTC)
@@ -55,6 +55,19 @@ class BaselineTest(unittest.TestCase):
         self.assertEqual(s.loc[240, "base_w"], 4.0)
         self.assertEqual(s.loc[6, "obs_t"], 10.0)       # scoring itself is unchanged
         self.assertEqual(len(s), 5)
+
+    def test_baseline_uses_actual_lead_so_it_is_known_at_fetch_time(self):
+        target = datetime(2026, 10, 12, 12, tzinfo=UTC)
+        f = target - timedelta(hours=26.5)  # "1 day" horizon, but fetched 26.5 h before
+        rows = [pend("yr", f, target, 1.0), pend("wn", f, target, 2.0)]
+        obs = pd.DataFrame([ob(target, 10.0),
+                            ob(target - timedelta(hours=24), 5.0),   # after the fetch: not allowed
+                            ob(target - timedelta(hours=48), 6.0)])
+        s = score.score_targets(pd.DataFrame(rows, columns=PENDING_COLUMNS), obs)
+        r = s[s.h == 24].iloc[0]
+        self.assertEqual(r.lead_h, 26.5)
+        self.assertEqual(r.base_t, 6.0)
+        self.assertLessEqual(pd.Timestamp(r.target) - pd.Timedelta(hours=48), pd.Timestamp(r.fetched_at))
 
     def test_finalize_uses_earlier_days_and_keeps_12_days_of_observations(self):
         with tempfile.TemporaryDirectory() as tmp:
