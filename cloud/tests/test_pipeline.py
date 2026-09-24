@@ -226,6 +226,16 @@ class MigrateTest(unittest.TestCase):
             self.assertEqual(r.yr_t, 10.0)
             self.assertEqual(r.wn_t, 2.0)  # run 3: collected within grace; run 4 too late
             self.assertEqual(r.obs_t, 11.0)
+            # A cloud day without WeatherNext gets filled from the PC database.
+            day = date(2026, 9, 20)
+            from cloud.store import scored_path
+            path = scored_path(day, out)
+            yr_only = df[df.target.str.startswith("2026-09-20")].copy()
+            yr_only[[c for c in yr_only if c.startswith("wn_")]] = None
+            path.unlink(); write_scored(day, yr_only, out)
+            migrate_sqlite.migrate(db, date(2026, 9, 21), out, log=lambda *a: None,
+                                   start=day, fill_missing_wn=True)
+            self.assertTrue(migrate_sqlite.has_wn(path))
             before = db.stat().st_mtime
             self.assertEqual(before, db.stat().st_mtime)
 

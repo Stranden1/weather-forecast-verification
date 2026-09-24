@@ -8,7 +8,14 @@ applies exactly the same scoring as the cloud pipeline.
     python -m cloud.migrate_sqlite --db data/weather.db --until 2026-10-01
 
 --until is exclusive: use the first UTC day the cloud collector owns.
-Existing day files are never overwritten.
+Existing day files are never overwritten, with one exception:
+
+    python -m cloud.migrate_sqlite --db data/weather.db --from 2026-09-23 \
+        --until 2026-10-05 --fill-missing-wn
+
+rewrites cloud-scored days that contain NO WeatherNext values at all (e.g. while
+the cloud service account was waiting for WeatherNext access), using the PC
+collector's copy, and only when that copy does contain WeatherNext values.
 """
 from __future__ import annotations
 
@@ -120,7 +127,13 @@ def observations(con, loc_id: int, station: str) -> pd.DataFrame:
     return agg
 
 
-def migrate(db: Path, until: date, out_root: Path = SCORED_DIR, log=print) -> list[str]:
+def has_wn(path: Path) -> bool:
+    df = pd.read_csv(path, usecols=lambda c: c == "wn_t")
+    return "wn_t" in df and df.wn_t.notna().any()
+
+
+def migrate(db: Path, until: date, out_root: Path = SCORED_DIR, log=print,
+            start: date | None = None, fill_missing_wn: bool = False) -> list[str]:
     con = sqlite3.connect(f"file:{Path(db).resolve().as_posix()}?mode=ro", uri=True)
     try:
         locs = pd.read_sql_query(
@@ -135,10 +148,22 @@ def migrate(db: Path, until: date, out_root: Path = SCORED_DIR, log=print) -> li
         con.close()
     pending = pd.concat(pend, ignore_index=True)
     ob = pd.concat(obs, ignore_index=True)
-    first = pd.to_datetime(pending.target.min()).date()
+    first = start or pd.to_datetime(pending.target.min()).date()
     written, day = [], first
     while day < until:
-        if scored_path(day, out_root).exists():
+        path = scored_path(day, out_root)
+        if path.exists() and fill_missing_wn and not has_wn(path):
+            p = pending[pending.target.str.startswith(day.isoformat())]
+            o = ob[ob.time.str.startswith(day.isoformat())]
+            sc = score_targets(p, o)
+            if sc.wn_t.notna().any():
+                path.unlink()
+                write_scored(day, sc, out_root)
+                written.append(day.isoformat())
+                log(f"{day}: replaced cloud file without WeatherNext ({len(sc)} rows)")
+            else:
+                log(f"{day}: PC copy has no WeatherNext either, kept")
+        elif path.exists():
             log(f"{day}: exists, kept")
         else:
             p = pending[pending.target.str.startswith(day.isoformat())]
@@ -156,8 +181,13 @@ def main(argv=None):
     ap.add_argument("--db", default="data/weather.db")
     ap.add_argument("--until", required=True, help="exclusive UTC date, YYYY-MM-DD")
     ap.add_argument("--out", default=str(SCORED_DIR))
+    ap.add_argument("--from", dest="start", help="first UTC date to process, YYYY-MM-DD")
+    ap.add_argument("--fill-missing-wn", action="store_true",
+                    help="replace existing day files that contain no WeatherNext values")
     a = ap.parse_args(argv)
-    migrate(Path(a.db), date.fromisoformat(a.until), Path(a.out))
+    migrate(Path(a.db), date.fromisoformat(a.until), Path(a.out),
+            start=date.fromisoformat(a.start) if a.start else None,
+            fill_missing_wn=a.fill_missing_wn)
 
 
 if __name__ == "__main__":
