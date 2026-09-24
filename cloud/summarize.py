@@ -27,7 +27,29 @@ def paired(df: pd.DataFrame, var: str) -> pd.DataFrame:
     d["e_wn"] = d[f"wn_{var}"] - d[f"obs_{var}"]
     if f"wn_{var}_p50" in d:
         d["e_wn50"] = d[f"wn_{var}_p50"] - d[f"obs_{var}"]
+    # Naive baseline; missing (NaN) on rows scored before it existed.
+    d["e_base"] = (pd.to_numeric(d[f"base_{var}"], errors="coerce") - d[f"obs_{var}"]
+                   if f"base_{var}" in d else np.nan)
     return d
+
+
+def baseline(d: pd.DataFrame) -> dict | None:
+    """Naive "same as before" error and skill = 1 - MAE_model / MAE_naive.
+
+    Uses only rows that have a baseline, for the models too, so older rows
+    without one are left out rather than counted as zero skill.
+    """
+    b = d[d["e_base"].notna()] if "e_base" in d else d.iloc[0:0]
+    if not len(b):
+        return None
+    mae_base = b["e_base"].abs().mean()
+    out = {"n": int(len(b)), "mae": _r(mae_base)}
+    for p in ("yr", "wn", "wn50"):
+        if f"e_{p}" in b and b[f"e_{p}"].notna().any():
+            mae = b[f"e_{p}"].abs().mean()
+            out[f"mae_{p}"] = _r(mae)
+            out[f"skill_{p}"] = _r(1 - mae / mae_base) if mae_base > 0 else None
+    return out
 
 
 def bootstrap_diff(d: pd.DataFrame, seed: int = 1) -> tuple[float | None, float | None]:
@@ -59,7 +81,7 @@ def verdict(lo, hi) -> str:
     return "too_close"
 
 
-def stats(d: pd.DataFrame, with_ci: bool = True) -> dict:
+def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True) -> dict:
     out = {"n": int(len(d)), "days": int(d.day.nunique()) if len(d) else 0}
     if not len(d):
         return out
@@ -71,6 +93,8 @@ def stats(d: pd.DataFrame, with_ci: bool = True) -> dict:
     if with_ci:
         lo, hi = bootstrap_diff(d)
         out.update(ci_lo=_r(lo), ci_hi=_r(hi), verdict=verdict(lo, hi))
+    if with_base and (b := baseline(d)):
+        out["base"] = b
     return out
 
 
@@ -88,17 +112,55 @@ def events(d: pd.DataFrame) -> dict:
     return out
 
 
+QUANTILES = (0.1, 0.5, 0.9)
+
+
+def quantile_columns(p: str, var: str) -> list[str]:
+    """p10/p50/p90 columns. Yr has no p50, so its main value stands in for it."""
+    mid = f"{p}_{var}_p50" if p == "wn" else f"{p}_{var}"
+    return [f"{p}_{var}_p10", mid, f"{p}_{var}_p90"]
+
+
+def pinball(obs: pd.Series, preds: list[pd.Series]) -> float:
+    """Mean quantile (pinball) loss over the 10th, 50th and 90th percentiles.
+
+    Lower is better. It rewards ranges that are both honest and narrow.
+    """
+    y = obs.to_numpy(float)
+    losses = []
+    for q, f in zip(QUANTILES, preds):
+        u = y - f.to_numpy(float)
+        losses.append(np.maximum(q * u, (q - 1) * u))
+    return float(np.mean(losses))
+
+
 def coverage(df: pd.DataFrame, var: str, h: int) -> dict:
-    """How often the observation fell inside each provider's 10th-90th range (ideal ~80%)."""
+    """How well each provider's 10th-90th range describes the uncertainty.
+
+    `inside`: share of observations inside the range (ideal ~80%), per provider.
+    `q`: pinball score and mean p10-p90 width, on rows where BOTH providers have
+    all three quantiles, so the two are compared on the same forecasts.
+    """
     d = df[df.h == h]
     out = {}
+    o = pd.to_numeric(d[f"obs_{var}"], errors="coerce")
     for p in ("yr", "wn"):
-        lo, hi, o = d.get(f"{p}_{var}_p10"), d.get(f"{p}_{var}_p90"), d[f"obs_{var}"]
+        lo, hi = d.get(f"{p}_{var}_p10"), d.get(f"{p}_{var}_p90")
         if lo is None or hi is None:
             continue
         m = lo.notna() & hi.notna() & o.notna()
         if m.sum():
             out[p] = {"inside": _r(((o[m] >= lo[m]) & (o[m] <= hi[m])).mean()), "n": int(m.sum())}
+    cols = {p: quantile_columns(p, var) for p in ("yr", "wn")}
+    if all(c in d for cs in cols.values() for c in cs):
+        num = d[[c for cs in cols.values() for c in cs]].apply(pd.to_numeric, errors="coerce")
+        m = o.notna() & num.notna().all(axis=1)
+        if m.sum():
+            q = {"n": int(m.sum())}
+            for p, cs in cols.items():
+                q[p] = {"pinball": _r(pinball(o[m], [num.loc[m, c] for c in cs])),
+                        "width": _r((num.loc[m, cs[2]] - num.loc[m, cs[0]]).mean())}
+            out["q"] = q
     return out
 
 
@@ -119,7 +181,7 @@ def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
                ("Mountain (≥ 600 m)", elev >= 600)]
     out = []
     for label, mask in groups:
-        s = stats(d[mask.fillna(False)], with_ci=False)
+        s = stats(d[mask.fillna(False)], with_ci=False, with_base=False)
         s["label"] = label
         out.append(s)
     return out

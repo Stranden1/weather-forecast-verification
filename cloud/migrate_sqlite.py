@@ -3,7 +3,8 @@
 Opens the database READ-ONLY and never modifies it. It rebuilds, for every
 past Yr collection, the same "snapshot" the cloud collector takes (Yr from that
 run, plus the newest WeatherNext run that had been collected by then), then
-applies exactly the same scoring as the cloud pipeline.
+applies exactly the same scoring as the cloud pipeline, including the naive
+"same as before" baseline from earlier observations.
 
     python -m cloud.migrate_sqlite --db data/weather.db --until 2026-10-01
 
@@ -27,7 +28,7 @@ from pathlib import Path
 import pandas as pd
 
 from .config import SCORED_DIR, wanted_leads
-from .score import score_targets
+from .score import obs_window, score_targets
 from .store import scored_path, write_scored
 
 WN = "WeatherNext3-mean"
@@ -154,7 +155,7 @@ def migrate(db: Path, until: date, out_root: Path = SCORED_DIR, log=print,
         path = scored_path(day, out_root)
         if path.exists() and fill_missing_wn and not has_wn(path):
             p = pending[pending.target.str.startswith(day.isoformat())]
-            o = ob[ob.time.str.startswith(day.isoformat())]
+            o = obs_window(ob, day)
             sc = score_targets(p, o)
             if sc.wn_t.notna().any():
                 path.unlink()
@@ -167,7 +168,7 @@ def migrate(db: Path, until: date, out_root: Path = SCORED_DIR, log=print,
             log(f"{day}: exists, kept")
         else:
             p = pending[pending.target.str.startswith(day.isoformat())]
-            o = ob[ob.time.str.startswith(day.isoformat())]
+            o = obs_window(ob, day)
             sc = score_targets(p, o)
             write_scored(day, sc, out_root)
             written.append(day.isoformat())

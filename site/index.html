@@ -12,6 +12,7 @@
 <header class="wrap hero">
   <p class="eyebrow">Forecast scorecard · Norway</p>
   <h1>Yr vs WeatherNext</h1>
+  <p class="health" id="health" role="status" hidden></p>
   <p class="lede">Every six hours we save what <b class="yr">Yr</b> and Google's AI model
     <b class="wn">WeatherNext</b> predict for 50 weather stations. Once the weather has happened,
     we check both forecasts against the measurements. Lower error is better.</p>
@@ -82,6 +83,9 @@
         which tends to lower the average error. The dashed line shows its median instead.</li>
       <li><b>"Too close to call"</b> means the 95% uncertainty range of the difference still includes zero.
         Days are the unit: errors from nearby stations on the same day are not independent.</li>
+      <li><b>A naive guess sets the bar.</b> "Same as before" predicts the value measured at the same time of day
+        on the latest day already known when the forecast was made. A useful forecast should beat it; skill above
+        zero means it does.</li>
       <li><b>Station measurements vs forecast grids.</b> A forecast describes an area; a station measures one spot.
         Both models face the same challenge.</li>
     </ul>

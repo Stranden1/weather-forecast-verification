@@ -1,6 +1,13 @@
 /* Yr vs WeatherNext scorecard. Reads the small JSON files in data/. */
 (() => {
-  const DATA = (window.WX_DATA_BASE || "data/");
+  // ?demo previews the made-up data from `python -m cloud.demo` (never deployed).
+  const DATA = window.WX_DATA_BASE || (new URLSearchParams(location.search).has("demo") ? "data_demo/" : "data/");
+  const SOURCE_NAME = { yr: "Yr", frost: "Frost", wn: "WeatherNext" };
+  const SOURCE_STATUS = {
+    ok: "✓", partial: "partly working", error: "failed", no_data: "no new data",
+    no_access: "waiting for access", paused: "paused",
+  };
+  const STALE_H = 9; // runs are every 6 h; allow for GitHub's schedule delays
   const H_LABEL = { 6: "6 h", 12: "12 h", 24: "1 day", 48: "2 days", 72: "3 days", 120: "5 days", 168: "7 days", 240: "10 days" };
   const VERDICT = {
     yr: ["Yr is ahead", "yr"], weathernext: ["WeatherNext is ahead", "wn"],
@@ -11,13 +18,14 @@
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmt = (x, d = 2) => x == null ? "–" : Number(x).toFixed(d);
+  const signed = x => x == null ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(2);
   const unit = () => D.meta.variables[S.v].unit;
   const hs = () => (S.v === "p" ? D.meta.precip_horizons : D.meta.horizons);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain"];
-    const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {})));
+    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health"];
+    const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
 
@@ -71,13 +79,15 @@
     const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
     const ci = s.ci_lo != null ? `95% range of the difference: ${fmt(s.ci_lo)} to ${fmt(s.ci_hi)} ${unit()}` :
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
+    const skill = p => s.base?.[`skill_${p}`] == null ? "" :
+      `<div class="d">Skill vs naive guess ${signed(s.base[`skill_${p}`])} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
     el.innerHTML = `
       <div class="tile"><p class="k"><span class="dot yr"></span>Yr · 1 day ahead</p>
         <div class="v">${fmt(s.mae_yr)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div></div>
+        <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr")}</div>
       <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext · 1 day ahead</p>
         <div class="v">${fmt(s.mae_wn)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(s.bias_wn)} ${unit()} · median version ${fmt(s.mae_wn50)}</div></div>
+        <div class="d">Bias ${fmt(s.bias_wn)} ${unit()} · median version ${fmt(s.mae_wn50)}</div>${skill("wn")}</div>
       <div class="tile"><p class="k">Verdict · ${s.days} days, ${s.n.toLocaleString()} forecasts</p>
         <div class="v" style="font-size:24px"><span class="badge ${cls}" style="font-size:15px">${vt}</span></div>
         <div class="d">${ci}</div></div>`;
@@ -87,19 +97,27 @@
     const b = D.leaderboard?.[S.v] || {};
     const H = hs().filter(h => b[h]?.[S.period]?.n);
     const g = k => H.map(h => b[h][S.period][k]);
+    const base = H.map(h => b[h][S.period].base?.mae ?? null);
     const o = baseOptions(`Average error (${unit()})`);
-    chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: [
+    const ds = [
       line("Yr", g("mae_yr"), css("--yr")),
       line("WeatherNext (average)", g("mae_wn"), css("--wn")),
       line("WeatherNext (median)", g("mae_wn50"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", pointRadius: 4, backgroundColor: css("--surface") }),
-    ] } });
+    ];
+    if (base.some(x => x != null))
+      ds.push(line("Naive guess (same as before)", base, css("--ink-3"), { borderDash: [2, 3], pointStyle: "rect", pointRadius: 3 }));
+    chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
-      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th><th>Difference</th><th>95% range</th><th>Days</th><th>Forecasts</th><th>Verdict</th></tr>
+      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th><th>Difference</th><th>95% range</th><th>Days</th><th>Forecasts</th><th>Verdict</th>
+        <th>Naive guess</th><th>Skill Yr</th><th>Skill WeatherNext</th></tr>
       ${H.map(h => { const s = b[h][S.period]; const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
         return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(s.mae_wn)}</td><td>${fmt(s.mae_wn50)}</td>
         <td>${fmt(s.diff)}</td><td>${s.ci_lo == null ? "–" : fmt(s.ci_lo) + " to " + fmt(s.ci_hi)}</td>
-        <td>${s.days}</td><td>${s.n.toLocaleString()}</td><td><span class="badge ${cls}">${vt}</span></td></tr>`; }).join("")}
-      </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext error − Yr error, in ${unit()}. Negative means WeatherNext was closer.</p>`;
+        <td>${s.days}</td><td>${s.n.toLocaleString()}</td><td><span class="badge ${cls}">${vt}</span></td>
+        <td>${fmt(s.base?.mae)}</td><td>${signed(s.base?.skill_yr)}</td><td>${signed(s.base?.skill_wn)}</td></tr>`; }).join("")}
+      </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
+      Naive guess = the value measured at the same time of day on the latest day already known when the forecast was made.
+      Skill = 1 − forecast error ÷ naive error, using only forecasts that have a naive value; positive means better than the naive guess.</p>`;
   }
 
   function rolling(arr, k = 7) {
@@ -196,20 +214,61 @@
     document.getElementById("calibration").innerHTML = S.v === "p" ? "" : `<h3>Honest about uncertainty?</h3>
       <p class="sub" style="font-size:14px">Both services give a likely range (10th to 90th percentile).
       The measurement should land inside it about 80% of the time.</p>
-      ${cal && (cal.yr || cal.wn) ? `<table><tr><th>Service</th><th>Inside range</th><th>Forecasts</th></tr>
+      ${cal && (cal.yr || cal.wn) ? `<div class="table-scroll"><table><tr><th>Service</th><th>Inside range</th><th>Range score</th><th>Avg. width</th><th>Forecasts</th></tr>
         ${["yr", "wn"].filter(p => cal[p]).map(p => `<tr><td><span class="dot ${p}"></span> ${p === "yr" ? "Yr" : "WeatherNext"}</td>
-        <td>${Math.round(cal[p].inside * 100)}%</td><td>${cal[p].n.toLocaleString()}</td></tr>`).join("")}</table>` : `<p class="muted">No data yet.</p>`}`;
+        <td>${Math.round(cal[p].inside * 100)}%</td><td>${fmt(cal.q?.[p]?.pinball)}</td>
+        <td>${cal.q?.[p]?.width == null ? "–" : fmt(cal.q[p].width, 1) + " " + unit()}</td>
+        <td>${cal[p].n.toLocaleString()}</td></tr>`).join("")}</table></div>
+        <p class="muted" style="font-size:13px">Range score and width: lower is better. The score rewards ranges that
+        catch the measurement while staying narrow${cal.q ? `; both use the ${cal.q.n.toLocaleString()} forecasts where both services gave a range, and Yr's main value counts as its middle` : ""}.</p>`
+        : `<p class="muted">No data yet.</p>`}`;
 
     const rain = S.v === "p" ? D.rain?.[S.patH] : null;
     document.getElementById("rain").innerHTML = !rain ? "" : `<h3>Catching rain</h3>
       <p class="sub" style="font-size:14px">A wet hour is more than 0.1 mm. ${rain.wet_hours.toLocaleString()} wet and
       ${rain.dry_hours.toLocaleString()} dry hours so far.</p>
-      <table><tr><th>Service</th><th>Rain caught</th><th>False alarms</th><th>Overall skill</th><th>Error when wet</th></tr>
+      <div class="table-scroll"><table><tr><th>Service</th><th>Rain caught</th><th>False alarms</th><th>Overall skill</th><th>Error when wet</th></tr>
       ${["yr", "wn"].map(p => `<tr><td><span class="dot ${p}"></span> ${p === "yr" ? "Yr" : "WeatherNext"}</td>
         <td>${rain[p].pod == null ? "–" : Math.round(rain[p].pod * 100) + "%"}</td>
         <td>${rain[p].far == null ? "–" : Math.round(rain[p].far * 100) + "%"}</td>
-        <td>${fmt(rain[p].csi)}</td><td>${fmt(rain[p].wet_mae)} mm</td></tr>`).join("")}</table>
+        <td>${fmt(rain[p].csi)}</td><td>${fmt(rain[p].wet_mae)} mm</td></tr>`).join("")}</table></div>
       <p class="muted" style="font-size:12px">Overall skill (CSI) runs from 0 to 1; higher is better.</p>`;
+  }
+
+  function ago(iso) {
+    const h = (Date.now() - Date.parse(iso)) / 36e5;
+    if (h < 1) return `${Math.max(1, Math.round(h * 60))} min ago`;
+    return h < 48 ? `${Math.round(h)} h ago` : `${Math.round(h / 24)} days ago`;
+  }
+  function renderHealth() {
+    const el = document.getElementById("health"), h = D.health;
+    if (!h || !h.generated_at) return;
+    el.hidden = false;
+    if (!h.last_run) { el.textContent = "No collection runs yet."; return; }
+    const age = (Date.now() - Date.parse(h.last_run)) / 36e5;
+    const parts = [];
+    let warn = false;
+    if (h.last_run_failed) {
+      warn = true;
+      parts.push(`Last run failed ${ago(h.last_run)}` + (h.last_success ? ` (last good run ${ago(h.last_success)})` : ""));
+    } else if (age > STALE_H) {
+      warn = true;
+      parts.push(`No update for ${ago(h.last_run).replace(" ago", "")}: collection may have stopped`);
+    } else {
+      parts.push(`Updated ${ago(h.last_run)}`);
+    }
+    for (const k of ["yr", "frost", "wn"]) {
+      const s = h.sources?.[k]; if (!s) continue;
+      if (s.status === "error" || s.status === "partial") warn = true;
+      parts.push(s.status === "ok" ? `${SOURCE_NAME[k]} ✓` : `${SOURCE_NAME[k]}: ${SOURCE_STATUS[s.status] || s.status}`);
+    }
+    if (h.expected_48h) {
+      const n = Math.min(h.runs_48h, h.expected_48h);
+      if (h.expected_48h - h.runs_48h > 2) warn = true;
+      parts.push(`${n} of ${h.expected_48h} runs in 48 h`);
+    }
+    el.classList.toggle("warn", warn);
+    el.innerHTML = (warn ? `<span class="warn-label">Check:</span> ` : "") + parts.map(esc).join(" · ");
   }
 
   function render() {
@@ -218,9 +277,11 @@
 
   load().then(() => {
     const m = D.meta || {};
+    renderHealth();
     if (!m.variables) { document.getElementById("fresh").textContent = "No data published yet."; return; }
+    const updated = D.health?.generated_at ? "" : ` · updated ${m.generated_at.replace("T", " ").slice(0, 16)} UTC`;
     document.getElementById("fresh").textContent = m.days
-      ? `${m.days} days scored (${m.first_day} to ${m.last_day}) · updated ${m.generated_at.replace("T", " ").slice(0, 16)} UTC`
+      ? `${m.days} days scored (${m.first_day} to ${m.last_day})${updated}`
       : "Collecting… the first scores appear about a day after collection starts.";
     if (m.demo) document.querySelector(".hero").insertAdjacentHTML("afterbegin",
       `<p class="badge" style="margin-bottom:8px">Demo data: made-up numbers for previewing the layout</p>`);

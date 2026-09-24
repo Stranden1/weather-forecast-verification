@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 from .config import HORIZONS, load_stations
+from .health import write as write_health
 from .summarize import build
 
 
@@ -46,8 +47,26 @@ def fake_scored(days=45, seed=3):
                         row.update(obs_p=op, yr_p=max(0, op * rng.uniform(.3, 1.3) + (rng.random() < .1) * rng.gamma(1, .5)),
                                    wn_p=max(0, op * rng.uniform(.5, 1.1) + rng.gamma(1, .15)),
                                    wn_p_p50=max(0, op * rng.uniform(.3, 1)))
+                    # Naive "same as before"; none in the first days, like older real history.
+                    if d >= 3:
+                        row.update(base_t=obs + rng.normal(0, 1.6 + h / 80), base_w=max(0, ow + rng.normal(0, 2)))
+                        if h <= 48:
+                            row["base_p"] = op if rng.random() < .8 else float(rng.random() < .15) * rng.gamma(1.2, 1.0)
                     rows.append(row)
     return pd.DataFrame(rows)
+
+
+def fake_meta(now: datetime) -> dict:
+    """Run log for the demo status line: 2 days of runs, WeatherNext without access."""
+    runs = []
+    for k in range(8, 0, -1):
+        t = (now - timedelta(hours=6 * k - 4)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        runs.append({"fetched_at": t, "sources": {
+            "yr": {"rows": 1400, "errors": 0, "error": None, "enabled": True},
+            "wn": {"rows": 0, "errors": 1, "enabled": True,
+                   "error": "WeatherNext failed: asset not found (does not exist or caller does not have access)."},
+            "frost": {"rows": 3500, "errors": 0, "error": None, "enabled": True}}})
+    return {"first_fetch": runs[0]["fetched_at"], "runs": runs}
 
 
 if __name__ == "__main__":
@@ -56,4 +75,5 @@ if __name__ == "__main__":
     meta = json.loads((out / "meta.json").read_text(encoding="utf-8"))
     meta["demo"] = True
     (out / "meta.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+    write_health(fake_meta(datetime.now(timezone.utc)), out)
     print("demo data written to", out)

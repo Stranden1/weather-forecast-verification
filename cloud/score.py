@@ -11,16 +11,46 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
 
+import numpy as np
 import pandas as pd
 
-from .config import (FINALIZE_DELAY_HOURS, HORIZON_TOLERANCE, HORIZONS, PRECIP_HORIZONS,
-                     VALUE_COLUMNS)
+from .config import (FINALIZE_DELAY_HOURS, HORIZON_TOLERANCE, HORIZONS, OBS_KEEP_DAYS,
+                     PRECIP_HORIZONS, VALUE_COLUMNS)
 
 YR_COLS = ["t", "t_p10", "t_p90", "w", "w_p10", "w_p90", "p", "p_min", "p_max", "p_prob"]
 WN_COLS = ["t", "t_p10", "t_p50", "t_p90", "w", "w_p10", "w_p50", "w_p90", "p", "p_p50", "p_p90"]
 SCORED_COLUMNS = (["target", "station", "h", "lead_h", "fetched_at", "yr_issued", "wn_issued",
-                   "obs_t", "obs_w", "obs_p"]
+                   "obs_t", "obs_w", "obs_p", "base_t", "base_w", "base_p"]
                   + [f"yr_{c}" for c in YR_COLS] + [f"wn_{c}" for c in WN_COLS])
+# Observations needed before a day to give every horizon its naive baseline.
+BASELINE_LOOKBACK_DAYS = 11
+
+
+def baseline_offset_hours(h) -> np.ndarray:
+    """Naive "same as before": the observation at the same time of day on the
+    latest day already observed at fetch time, i.e. target - 24*ceil(h/24) h."""
+    return 24 * np.ceil(np.asarray(h, dtype=float) / 24)
+
+
+def obs_window(obs: pd.DataFrame, day: date) -> pd.DataFrame:
+    """Observations for `day` plus the lookback its baselines need."""
+    t = obs["time"].astype(str)
+    lo = (day - timedelta(days=BASELINE_LOOKBACK_DAYS)).isoformat()
+    return obs[(t >= lo) & (t < (day + timedelta(days=1)).isoformat())]
+
+
+def add_baseline(scored: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
+    back = (pd.to_datetime(scored.target, utc=True)
+            - pd.to_timedelta(baseline_offset_hours(scored.h), unit="h"))
+    scored = scored.assign(base_key=back.dt.strftime("%Y-%m-%dT%H:%M:%SZ"))
+    o = obs.rename(columns={"time": "base_key", "t": "base_t", "w": "base_w", "p": "base_p"})
+    o = o.drop_duplicates(["station", "base_key"], keep="last")
+    scored = scored.drop(columns=["base_t", "base_w", "base_p"], errors="ignore").merge(
+        o[["station", "base_key", "base_t", "base_w", "base_p"]], on=["station", "base_key"],
+        how="left").drop(columns="base_key")
+    # Rain is only scored on the short horizons; keep the baseline consistent with that.
+    scored.loc[~scored.h.isin(PRECIP_HORIZONS), "base_p"] = np.nan
+    return scored
 
 
 def _provider(pending: pd.DataFrame, name: str, cols: list[str]) -> pd.DataFrame:
@@ -31,7 +61,10 @@ def _provider(pending: pd.DataFrame, name: str, cols: list[str]) -> pd.DataFrame
 
 
 def score_targets(pending: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
-    """Score every pending target that has an observation. Pure function."""
+    """Score every pending target that has an observation. Pure function.
+
+    `obs` may include earlier days (see obs_window); they only feed the baseline.
+    """
     if pending.empty:
         return pd.DataFrame(columns=SCORED_COLUMNS)
     from .config import PENDING_COLUMNS
@@ -69,6 +102,7 @@ def score_targets(pending: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
     scored = scored.merge(o[["station", "target", "obs_t", "obs_w", "obs_p"]],
                           on=["station", "target"], how="inner")
     scored = scored[scored[["obs_t", "obs_w", "obs_p"]].notna().any(axis=1)]
+    scored = add_baseline(scored, obs)
     return scored.reindex(columns=SCORED_COLUMNS).sort_values(["target", "station", "h"]) \
                  .reset_index(drop=True)
 
@@ -102,7 +136,7 @@ def finalize(state, now: datetime | None = None, write=None) -> list[str]:
     written = []
     for day in days_ready(now, meta.get("first_fetch"), meta["finalized_days"]):
         p = pending[day_slice(pending, "target", day)]
-        o = obs[day_slice(obs, "time", day)]
+        o = obs_window(obs, day)
         if not exists(day):  # e.g. already provided by the one-off migration
             write(day, score_targets(p, o))
         meta["finalized_days"].append(day.isoformat())
@@ -111,7 +145,7 @@ def finalize(state, now: datetime | None = None, write=None) -> list[str]:
         pending = pending[pending.target.astype(str) >= (day + timedelta(days=1)).isoformat()]
     if written:
         state.replace_pending(pending)
-        cutoff = (now - timedelta(days=4)).strftime("%Y-%m-%d")
+        cutoff = (now - timedelta(days=OBS_KEEP_DAYS)).strftime("%Y-%m-%d")
         state.replace_obs(obs[obs.time.astype(str) >= cutoff])
         state.save_meta(meta)
     return written
