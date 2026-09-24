@@ -13,4 +13,11 @@ Before starting, read `AGENTS.md`, `WORK_STATUS.md`, `PROJECT_STATUS.md`,
 - `data/weather.db` is authoritative. Open it read-only unless the task
   explicitly requires writes.
 - Commit in validated steps. Do not push unless asked.
-- Delegate simple, well-specified coding tasks to the `coder` subagent (Sonnet). Keep design decisions, reviews and anything touching scoring rules in the main session.
+
+## Model routing
+- If this session runs on **Sonnet**: do routine, clearly specified work yourself. For hard
+  problems (see the `deep-thinker` description), consult the `deep-thinker` subagent (Opus)
+  first, then carry out its plan yourself.
+- If this session runs on **Opus**: never call `deep-thinker`; handle hard problems directly.
+- Either way: one task per session, run the tests before committing, and never push without
+  the user's OK.
