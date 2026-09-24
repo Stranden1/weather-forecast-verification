@@ -13,3 +13,4 @@ Before starting, read `AGENTS.md`, `WORK_STATUS.md`, `PROJECT_STATUS.md`,
 - `data/weather.db` is authoritative. Open it read-only unless the task
   explicitly requires writes.
 - Commit in validated steps. Do not push unless asked.
+- Delegate simple, well-specified coding tasks to the `coder` subagent (Sonnet). Keep design decisions, reviews and anything touching scoring rules in the main session.
