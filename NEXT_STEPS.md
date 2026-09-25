@@ -121,3 +121,8 @@ Deployed 2026-09-23; history migrated up to 2026-09-22. Open items:
   10 days after deployment.
 - Setting secrets by piping from PowerShell 5.1 adds a BOM; use `gh secret set --body`. Stop the Windows task only after about a week in parallel.
 Do not spend more effort on local rain-query speed; the new design replaces it.
+
+## Storm replays + forecast steadiness — planned 2026-09-25
+
+Plan: `PLAN_REPLAYS.md`, not started. It first needs the user's decision on
+`WX_PUBLISH_FORECAST_VALUES` (WeatherNext terms), because replays show forecast values.
