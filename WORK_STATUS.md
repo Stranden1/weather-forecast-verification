@@ -1,5 +1,14 @@
 # WeatherNext integration checkpoint — 2026-09-15
 
+## Forecast steadiness (PLAN_REPLAYS step 1) — 2026-09-25 (Claude)
+
+New `cloud/replay.py`: `steadiness(scored, var)` gives the revision size per horizon
+step, the share of revisions that moved toward the observation, flip-flops per 100
+forecasts, and a day-block bootstrap on the revision difference. `summarize.build`
+writes `steadiness.json`. The page does not show it yet (step 3). 35 cloud tests pass.
+The history files were only read. Plan and results: PLAN_REPLAYS.md. Git works here
+only through GitHub Desktop's `git.exe` (not on PATH). Not pushed.
+
 ## Cloud pipeline improvements — 2026-09-24 (Claude)
 
 Added the naive "same as before" baseline and skill score, a pinball score and range

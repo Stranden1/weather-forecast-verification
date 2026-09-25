@@ -238,6 +238,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     dump("patterns.json", patterns)
     dump("rain.json", rain)
 
+    from .replay import steadiness
+    dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})
+
     # Recent hourly series at the 24 h horizon for the "predicted vs actual" chart.
     recent = scored[(scored.h == 24) & scored.target.astype(str).str[:10].isin(days[-7:])]
     for sid, g in recent.groupby("station"):
