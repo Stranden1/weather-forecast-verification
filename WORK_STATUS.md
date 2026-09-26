@@ -20,4 +20,5 @@ Done, following REVIEW_2026-09-23 §4:
 - Project HQ committed first as its own commit (`7e01378`, Codex's work, unchanged).
 
 No code, data, history or schedule changed. 79 local + 43 cloud + 8 HQ tests pass.
-Not pushed.
+Pushed 26 Sep 14:59 UTC with all earlier local commits, after merging three CI scored-day
+files from `origin/main`. GitHub's cloud tests passed on the push.

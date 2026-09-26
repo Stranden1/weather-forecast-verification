@@ -26,9 +26,7 @@ stations. Two systems run side by side while the new one is proven:
   health line. WeatherNext's forecast values are hidden until its data terms are read;
   its errors are in every score.
 
-## Waiting locally (not pushed)
-
-These are committed on `main` but not on GitHub, so the cloud and the page don't use them yet:
+## Pushed 26 Sep (live from the next scheduled cloud run, ~18:17 UTC)
 
 - **Bilinear WeatherNext sampling** on the native grid, recorded per row (`wn_sampling`).
   The local collector already uses it from 26 Sep 16:00 UTC.
@@ -37,8 +35,6 @@ These are committed on `main` but not on GitHub, so the cloud and the page don't
 - **Forecast steadiness** numbers (`steadiness.json`, not yet shown on the page).
 - **Project HQ** (`project_hq/`), a local read-only viewer of these documents: run
   `.\.venv\Scripts\python.exe -B project_hq\run.py` and open http://127.0.0.1:8510.
-
-GitHub has 3 newer scored-day commits from CI; they only add `history/` files and merge cleanly.
 
 ## First results (preliminary: about one week with both services)
 

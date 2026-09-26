@@ -6,39 +6,36 @@ Updated 2026-09-26._
 ## Open items — 2026-09-26
 
 ### Needs the user
-1. **Push `main`** (OK required). It holds the bilinear sampling, the height-adjusted line,
-   steadiness, Project HQ and this document cleanup. First merge `origin/main`, which only
-   adds three CI scored-day files.
-2. **WeatherNext data terms.** Read the real-time terms and decide `WX_PUBLISH_FORECAST_VALUES`.
+1. **WeatherNext data terms.** Read the real-time terms and decide `WX_PUBLISH_FORECAST_VALUES`.
    Storm replays (PLAN_REPLAYS step 2) show WeatherNext values only if this is allowed.
-3. **Early cloud days.** Decide whether to fill 23–24 Sep, which have no WeatherNext, from the
+2. **Early cloud days.** Decide whether to fill 23–24 Sep, which have no WeatherNext, from the
    PC database once (`python -m cloud.migrate_sqlite --from 2026-09-23 --until 2026-09-25
    --fill-missing-wn`). It is an allowed exception to "written once" and must be recorded in
    DECISIONS.md. 25 Sep already has WeatherNext from 05 UTC and would be kept.
-4. **Decide what to do with `FINDINGS_2026-09-26.md`**, the untracked first-results note:
+3. **Decide what to do with `FINDINGS_2026-09-26.md`**, the untracked first-results note:
    commit it or delete it.
-5. **Stop the Windows task** after the parallel week: compare cloud and local results around
+4. **Stop the Windows task** after the parallel week: compare cloud and local results around
    2 Oct (a week of complete cloud data), then stop it. Keep `data/weather.db`.
 
-### After the push
-6. Check the first cloud run's rows are marked `wn_sampling = bilinear` and the page shows the
+### After the push (pushed 26 Sep 14:59 UTC)
+5. Check the first cloud run's rows are marked `wn_sampling = bilinear` and the page shows the
    height-adjusted line and station notes.
-7. Check the local 16:10 UTC run on 26 Sep: `weather.db` WeatherNext values for that run should
+6. Check the local 16:10 UTC run on 26 Sep: `weather.db` WeatherNext values for that run should
    look sane, and `migrate_sqlite` should mark them `bilinear`.
-8. Turn on `--strict` in `.github/workflows/collect.yml` now that all sources work, so a
+7. Turn on `--strict` in `.github/workflows/collect.yml` now that all sources work, so a
    failing source makes the run red.
 
 ### Features
-9. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
-10. **WeatherNext median as the headline rain value**, with the average as the dashed line
-    (FINDINGS recommendation 2).
-11. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
+8. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
+9. **WeatherNext median as the headline rain value**, with the average as the dashed line
+   (FINDINGS recommendation 2).
+10. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
     the height adjustment over-warms cold valley stations (Røros, Dividalen, Grønliheia).
 
 ### Housekeeping
-12. `scoring/scorer.py` still holds the old hour-floored join (`strftime` on `observed_at`),
+11. `scoring/scorer.py` still holds the old hour-floored join (`strftime` on `observed_at`),
     off the dashboard path. Mark it deprecated or remove it.
-13. `work/` holds ~20 MB of local evidence. Keep `work/temperature-backfill/first-run.json` and
+12. `work/` holds ~20 MB of local evidence. Keep `work/temperature-backfill/first-run.json` and
     `second-run.json` (original availability metadata); the rest can be archived.
 
 ## Standing reminders
