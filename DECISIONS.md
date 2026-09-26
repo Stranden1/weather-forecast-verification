@@ -260,6 +260,63 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
 - Frost fetch window (4 days) and observation retention (12 days) are now separate settings.
 - health.json publishes statuses and counts only, never raw error messages.
 
+## WeatherNext terms — 2026-09-26 (Claude)
+
+Sources read on 26 Sep 2026: the real-time terms
+(https://storage.googleapis.com/weathernext-public/terms-of-use.pdf, "Last modified: 3 September
+2026"), the attributions PDF
+(https://storage.googleapis.com/weathernext-public/weathernext-3-attributions-acknowledgements.pdf)
+and the "Terms of Use" / "Citations" sections of the Earth Engine catalog page for
+`weathernext_3_0_0_0p05deg`. Our reading, not legal advice.
+
+**Real-time vs historic** (terms PDF, preamble):
+> "These GDM Real-Time Weather Forecasting Experimental Data Terms of Use apply to any data that
+> relates to a time less than 1 hour ago and the future"
+> "Any data that relates to a time 1 hour ago or more is licensed under the Creative Commons
+> Attribution International License, Version 4.0 (CC BY 4.0)."
+
+**Public sharing** (terms PDF, sections 2–3): real-time data may be used "for any internal
+purpose", to create a Value Added Service, and shared only with "clearly identified third parties
+via controlled distribution (which does not enable onward sharing), solely for educational
+purposes", subsidiaries and contractors. Subsetting or reformatting still counts as
+"unmodified Real-Time Experimental Data". A value-added service "from which the Real-Time
+Experimental Data cannot be retrieved or reverse engineered without significant technical effort
+or expense" may be shared "including by publication"; a retrievable one only via "controlled
+transmission or supply to clearly identified and known third parties".
+
+**Attribution**
+- Terms PDF, section 4(b), for findings and non-retrievable services: "you must cite the Google
+  product or service you used to access the Real-Time Experimental Data and "© 2024-6 Google LLC,
+  whose machine learning models were used to create the experimental data made available under
+  the following licence terms https://storage.googleapis.com/weathernext-public/terms-of-use.pdf.
+  This data is intended for experimental modelling only and is not intended, validated, or
+  approved for real world use.""
+- Terms PDF, section 4(a), only when sharing real-time data or a retrievable service: a copy of
+  the terms, a "Legally Binding Terms of Use" text file, "Copyright 2024-6 Google LLC" and notice
+  of modifications. Not applicable to us while we publish error statistics only.
+- Catalog "Citations", historic data: "© 2026 DeepMind Technologies Limited's machine learning
+  models used to create the experimental data made available at
+  https://developers.google.com/earth-engine/datasets/catalog/projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg
+  under CC BY 4.0 licence terms. This data is intended for experimental modelling only and is
+  not intended, validated, or approved for real world use."
+- Catalog "Acknowledgements": generated using "data and products of the European Centre for
+  Medium-Range Weather Forecasts (ECMWF), as well as additional third-party providers", with the
+  attributions PDF linked. That PDF lists the upstream sources (ERA5, ECMWF HRES, EUMETSAT, NOAA,
+  NASA, JMA, KMA, …); it states no separate requirement for users of WeatherNext output. We link to it.
+
+**Policy**
+- The page publishes WeatherNext **error statistics only** (non-retrievable findings), with the
+  real-time 4(b) citation naming Google Earth Engine, the historic CC BY citation and the
+  acknowledgement link (`ATTRIBUTION` in `cloud/config.py`, rendered with clickable links).
+- Raw WeatherNext forecast values stay off: `WX_PUBLISH_FORECAST_VALUES` remains unset/0.
+- Future forecasts never go public: the `state` branch is encrypted (`WX_STATE_KEY`).
+
+**Are values older than one hour clearly publishable?** Not clearly. The preamble says data that
+"relates to a time 1 hour ago or more" is CC BY 4.0, which suggests forecasts for past times may
+be published. But "relates to a time" is not defined (valid time vs issue time), and the terms
+do not say whether a copy obtained while it was real-time becomes CC BY once the time passes.
+Until Google confirms it (weathernext@google.com), treat publishing values as not settled.
+
 ## One-off fill of the first cloud days — 2026-09-26 (Claude, user's decision)
 
 - The cloud day files for 23 and 24 Sep had no WeatherNext (the service account had no access

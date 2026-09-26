@@ -6,10 +6,10 @@ Updated 2026-09-26._
 ## Open items — 2026-09-26
 
 ### Needs the user
-1. **Show WeatherNext values on the page** (allowed for past times, CC BY 4.0; the page already
-   uses the required citation). Set the repo variable yourself (the permission system blocked
-   it for Claude): `gh variable set WX_PUBLISH_FORECAST_VALUES --body 1 --repo
-   Stranden1/weather-forecast-verification`.
+1. **WeatherNext forecast values stay off** (policy in DECISIONS.md, "WeatherNext terms"): the
+   terms don't clearly say values for past times may be published. To change that, first ask
+   weathernext@google.com. Storm replays (PLAN_REPLAYS step 2) show Yr and measured values only
+   until then.
 2. **Decide what to do with `FINDINGS_2026-09-26.md`**, the untracked first-results note:
    commit it or delete it.
 3. **Stop the Windows task** after the parallel week: compare cloud and local results around

@@ -82,16 +82,26 @@ OBS_COLUMNS = ["station", "time", "t", "w", "p"]
 # them, publish only aggregated error statistics, not WeatherNext forecast values.
 PUBLISH_FORECAST_VALUES = os.getenv("WX_PUBLISH_FORECAST_VALUES", "0") == "1"
 
-# Everything on the page is about times that have passed, so WeatherNext falls under its
-# CC BY 4.0 "historic data" licence, which requires this exact citation (Earth Engine catalog).
+# WeatherNext wording is quoted exactly from Google (DECISIONS.md, "WeatherNext terms").
+# We publish error statistics only. Our forecasts were fetched while real-time and scored
+# once the time had passed, so both required citations are shown: the real-time terms'
+# "findings" citation (section 4(b)) and the Earth Engine catalog's CC BY 4.0 citation for
+# historic data. The last line is the catalog's acknowledgement of upstream data.
 ATTRIBUTION = [
     "Forecasts and observations from MET Norway (Yr, Frost), licensed CC BY 4.0.",
-    "WeatherNext accessed via Google Earth Engine. © 2026 DeepMind Technologies Limited's "
-    "machine learning models used to create the experimental data made available at "
-    "https://developers.google.com/earth-engine/datasets/catalog/"
-    "projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg "
-    "under CC BY 4.0 licence terms. This data is intended for experimental modelling only "
-    "and is not intended, validated, or approved for real world use.",
+    "WeatherNext 3 forecasts accessed via Google Earth Engine.",
+    "© 2024-6 Google LLC, whose machine learning models were used to create the experimental "
+    "data made available under the following licence terms "
+    "https://storage.googleapis.com/weathernext-public/terms-of-use.pdf. This data is intended "
+    "for experimental modelling only and is not intended, validated, or approved for real world use.",
+    "© 2026 DeepMind Technologies Limited's machine learning models used to create the "
+    "experimental data made available at https://developers.google.com/earth-engine/datasets/"
+    "catalog/projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg under "
+    "CC BY 4.0 licence terms. This data is intended for experimental modelling only and is not "
+    "intended, validated, or approved for real world use.",
+    "WeatherNext 3 was generated using data and products of the European Centre for "
+    "Medium-Range Weather Forecasts (ECMWF), as well as additional third-party providers: "
+    "https://storage.googleapis.com/weathernext-public/weathernext-3-attributions-acknowledgements.pdf",
 ]
 
 

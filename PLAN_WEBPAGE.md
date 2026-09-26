@@ -59,9 +59,9 @@ export → deploy Pages. Secrets: `MET_USER_AGENT`, `FROST_CLIENT_ID`,
 
 ### Licensing
 
-Yr/Frost: CC BY 4.0 with attribution (on the page). WeatherNext **real-time**
-data has separate Google DeepMind terms. Until read, the page publishes only
-error statistics, not WeatherNext forecast values (`WX_PUBLISH_FORECAST_VALUES=0`).
+Yr/Frost: CC BY 4.0 with attribution (on the page). WeatherNext: terms read on
+26 Sep 2026, see DECISIONS.md "WeatherNext terms". The page publishes only error
+statistics, not WeatherNext forecast values (`WX_PUBLISH_FORECAST_VALUES=0`).
 
 ## Webpage views
 

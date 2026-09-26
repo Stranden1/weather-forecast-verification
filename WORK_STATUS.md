@@ -19,7 +19,9 @@ Done:
   `.env`); plain files stay readable. Verified after a manual run at 15:25 UTC: both files
   encrypted, readable with the key, all sources OK, new rows `bilinear`. 44 cloud tests pass.
   Old plain versions may stay reachable on GitHub by commit hash for a while.
-- Page attribution now uses WeatherNext's exact CC BY citation; `FINDINGS_2026-09-26.md`
-  committed with it.
+- Attribution updated to Google's current wording (terms PDF 4(b) citation naming Google Earth
+  Engine, catalog CC BY citation, ECMWF acknowledgement link), shown one per line with clickable
+  links; same text in `FINDINGS_2026-09-26.md`. DECISIONS.md "WeatherNext terms" quotes the
+  clauses. Policy: error statistics only; `WX_PUBLISH_FORECAST_VALUES` stays off.
 
-Remaining: the user sets `WX_PUBLISH_FORECAST_VALUES=1` (NEXT_STEPS item 1).
+Remaining: none. Publishing values would need Google's confirmation first (NEXT_STEPS item 1).

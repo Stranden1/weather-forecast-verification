@@ -308,7 +308,9 @@
       : "Collecting… the first scores appear about a day after collection starts.";
     if (m.demo) document.querySelector(".hero").insertAdjacentHTML("afterbegin",
       `<p class="badge" style="margin-bottom:8px">Demo data: made-up numbers for previewing the layout</p>`);
-    document.getElementById("attrib").textContent = (m.attribution || []).join(" ");
+    // One line per notice; URLs become links (text is escaped first).
+    const link = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,)]/g, u => `<a href="${u}" rel="noopener">${u}</a>`);
+    document.getElementById("attrib").innerHTML = (m.attribution || []).map(a => `<span>${link(a)}</span>`).join("<br>");
     seg(document.getElementById("var-seg"), Object.entries(m.variables).map(([k, v]) => [k, v.name]),
         () => S.v, v => (S.v = v));
     seg(document.getElementById("period-seg"), [["all", "All time"], ["last30", "Last 30 days"]],

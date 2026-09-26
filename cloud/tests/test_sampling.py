@@ -155,6 +155,26 @@ class HeightTest(unittest.TestCase):
         self.assertEqual({x["id"] for x in meta["stations"]}, {"LAND", "SEA", "NOTE"})  # none dropped
         self.assertEqual({x["id"] for x in meta["stations"] if "flag" in x}, {"LAND", "NOTE"})
 
+    def test_meta_carries_required_weathernext_notices(self):
+        import json
+        from cloud import summarize
+        from cloud.tests.test_pipeline import synthetic_scored
+        stations = [{"station_id": "SN1", "name": "A", "latitude": 60, "longitude": 10}]
+        with tempfile.TemporaryDirectory() as tmp:
+            summarize.build(synthetic_scored(days=1, stations=("SN1",)), Path(tmp), stations,
+                            heights={"stations": {}})
+            meta = json.loads((Path(tmp) / "meta.json").read_text(encoding="utf-8"))
+        text = " ".join(meta["attribution"])
+        self.assertIn("MET Norway (Yr, Frost), licensed CC BY 4.0", text)
+        self.assertIn("accessed via Google Earth Engine", text)
+        self.assertIn("© 2024-6 Google LLC, whose machine learning models were used to create the "
+                      "experimental data made available under the following licence terms "
+                      "https://storage.googleapis.com/weathernext-public/terms-of-use.pdf.", text)
+        self.assertIn("© 2026 DeepMind Technologies Limited's machine learning models", text)
+        self.assertIn("not intended, validated, or approved for real world use.", text)
+        self.assertIn("weathernext-3-attributions-acknowledgements.pdf", text)
+        self.assertFalse(meta["publish_forecast_values"])
+
     def test_build_without_heights_has_no_secondary_line(self):
         import json
         from cloud import summarize
