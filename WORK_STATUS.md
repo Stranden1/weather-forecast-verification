@@ -1,5 +1,25 @@
 # WeatherNext integration checkpoint — 2026-09-15
 
+## WeatherNext cold bias: sampling fix and height-adjusted line — 2026-09-26 (Claude)
+
+Investigation (deep-thinker, read-only EE): `INVESTIGATION_COLD_BIAS_2026-09-26.md`. Cause:
+the ~5 km cell's terrain is up to 400 m above low fjord/valley stations; plus lake/fjord/urban
+night warmth at Mjøsbrua, Sunndalsøra, Oslo; plus a sampling artefact (15/50 stations read a
+neighbouring cell). Done, per DECISIONS.md "WeatherNext sampling and station height":
+- Both collectors now sample bilinearly on the native grid (`resample("bilinear")`, 100 m).
+  Verified live against hand-computed bilinear for all 50 stations. Scored rows carry
+  `wn_sampling`; PC switch time `LOCAL_BILINEAR_SINCE` = 2026-09-26 16:00 UTC (the Windows
+  task's next run was 16:10 UTC). A running Streamlit dashboard keeps the old code in memory:
+  restart it before any manual WeatherNext fetch from Admin.
+- `cloud/heights.py` + `config/wn_heights.json` (GMTED2010 cell heights per station and
+  method; regenerate with `python -m cloud.heights`, read-only EE).
+- Page: height-adjusted WeatherNext (temperature, 6.5 °C/km, land only) in the tile, verdict
+  tile, horizon chart/table and station panel; 15 stations flagged; "How to read" bullet.
+  Primary verdict and all 50 stations unchanged. Real history: height-adjusted MAE
+  0.76/0.78/0.80/0.85 at 6/12/24/48 h vs Yr 0.81/0.84/0.89/0.97.
+- 43 cloud tests, 122 total pass. Page checked with real history (desktop, 375 px). No history
+  file rewritten; `weather.db` only read. Not pushed.
+
 ## Forecast steadiness (PLAN_REPLAYS step 1) — 2026-09-25 (Claude)
 
 New `cloud/replay.py`: `steadiness(scored, var)` gives the revision size per horizon

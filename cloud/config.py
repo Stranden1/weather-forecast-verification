@@ -51,6 +51,9 @@ PROVIDERS = {
     "yr": "Yr (MET Norway)",
     "wn": "Google WeatherNext 3 (ensemble mean)",
     "wn50": "Google WeatherNext 3 (ensemble median)",
+    # Our adjustment, not Google's product: temperature moved from the model cell's
+    # height to the station's height at 6.5 °C/km (cloud/heights.py).
+    "wnh": "Google WeatherNext 3, height-adjusted (our adjustment)",
 }
 
 # How WeatherNext grid values are read at a station (DECISIONS.md, 2026-09-26).

@@ -84,16 +84,21 @@
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
     const skill = p => s.base?.[`skill_${p}`] == null ? "" :
       `<div class="d">${skillSentence(s.base[`skill_${p}`])} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
+    // Temperature only: WeatherNext moved to each station's height (our adjustment, secondary).
+    const adj = s.mae_wnh == null ? "" : `<div class="d">Height-adjusted (our estimate): ${fmt(s.mae_wnh)} ${unit()}</div>`;
+    const [vh, clsh] = VERDICT[s.verdict_h] || VERDICT.not_enough_data;
+    const adjVerdict = s.mae_wnh == null ? "" :
+      `<div class="d">After a standard height adjustment: <span class="badge ${clsh}">${vh}</span></div>`;
     el.innerHTML = `
       <div class="tile"><p class="k"><span class="dot yr"></span>Yr · 1 day ahead</p>
         <div class="v">${fmt(s.mae_yr)} <small>${unit()} avg. error</small></div>
         <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr")}</div>
       <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext · 1 day ahead</p>
         <div class="v">${fmt(s.mae_wn)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(s.bias_wn)} ${unit()} · median version ${fmt(s.mae_wn50)}</div>${skill("wn")}</div>
+        <div class="d">Bias ${fmt(s.bias_wn)} ${unit()} · median version ${fmt(s.mae_wn50)}</div>${skill("wn")}${adj}</div>
       <div class="tile"><p class="k">Verdict · ${s.days} days, ${s.n.toLocaleString()} forecasts</p>
         <div class="v" style="font-size:24px"><span class="badge ${cls}" style="font-size:15px">${vt}</span></div>
-        <div class="d">${ci}</div></div>`;
+        <div class="d">${ci}</div>${adjVerdict}</div>`;
   }
 
   function renderHorizon() {
@@ -109,16 +114,21 @@
     ];
     if (base.some(x => x != null))
       ds.push(line("Naive guess (same as before)", base, css("--ink-3"), { borderDash: [2, 3], pointStyle: "rect", pointRadius: 3 }));
+    const adj = g("mae_wnh"), hasAdj = adj.some(x => x != null);
+    if (hasAdj)
+      ds.push(line("WeatherNext, height-adjusted (our estimate)", adj, css("--wn"), { borderDash: [1, 3], borderWidth: 2, pointStyle: "triangle", pointRadius: 4, backgroundColor: css("--surface") }));
     chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
-      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th><th>Difference</th><th>95% range</th><th>Verdict</th>
+      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th>${hasAdj ? "<th>Height-adj.</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
         <th>Naive guess</th><th>Yr vs naive</th><th>WeatherNext vs naive</th></tr>
       ${H.map(h => { const s = b[h][S.period]; const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
         return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(s.mae_wn)}</td><td>${fmt(s.mae_wn50)}</td>
+        ${hasAdj ? `<td>${fmt(s.mae_wnh)}</td>` : ""}
         <td>${fmt(s.diff)}</td><td>${s.ci_lo == null ? "–" : fmt(s.ci_lo) + " to " + fmt(s.ci_hi)}</td>
         <td><span class="badge ${cls}">${vt}</span></td>
         <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(s.base?.skill_wn)}</td></tr>`; }).join("")}
       </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
+      ${hasAdj ? `Height-adj. = WeatherNext moved to each station's height at 6.5 °C per km (our adjustment, not Google's); the difference, range and verdict use the published values.` : ""}
       Naive guess = the value measured at the same time of day on the latest day already known when the forecast was made.
       "36% better" means the forecast's average error was 36% smaller than the naive guess's, counting only forecasts that have a naive value.</p>`;
   }
@@ -166,7 +176,8 @@
       if (r && r.yr != null && r.wn != null) {
         const d = r.wn - r.yr, t = Math.min(1, Math.abs(d) / scale);
         color = d > 0 ? mix(neutral, yr, t) : mix(neutral, wn, t);
-        tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · WeatherNext ${fmt(r.wn)} ${unit()}<br>${r.n} forecasts`;
+        tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · WeatherNext ${fmt(r.wn)} ${unit()}<br>${r.n} forecasts` +
+          (s.flag && S.v === "t" ? "<br>Height note: see station details" : "");
       }
       const m = L.circleMarker([s.lat, s.lon], { radius: 8, weight: 2, color: css("--surface"), fillColor: color, fillOpacity: 1 })
         .bindTooltip(tip).on("click", () => { S.station = s.id; renderStation(); }).addTo(map);
@@ -182,9 +193,18 @@
     const st = D.stations?.[S.v]?.[S.mapH]?.[s.id];
     let rec = null;
     try { rec = await fetch(`${DATA}recent/${s.id}.json`).then(r => r.ok ? r.json() : null); } catch (e) {}
+    const f = S.v === "t" ? s.flag : null;
+    const higher = dz => `${Math.abs(dz)} m ${dz > 0 ? "higher" : "lower"}`;
+    const flagText = !f ? "" : `<p class="note" style="font-size:13px"><b>Height note.</b> ${f.dz != null
+      ? `WeatherNext's temperature is for its grid area, which here is on average ${higher(f.dz)} than the station,
+         so it should read about ${fmt(Math.abs(f.expected), 1)} °C ${f.expected < 0 ? "colder" : "warmer"} from height alone.
+         ${f.dz_old != null && f.dz_old !== f.dz ? `Before 26 Sep we read a slightly different grid point, ${higher(f.dz_old)} than the station.` : ""}` : ""}
+      ${f.note ? `${esc(f.note)} In the data up to 26 Sep, height explained only part of WeatherNext's error here.` : ""}</p>`;
     el.innerHTML = `<h3>${esc(s.name)}</h3>
       <p class="muted" style="margin:0 0 8px;font-size:14px">${s.elev != null ? Math.round(s.elev) + " m above sea level · " : ""}${esc(s.county || "")}</p>
-      <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>WeatherNext ${fmt(st?.wn)}</b> ${unit()}</p>
+      <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>WeatherNext ${fmt(st?.wn)}</b> ${unit()}${
+        st?.wnh != null && st.wnh !== st.wn ? ` · height-adjusted ${fmt(st.wnh)}` : ""}</p>
+      ${flagText}
       <p class="muted" style="margin:0 0 4px;font-size:13px">Last 7 days: forecast made 1 day ahead vs what happened</p>
       <div class="chart"><canvas id="station-chart"></canvas></div>
       ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's raw values are hidden until its data terms are confirmed; its errors are included in every score.</p>`}`;

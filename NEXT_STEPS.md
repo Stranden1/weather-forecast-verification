@@ -122,6 +122,16 @@ Deployed 2026-09-23; history migrated up to 2026-09-22. Open items:
 - Setting secrets by piping from PowerShell 5.1 adds a BOM; use `gh secret set --body`. Stop the Windows task only after about a week in parallel.
 Do not spend more effort on local rain-query speed; the new design replaces it.
 
+## WeatherNext height / sampling — follow-up (2026-09-26)
+
+- **Push needed** for the cloud collector and page to use the bilinear sampling and the
+  height-adjusted line (user's OK). The PC collector already switched at 16:00 UTC.
+- After the 16:10 UTC Windows run: check that `weather.db` WeatherNext values for 26 Sep 06Z+
+  look sane and that `migrate_sqlite --fill-missing-wn` marks them `bilinear`.
+- Revisit at ~30 paired days and in winter: the lapse correction over-warms cold-pool valleys
+  (Røros, Dividalen, Grønliheia); consider flagging that on the page if it grows.
+- Restart the local Streamlit dashboard before any manual WeatherNext fetch (stale imports).
+
 ## Storm replays + forecast steadiness — planned 2026-09-25
 
 Plan: `PLAN_REPLAYS.md`, not started. It first needs the user's decision on

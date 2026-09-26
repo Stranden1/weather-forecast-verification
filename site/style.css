@@ -61,6 +61,8 @@ h2 { font-size: 20px; margin: 0 0 4px; }
   border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
 .health.warn { color: var(--warn-ink); background: var(--warn-bg); border-color: var(--warn-line); }
 .health .warn-label { font-weight: 650; }
+.note { margin: 0 0 12px; padding: 8px 10px; border-left: 3px solid var(--warn-line); background: var(--warn-bg);
+  color: var(--ink); border-radius: 0 8px 8px 0; line-height: 1.45; }
 .sub { color: var(--ink-2); margin: 0 0 16px; font-size: 15px; max-width: 720px; }
 .muted { color: var(--ink-3); }
 

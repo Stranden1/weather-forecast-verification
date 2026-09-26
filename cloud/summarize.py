@@ -9,6 +9,7 @@ import pandas as pd
 
 from .config import (ATTRIBUTION, HORIZONS, PRECIP_HORIZONS, PROVIDERS, PUBLISH_FORECAST_VALUES,
                      SITE_DATA_DIR, VARIABLES, WET_THRESHOLD_MM, load_stations)
+from .heights import adjusted_t, flags, load_heights
 
 MIN_DAYS_FOR_VERDICT = 7
 BOOTSTRAP = 2000
@@ -27,6 +28,8 @@ def paired(df: pd.DataFrame, var: str) -> pd.DataFrame:
     d["e_wn"] = d[f"wn_{var}"] - d[f"obs_{var}"]
     if f"wn_{var}_p50" in d:
         d["e_wn50"] = d[f"wn_{var}_p50"] - d[f"obs_{var}"]
+    if f"wn_{var}_adj" in d:  # height-adjusted WeatherNext (temperature only; our adjustment)
+        d["e_wnh"] = d[f"wn_{var}_adj"] - d[f"obs_{var}"]
     # Naive baseline; missing (NaN) on rows scored before it existed.
     d["e_base"] = (pd.to_numeric(d[f"base_{var}"], errors="coerce") - d[f"obs_{var}"]
                    if f"base_{var}" in d else np.nan)
@@ -44,7 +47,7 @@ def baseline(d: pd.DataFrame) -> dict | None:
         return None
     mae_base = b["e_base"].abs().mean()
     out = {"n": int(len(b)), "mae": _r(mae_base)}
-    for p in ("yr", "wn", "wn50"):
+    for p in ("yr", "wn", "wn50", "wnh"):
         if f"e_{p}" in b and b[f"e_{p}"].notna().any():
             mae = b[f"e_{p}"].abs().mean()
             out[f"mae_{p}"] = _r(mae)
@@ -85,14 +88,19 @@ def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True) -> dict
     out = {"n": int(len(d)), "days": int(d.day.nunique()) if len(d) else 0}
     if not len(d):
         return out
-    for p in ("yr", "wn", "wn50"):
+    for p in ("yr", "wn", "wn50", "wnh"):
         if f"e_{p}" in d and d[f"e_{p}"].notna().any():
             out[f"mae_{p}"] = _r(d[f"e_{p}"].abs().mean())
             out[f"bias_{p}"] = _r(d[f"e_{p}"].mean())
     out["diff"] = _r(out["mae_wn"] - out["mae_yr"])
+    if "mae_wnh" in out:
+        out["diff_h"] = _r(out["mae_wnh"] - out["mae_yr"])
     if with_ci:
         lo, hi = bootstrap_diff(d)
         out.update(ci_lo=_r(lo), ci_hi=_r(hi), verdict=verdict(lo, hi))
+        if "mae_wnh" in out:  # a second verdict for the height-adjusted line; the first stays primary
+            lo, hi = bootstrap_diff(d.assign(e_wn=d.e_wnh))
+            out.update(ci_h_lo=_r(lo), ci_h_hi=_r(hi), verdict_h=verdict(lo, hi))
     if with_base and (b := baseline(d)):
         out["base"] = b
     return out
@@ -188,10 +196,12 @@ def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
 
 
 def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
-          publish_values: bool = PUBLISH_FORECAST_VALUES) -> dict:
+          publish_values: bool = PUBLISH_FORECAST_VALUES, heights: dict | None = None) -> dict:
     out_dir = Path(out_dir)
     (out_dir / "recent").mkdir(parents=True, exist_ok=True)
     stations = stations or load_stations()
+    heights = load_heights() if heights is None else heights
+    station_flags = flags(heights)
     elevation = {s["station_id"]: s.get("elevation_m") for s in stations}
     files = {}
 
@@ -204,6 +214,8 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         scored = pd.DataFrame(columns=["target", "station", "h"])
     scored = scored.copy()
     scored["h"] = pd.to_numeric(scored["h"], errors="coerce")
+    if "wn_t" in scored and heights.get("stations"):
+        scored["wn_t_adj"] = adjusted_t(scored, heights)
     days = sorted(scored.target.astype(str).str[:10].unique())
     last30 = days[-30:]
 
@@ -221,9 +233,13 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
                                      mae_wn=("e_wn", lambda s: s.abs().mean())).reset_index()
             trend[var][key] = [{"day": r.day, "n": int(r.n), "yr": _r(r.mae_yr), "wn": _r(r.mae_wn)}
                                for r in t.itertuples()]
-            st = d.groupby("station").agg(n=("e_yr", "size"), yr=("e_yr", lambda s: s.abs().mean()),
-                                          wn=("e_wn", lambda s: s.abs().mean())).reset_index()
-            per_station[var][key] = {r.station: {"n": int(r.n), "yr": _r(r.yr), "wn": _r(r.wn)}
+            agg = dict(n=("e_yr", "size"), yr=("e_yr", lambda s: s.abs().mean()),
+                       wn=("e_wn", lambda s: s.abs().mean()))
+            if "e_wnh" in d:
+                agg["wnh"] = ("e_wnh", lambda s: s.abs().mean())
+            st = d.groupby("station").agg(**agg).reset_index()
+            per_station[var][key] = {r.station: {"n": int(r.n), "yr": _r(r.yr), "wn": _r(r.wn),
+                                                 **({"wnh": _r(r.wnh)} if "wnh" in agg else {})}
                                      for r in st.itertuples()}
             if var in ("t", "w"):
                 calib[var][key] = coverage(scored[scored.h == h], var, h)
@@ -264,7 +280,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "attribution": ATTRIBUTION,
         "stations": [{"id": s["station_id"], "name": s.get("name") or s.get("station_name"),
                       "lat": s["latitude"], "lon": s["longitude"], "elev": s.get("elevation_m"),
-                      "county": s.get("county")} for s in stations],
+                      "county": s.get("county"),
+                      **({"flag": station_flags[s["station_id"]]} if s["station_id"] in station_flags else {})}
+                     for s in stations],
     }
     dump("meta.json", meta)
     return files

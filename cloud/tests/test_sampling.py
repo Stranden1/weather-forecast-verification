@@ -110,5 +110,62 @@ class MigrateTest(unittest.TestCase):
             self.assertEqual(set(pending[pending.provider == "wn"].sampling), {WN_SAMPLING_OLD})
 
 
+HEIGHTS = {"stations": {
+    "LAND": {"elev": 100.0, "cell_nn5km": 400.0, "cell_bilinear": 200.0, "offshore": False},
+    "SEA": {"elev": 60.0, "cell_nn5km": 0.0, "cell_bilinear": 0.0, "offshore": True},
+    "NOTE": {"elev": 10.0, "cell_nn5km": 30.0, "cell_bilinear": 40.0, "offshore": False, "note": "Lake."},
+}}
+
+
+class HeightTest(unittest.TestCase):
+    def test_adjustment_per_sampling_method(self):
+        from cloud.heights import adjusted_t
+        df = pd.DataFrame({"station": ["LAND", "LAND", "LAND", "SEA", "UNKNOWN"],
+                           "wn_sampling": [None, WN_SAMPLING_OLD, WN_SAMPLING, None, None],
+                           "wn_t": [5.0, 5.0, 5.0, 5.0, 5.0]})
+        got = adjusted_t(df, HEIGHTS).round(3).tolist()
+        # Empty marker = old method: 300 m -> +1.95 °C. Bilinear: 100 m -> +0.65 °C.
+        self.assertEqual(got, [6.95, 6.95, 5.65, 5.0, 5.0])
+
+    def test_flags_keep_every_station_and_explain(self):
+        from cloud.heights import flags
+        f = flags(HEIGHTS)
+        self.assertEqual(f["LAND"], {"dz": 100, "expected": -0.7, "dz_old": 300})
+        self.assertNotIn("SEA", f)
+        self.assertEqual(f["NOTE"], {"note": "Lake."})
+
+    def test_build_adds_secondary_line_and_flags(self):
+        import json
+        from cloud import summarize
+        from cloud.tests.test_pipeline import synthetic_scored
+        stations = [{"station_id": s, "name": s, "latitude": 60, "longitude": 10, "elevation_m": 100}
+                    for s in ("LAND", "SEA", "NOTE")]
+        scored = synthetic_scored(days=8, stations=("LAND", "SEA", "NOTE"))
+        with tempfile.TemporaryDirectory() as tmp:
+            summarize.build(scored, Path(tmp), stations, heights=HEIGHTS)
+            board = json.loads((Path(tmp) / "leaderboard.json").read_text(encoding="utf-8"))
+            meta = json.loads((Path(tmp) / "meta.json").read_text(encoding="utf-8"))
+            per = json.loads((Path(tmp) / "stations.json").read_text(encoding="utf-8"))
+        s = board["t"]["24"]["all"]
+        self.assertIn("mae_wnh", s)
+        self.assertIn(s["verdict_h"], ("yr", "weathernext", "too_close"))
+        self.assertIn(s["verdict"], ("yr", "weathernext", "too_close"))  # primary verdict kept
+        self.assertNotIn("mae_wnh", board["w"]["24"]["all"])
+        self.assertEqual(per["t"]["24"]["SEA"]["wnh"], per["t"]["24"]["SEA"]["wn"])
+        self.assertEqual({x["id"] for x in meta["stations"]}, {"LAND", "SEA", "NOTE"})  # none dropped
+        self.assertEqual({x["id"] for x in meta["stations"] if "flag" in x}, {"LAND", "NOTE"})
+
+    def test_build_without_heights_has_no_secondary_line(self):
+        import json
+        from cloud import summarize
+        from cloud.tests.test_pipeline import synthetic_scored
+        stations = [{"station_id": "SN1", "name": "A", "latitude": 60, "longitude": 10}]
+        with tempfile.TemporaryDirectory() as tmp:
+            summarize.build(synthetic_scored(days=2, stations=("SN1",)), Path(tmp), stations,
+                            heights={"stations": {}})
+            board = json.loads((Path(tmp) / "leaderboard.json").read_text(encoding="utf-8"))
+        self.assertNotIn("mae_wnh", board["t"]["24"]["all"])
+
+
 if __name__ == "__main__":
     unittest.main()

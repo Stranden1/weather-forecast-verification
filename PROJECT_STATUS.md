@@ -260,3 +260,10 @@ unchanged. Setup and remaining steps: `SETUP_CLOUD.md`, `PLAN_WEBPAGE.md`.
 
 2026-09-24: added the naive baseline and skill score, the pinball score and range width,
 and a health line on the page (25 cloud tests). Pushed.
+
+2026-09-26: WeatherNext's cold bias at 8 stations traced to grid-cell height (plus local
+night warmth and a neighbour-cell sampling artefact). WeatherNext is now sampled bilinearly
+on its native grid (dated switch, per-row `wn_sampling`), and the page adds a labelled
+height-adjusted temperature line and station height notes. Published values stay primary;
+no station dropped. Local commits, not pushed. See DECISIONS.md and
+INVESTIGATION_COLD_BIAS_2026-09-26.md.

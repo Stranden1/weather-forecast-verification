@@ -88,6 +88,13 @@
         zero means it does.</li>
       <li><b>Station measurements vs forecast grids.</b> A forecast describes an area; a station measures one spot.
         Both models face the same challenge.</li>
+      <li><b>Grid height.</b> WeatherNext's temperature is for the average terrain height of its ~5 km grid area,
+        not the station's height. In steep terrain the area can be a few hundred metres higher than a station
+        in a fjord or valley, so WeatherNext reads colder there (about 0.65 °C per 100 m). Stations where this matters are
+        marked in the station details. The dotted "height-adjusted" line is our own estimate, a standard
+        correction to each station's height, and is not Google's product; the published values stay the main score
+        and every station is kept. On 26 Sep we also switched to reading WeatherNext exactly as Google does
+        (interpolated between grid points); earlier days sometimes used a neighbouring grid point.</li>
     </ul>
     <p class="attrib" id="attrib"></p>
   </section>

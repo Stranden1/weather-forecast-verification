@@ -281,6 +281,11 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   `wn_t + 6.5 °C/km × (model cell height − station height)`, land stations only. The cell
   height is the GMTED2010 mean over the cell (Google does not publish its grid heights),
   bilinearly weighted for `bilinear` rows. It is our adjustment, not Google's product.
-- Stations with a cell–station height difference of ≥ 100 m are flagged on the page.
-  E6 Mjøsbrua, Sunndalsøra III and Oslo-Blindern are flagged as not explained by height
+- Stations with a cell–station height difference of ≥ 100 m under either sampling method are
+  flagged on the page (both figures shown). E6 Mjøsbrua, Sunndalsøra III and Oslo-Blindern
+  carry a note that, in the data up to 26 Sep, height explained only part of the error
   (night-time lake / fjord-head / urban warmth).
+- Bilinear sampling is chosen because it matches Google's method, not to improve scores. It
+  raises the effective cell height at some coastal stations (Sunndalsøra 134 → 318 m, Bergen
+  30 → 142 m), so their published WeatherNext values may read colder from 26 Sep on. The
+  height-adjusted line accounts for that per row.
