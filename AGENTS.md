@@ -16,10 +16,21 @@ Use the existing `.venv`. WeatherNext must use the same active station network a
 MET/Frost. Change or restart the scheduled task only after the relevant integration
 has passed validation. Preserve `.env` secrets and never include them in reports.
 
-Read `WORK_STATUS.md` and `WEATHERNEXT.md` before resuming this integration.
-Keep a concrete completion/remaining-work checkpoint in `WORK_STATUS.md`.
-At the end of future substantial tasks, also update `PROJECT_STATUS.md`,
-`NEXT_STEPS.md`, and `DECISIONS.md` when their contents are affected.
+Read `WEATHERNEXT.md` before changing the local WeatherNext integration.
+
+## Handoff documents (since 2026-09-26)
+
+Keep them short; nothing is lost, because `CHANGELOG.md` and Git keep the history.
+
+- `PROJECT_STATUS.md`: current state only, about one page. **Rewrite** it; never append
+  dated sections. Keep its `## Summary` heading (Project HQ reads it).
+- `NEXT_STEPS.md`: open items only. Remove an item when it is done.
+- `WORK_STATUS.md`: the latest task's checkpoint only (what is done, what remains).
+  At the end of a task, move the previous entry to the top of `CHANGELOG.md`, then write yours.
+- `CHANGELOG.md`: dated record of completed work, newest first. Add to the top; don't rewrite.
+- `DECISIONS.md`: rules and choices that must be kept. Add a dated section for new ones.
+
+At the end of each substantial task, update the ones whose contents changed.
 
 ## Cloud pipeline (added 2026-09-23)
 

@@ -1,6 +1,6 @@
 # Decisions
 
-_Updated 2026-09-23_
+_Updated 2026-09-26_
 
 - SQLite remains the local source of truth; WeatherNext extends the existing
   forecast model rather than introducing a separate datastore.

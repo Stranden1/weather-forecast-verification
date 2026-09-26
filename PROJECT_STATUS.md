@@ -1,269 +1,80 @@
 # Project status
 
-_Updated 2026-09-23_
+_Current state only, rewritten at the end of each task. Updated 2026-09-26. History: `CHANGELOG.md`._
 
 ## Summary
 
-WeatherApp is a runnable local Windows benchmark comparing Yr/MET and Google
-WeatherNext forecasts against Frost observations across 50 active Norwegian
-stations. Data collection, storage, scoring, background scheduling, and the
-Streamlit dashboard are operational.
+WeatherApp checks which forecast is more accurate in Norway: **Yr** (MET Norway) or Google's
+AI model **WeatherNext 3**. Both are compared with **Frost** station measurements at 50
+stations. Two systems run side by side while the new one is proven:
 
-## Current capabilities
+| | Cloud pipeline (the future) | Local app (being phased out) |
+|---|---|---|
+| Where | GitHub Actions every 6 h → public page on GitHub Pages | Windows scheduled task every 6 h → Streamlit `app.py` |
+| Stores | Only the scored rows: `history/YYYY/*.csv.gz` (~90 MB/year) | Everything: `data/weather.db`, now 3.08 GB |
+| Code | `cloud/`, `site/`, `.github/workflows/` | `app.py`, `collectors/`, `scoring/` |
+| Plan | `PLAN_WEBPAGE.md` | `SCORING.md`, `WEATHERNEXT.md` |
 
-- Long-range temperature retrospectively compares Yr and verified historical
-  WeatherNext at 3/5/7/9 days, with actual evaluation dates and shared counts.
+## Cloud pipeline
 
-- Collects Yr/MET forecasts and Frost temperature, wind, and supported hourly
-  precipitation observations.
-- Collects 360-hour WeatherNext forecasts for the shared station network,
-  including means, percentiles, precipitation, wind components, and pressure.
-- Shows a compact Forecast vs Actual temperature/wind/hourly precipitation view with automatic fair
-  run pairing and optional advanced manual selection,
-  WeatherNext p10–p90 uncertainty, elapsed Frost observations, errors, and MAE.
-- Shows station metadata/maps, overall temperature, wind and hourly precipitation accuracy, and
-  WeatherNext collection status/history.
-- Shows compact collection health for Yr/MET, WeatherNext, and Frost using
-  completed retrieval timestamps, age, and conservative OK/Delayed/Stale states.
-- Dashboard browsing is read-only; manual collection controls are separated in
-  the collapsed Admin section.
-- Daily-use UI polish adds consistent metric cards, compact selectors and table
-  rows, softer forecast chart styling, and a horizontal MAE dot plot. Status,
-  logs, and manual controls remain in compact collapsed expanders.
+- All three sources have worked on every run since **25 Sep 04:58 UTC**, when WeatherNext
+  access for the service account started working (before that only Yr and Frost).
+- Scored days: 5–22 Sep migrated from the local database; 23 Sep empty (first run was that
+  evening); 24 Sep Yr only; 25 Sep with WeatherNext from 05 UTC. From 26 Sep, complete days.
+- The page shows error by horizon, trend, a station map, weather/terrain patterns,
+  uncertainty ranges, rain detection, a naive "same as before" baseline with skill, and a
+  health line. WeatherNext's forecast values are hidden until its data terms are read;
+  its errors are in every score.
 
-## Live state (read-only snapshot, 2026-09-17 local time)
+## Waiting locally (not pushed)
 
-- Authoritative database: `data/weather.db`; active stations: 50.
-- Total forecast runs / points: 4,504 / 344,008.
-- Frost observation rows: 189,084.
-- Frost hourly precipitation: 13,344 station-hours at 29 active stations;
-  2,243 non-zero values, 2026-08-26 16:00 through 2026-09-16 22:00 UTC.
-- Latest operational WeatherNext initialization: 2026-09-16 18:00 UTC.
-- WeatherNext forecast points / statistic values: 130,400 / 2,672,400.
-- Includes 4,400 sparse historical temperature points at 72/120/168/216h;
-  these archive runs do not contain full hourly/multivariable coverage.
+These are committed on `main` but not on GitHub, so the cloud and the page don't use them yet:
+
+- **Bilinear WeatherNext sampling** on the native grid, recorded per row (`wn_sampling`).
+  The local collector already uses it from 26 Sep 16:00 UTC.
+- **Height-adjusted WeatherNext temperature** as a separate, labelled line, plus height
+  notes for 15 stations. Published values stay the main score; no station is dropped.
+- **Forecast steadiness** numbers (`steadiness.json`, not yet shown on the page).
+- **Project HQ** (`project_hq/`), a local read-only viewer of these documents: run
+  `.\.venv\Scripts\python.exe -B project_hq\run.py` and open http://127.0.0.1:8510.
+
+GitHub has 3 newer scored-day commits from CI; they only add `history/` files and merge cleanly.
+
+## First results (preliminary: about one week with both services)
+
+From `FINDINGS_2026-09-26.md` and `INVESTIGATION_COLD_BIAS_2026-09-26.md`:
+
+- **Temperature:** Yr ahead at short range as published. WeatherNext reads too cold at
+  stations whose ~5 km grid area is much higher than the station; after a standard height
+  adjustment WeatherNext is ahead at 12 h–1 day (0.78/0.80 vs Yr 0.84/0.89 °C).
+- **Wind:** WeatherNext ahead at 1–2 days, especially in stronger wind.
+- **Rain:** Yr has the lower average error; WeatherNext's average catches more rain but gives
+  many false alarms, and its median is about as good as Yr.
+- **Steadiness:** WeatherNext changes its forecast about half as much as Yr between runs.
+- WeatherNext's uncertainty ranges are too narrow for wind (50% inside vs 80% ideal).
 
 ## Validation
 
-All 69 unit/regression tests pass. Front-page automatic/manual/no-pair behavior,
-compact health states and existing pages pass fixture UI and live render checks. The compact retrospective and collection-health views also passed
-fixture interaction tests and a live browser check. The additive verification
-table contains 4,400 historical points; registration preserved all prior data. Historical temperature ingestion was repeated
-with zero additions and zero duplicate keys; every pre-existing domain row was
-preserved. The fixture dashboard interaction test and production-data render
-also pass. Existing dependency deprecation warnings are non-fatal.
+Tests: 79 local-app, 43 cloud-pipeline and 8 Project HQ tests pass (26 Sep).
+Run: `.\.venv\Scripts\python.exe -m unittest discover -s . -p "test_*.py"` (local + cloud)
+and `.\.venv\Scripts\python.exe -B -m unittest discover -s project_hq -p "test_*.py"`.
 
 ## Known limits
 
-- Forecast vs Actual's 72 h / 7 days span starts at the selected runs' earliest
-  forecast time. Automatic pairing chooses the newest fair pair; older actual
-  history requires selecting older forecast runs in Manual runs.
-- Fair comparisons require shared exact-time observations and forecast leads within 3 hours in the same bucket; initial overlapping history is short.
-- Hourly precipitation scoring is enabled with canonical intervals and wet/event
-  context. Short leads currently have no fair samples; 48–72h coverage is partial.
+- Only about a week of paired data: treat every result as preliminary. Verdicts need 7 days.
+- Yr has a home advantage: its first 2–3 days are corrected with these stations' data.
+- Hourly rain is scored only up to 2 days ahead; the 10-day horizon has almost no data yet.
+- Pressure, wind direction and cloud cover are not scored (no matching observations).
 
-## Frost hourly precipitation — 2026-09-16
+## Where to find things
 
-- The normal Frost run now requests `sum(precipitation_amount PT1H)` only for the
-  29 active stations advertising that exact element.
-- Frost `referenceTime` is stored unchanged as the interval end. See
-  `PRECIPITATION.md` for the cross-provider mapping.
-- The historical backfill added 13,118 values without changing existing
-  temperature or wind values. Repeating the same range produced no database
-  changes, no duplicate keys, and no off-hour timestamps.
-- No scoring, dashboard, station-network, provider, schema, or scheduled-task
-  changes were made for this work.
-- Accuracy becomes more meaningful as additional model cycles and observations
-  accumulate.
-
-## Collection health — 2026-09-17
-
-- The dashboard reads finalized source outcomes from `data/background.log`, not
-  forecast valid times. Existing combined summaries provide historical continuity;
-  future runs add one stable completion line per source.
-- The Windows task is scheduled every 6 hours. Health is OK through 8 hours,
-  Delayed through 12 hours, and Stale / attention needed after 12 hours. A failed
-  latest attempt is Delayed immediately; an absent success is Stale.
-- Yr success intervals longer than 12 hours within the last 7 days are reported.
-  A stale Yr state warns that missed long-range forecast history may be unrecoverable.
-- Current state at validation: Yr/MET, WeatherNext, and Frost all OK; last success
-  2026-09-17 04:13 UTC; no recent Yr gap detected.
-- No schema, schedule, provider, scoring, station-network, forecast, or observation
-  history changes were made.
-
-## Version control — 2026-09-16
-
-Private remote: https://github.com/Stranden1/weather-forecast-verification.
-Code, tests, setup scripts, docs and a 50-station metadata snapshot are versioned.
-Secrets, live data, environments and scratch artifacts remain local. All 18 tests,
-fixture UI test and production dashboard render passed; existing deprecation warnings
-are non-fatal. Application code and scheduling were not changed for Git setup.
-
-
-## Accuracy dashboard expansion — 2026-09-16
-
-- Forecast vs Actual supports temperature and wind speed, exact-time Frost values,
-  uncertainty bands, run/lead information, individual errors and matched MAE.
-- Overall Accuracy filters variable, valid-time period, station and existing lead
-  bucket; shows paired MAE, bias, shared count, MAE difference, daily trends and details.
-- Model Disagreement ranks future latest-run differences and opens a chosen station,
-  variable and run pair in Forecast vs Actual.
-- SCORING.md records the variable audit, matching rules and limitations. Rainfall,
-  pressure, direction and cloud scoring remain disabled.
-- Audit validation: 27 regression tests; expanded disposable-database UI test
-  (including no writes); live browser checks of wind accuracy, forecasts and
-  disagreement navigation. Production queries took about 0.7 seconds per variable
-  for all-history matching plus the 72-hour disagreement query.
-- Source changes are local and uncommitted; no push was requested for this task.
-
-
-## Historical temperature comparison — 2026-09-17
-
-Backfilled 34 WeatherNext initializations from September 5 12:00 to September 13
-18:00 UTC, selecting only 88 temperature images needed by existing long-range
-Yr/Frost cases. All six statistics were added for all 50 active stations.
-
-Retrospective shared counts at 72/120/168/216h: 1,603 / 1,215 / 824 / 438.
-Yr MAE: 1.077 / 1.325 / 1.490 / 1.532 °C; WeatherNext MAE: 1.065 / 1.300 /
-1.708 / 1.720 °C. Both leads are within nominal ±3h and pair gaps ≤3h. These
-short-period results need cautious interpretation; WeatherNext usually has a
-roughly 2.4-hour shorter lead. Original Earth Engine availability is verified,
-but local collection occurred later, so production scoring still excludes the
-backfilled points from operational long-range matches. Its rules are unchanged.
-
-Full local report, lead distributions and individual cases:
-`outputs/temperature-backfill/REPORT.md`. The source helpers and tests are local,
-uncommitted additions. No UI, schema, other collector or scheduling changes.
-
-
-## Retrospective view available — 2026-09-17
-
-The **Long-range temperature** tab now uses database-persisted historical
-verification. Original publication before target makes certified archive points
-eligible for this retrospective view; truthful local retrieval dates remain
-unchanged. The separate operational views keep their existing rules. A compact
-four-row table shows MAE, difference, shared count and each horizon's evaluation
-period, with station/window filters and expandable bias/lead details. See the
-latest WORK_STATUS.md checkpoint and SCORING.md for validation and semantics.
-
-
-## Validated Git checkpoint — 2026-09-17
-
-The mixed dashboard/scoring/backfill/health worktree was reviewed and validated as
-one coherent checkpoint. All 51 tests, fixture dashboard interactions and a live
-read-only dashboard render passed, including long-range temperature and Collection
-health. No application behavior or live data was changed during checkpoint review.
-The checkpoint message is `Checkpoint long-range verification and collection health`;
-use Git history for its hash. No push was requested. Earlier uncommitted notes above
-record the state at the time of each implementation task.
-
-
-## Front-page usability — 2026-09-22
-
-Forecast vs Actual defaults to **Automatic fair pair** for the station, variable
-and chart window. It reuses the operational matcher: exact shared Frost targets,
-issued/collected before target, same lead bucket and a maximum 3-hour lead gap.
-Among pairs with observations, the newest pair is chosen by older initialization,
-then newer initialization and stable run IDs. Errors and sample counts do not rank
-pairs. If no observed pair exists, a fair future pair is preferred; missing matches
-have a concise data-based explanation. Independent dropdowns remain in Advanced /
-Manual run selection, and disagreement drill-through enters Manual runs.
-
-Healthy collectors occupy one status line and a collapsed details panel. Active
-source delays/failures and stale Yr warnings remain prominent; resolved recent gaps
-remain in details. Thresholds, logging, collectors, schema and history are unchanged.
-The existing dashboard process was restarted once to clear stale Python imports;
-no scheduled collection task was changed or restarted.
-
-
-## Exploratory precipitation benchmark — 2026-09-22
-
-Read-only analysis completed; precipitation production scoring remains disabled.
-The snapshot has 17,160 Frost rainfall hours at 29 stations. Fair 12–24/24–48/
-partial 48–72h sample counts are 3,116/4,244/3,359; 0–12h is empty under strict
-availability and same-bucket rules. Both issue and collection precede interval
-start; canonical interval mapping and <=3h lead gaps are preserved. Yr has lower
-all-hour MAE, WeatherNext lower wet-hour MAE and more hits but more false alarms.
-Dry hours dominate; only one week is paired. Data structure/alignment supports
-careful future implementation, not a stable winner claim. Full local evidence:
-work/precipitation-benchmark/REPORT.md. No production code or data changes.
-
-
-## Production precipitation — 2026-09-22
-
-Hourly precipitation is available in the existing Forecast vs Actual and Overall
-accuracy selectors. Automatic/manual comparisons share one fair precipitation
-matcher, reusing the established closest-lead infrastructure. Charts align Yr,
-WeatherNext mean and Frost to physical interval end; no rainfall uncertainty band.
-Wet-hour MAE, all-hour MAE, bias, POD, FAR and CSI appear with counts/dates and
-actual lead ranges. Dry-hour context is shown once per view; no winner/combined score.
-
-Read-only snapshot 2026-09-22 16:24 UTC: 0/3,232/4,417/3,501 shared pairs in
-0–12/12–24/24–48/partial 48–72h, 29 stations in each populated bucket. The original
-10,719 benchmark pairs reproduce exactly; two additional fixed-period pairs are
-newly filled observations. Temperature/wind/long-range outputs are unchanged.
-69 unit tests and expanded fixture UI checks pass. No database, collector,
-schedule, station or secret changes. Only the dashboard process was restarted.
-
-
-## Optional 6h/24h precipitation — 2026-09-23
-
-Overall accuracy now offers 1h (default), 6h UTC periods and 24h UTC-day
-precipitation verification. Complete Frost/Yr/WeatherNext hours and one
-available run per provider are required. The dashboard shows MAE, bias,
-observed-wet MAE, POD/FAR/CSI, actual lead ranges, dates and both shared
-pair and distinct-period counts. Forecast vs Actual stays hourly.
-
-The fixed 22 September 23:21 UTC benchmark reproduces exactly:
-2,110 six-hour period/lead pairs from 796 distinct station periods, and
-293 daily pairs from 160 distinct station-days, across 29 stations.
-The 6h 48–72h bucket is partial; no daily pair reaches it. These are
-preliminary correlated samples, not a provider ranking. No database,
-collector, station, schedule or historical-data change was made.
-
-## WeatherNext status rerun optimization — 2026-09-23
-
-The compact dashboard status now avoids the full WeatherNext sample count on
-routine interactions. Exact stored-data counts remain available through
-**Refresh stored-data counts** in WeatherNext system status. Log-based collection
-health is uncached and unchanged. On the same live data, Station network reruns
-fell from about 5.5 seconds to 0.23 seconds; the explicit count still takes
-about 5 seconds when requested. Scoring, collectors, schema and schedule are
-unchanged.
-
-## All-station precipitation query — 2026-09-23
-
-An additive partial expression index for WeatherNext hourly-mean samples now
-supports bounded precipitation reads. On a fixed 7-day snapshot, average 1h/6h/
-24h runtimes fell from 7.7/8.7/8.6 s to 5.0/5.9/5.9 s, with every pair row and
-metric unchanged. Query cost remains significant; broader matching/scoring
-changes were outside this bounded optimization. The index changed no stored rows.
-
-Long-range temperature now constrains the 69–219 h candidate leads in SQL,
-starts verified-history validation from the small manifest, and scopes Frost
-targets to the selected station and date range. Fixed-snapshot all-history,
-7-day, and 24-hour runtimes are 1.51/1.13/0.73 s; Trondheim-Voll all-history
-and 7-day are 0.15/0.13 s. Every candidate pair and horizon score matched the
-pre-optimization snapshot exactly. No cache or scientific-rule change was added.
-
-
-## Cloud pipeline and public webpage — 2026-09-23 (Claude)
-
-New, parallel, not yet deployed. `cloud/` collects only the forecast hours needed
-for 6 h–10 day verification horizons, scores each finished UTC day once into
-`history/YYYY/YYYY-MM-DD.csv.gz` (~20 MB/year) and discards the rest. Yr and
-WeatherNext are paired from the same collection run (same lead). `site/` is a
-static scorecard for GitHub Pages; `.github/workflows/collect.yml` runs every 6 h.
-8 unit tests pass; the page was checked in light/dark/mobile with demo data and
-with an empty first run. The local app, Windows task and `data/weather.db` are
-unchanged. Setup and remaining steps: `SETUP_CLOUD.md`, `PLAN_WEBPAGE.md`.
-
-2026-09-24: added the naive baseline and skill score, the pinball score and range width,
-and a health line on the page (25 cloud tests). Pushed.
-
-2026-09-26: WeatherNext's cold bias at 8 stations traced to grid-cell height (plus local
-night warmth and a neighbour-cell sampling artefact). WeatherNext is now sampled bilinearly
-on its native grid (dated switch, per-row `wn_sampling`), and the page adds a labelled
-height-adjusted temperature line and station height notes. Published values stay primary;
-no station dropped. Local commits, not pushed. See DECISIONS.md and
-INVESTIGATION_COLD_BIAS_2026-09-26.md.
+| File | What it holds |
+|---|---|
+| `NEXT_STEPS.md` | Open items only |
+| `WORK_STATUS.md` | The latest task's checkpoint |
+| `CHANGELOG.md` | Everything done so far, newest first |
+| `DECISIONS.md` | Rules and choices that must be kept |
+| `SCORING.md`, `PRECIPITATION.md` | How the local app matches and scores forecasts |
+| `PLAN_WEBPAGE.md`, `SETUP_CLOUD.md` | Cloud pipeline design and setup |
+| `PLAN_REPLAYS.md` | Next feature: storm replays and steadiness |
+| `REVIEW_2026-09-23.md`, `INVESTIGATION_*.md`, `FINDINGS_*.md` | Reviews and analyses |

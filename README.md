@@ -1,10 +1,20 @@
 # WeatherApp
 
-Local Windows weather forecast verification dashboard. Compares Yr/MET and Google
-WeatherNext 3 forecasts with Frost observations across a shared Norwegian station
-network. Stores forecast history in SQLite and displays temperature/wind comparisons,
-WeatherNext uncertainty, station maps, and temperature/wind accuracy in Streamlit.
-WeatherNext rainfall is stored but is not yet scored.
+Checks which forecast is more accurate in Norway: Yr/MET or Google WeatherNext 3,
+against Frost observations at a shared network of 50 stations. Temperature, wind and
+hourly precipitation are scored. Start with [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
+It has two parts:
+
+- **Cloud pipeline** (`cloud/`, `site/`, `.github/workflows/`): collects every 6 hours on
+  GitHub Actions, keeps only scored rows in `history/`, and publishes a static scorecard on
+  GitHub Pages. See [PLAN_WEBPAGE.md](PLAN_WEBPAGE.md) and [SETUP_CLOUD.md](SETUP_CLOUD.md).
+- **Local app** (this page, below): a Windows scheduled task stores full forecast history in
+  SQLite, with a detailed Streamlit dashboard. It runs in parallel until the cloud pipeline
+  is proven.
+
+**Project HQ** (`project_hq/`) is a local, read-only viewer of the project documents:
+`.\.venv\Scripts\python.exe -B project_hq\run.py`, then open http://127.0.0.1:8510.
 
 ## Run the existing local installation
 
@@ -79,8 +89,8 @@ git push
 ```
 
 Review staged changes for secrets before committing. See `PROJECT_STATUS.md`,
-`WORK_STATUS.md`, `NEXT_STEPS.md` and `DECISIONS.md` for the project handoff.
-Historical references to `work/` in those documents refer to local-only evidence.
+`NEXT_STEPS.md`, `WORK_STATUS.md`, `DECISIONS.md` and `CHANGELOG.md` for the project
+handoff. References to `work/` in those documents refer to local-only evidence.
 
 
 The dashboard also offers fair shared-target Overall Accuracy and a future Model
