@@ -51,6 +51,7 @@ jobs:
           WEATHERNEXT_ENABLED: ${{ vars.WEATHERNEXT_ENABLED || '1' }}
           WX_PUBLISH_FORECAST_VALUES: ${{ vars.WX_PUBLISH_FORECAST_VALUES || '0' }}
           WX_STATE_DIR: state
+          WX_STATE_KEY: ${{ secrets.WX_STATE_KEY }}  # encrypts future forecasts on the public state branch
         run: python -m cloud.run all
 
       - name: Save working state (single commit, replaced each run)
