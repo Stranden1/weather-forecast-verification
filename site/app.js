@@ -207,7 +207,7 @@
       ${flagText}
       <p class="muted" style="margin:0 0 4px;font-size:13px">Last 7 days: forecast made 1 day ahead vs what happened</p>
       <div class="chart"><canvas id="station-chart"></canvas></div>
-      ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's raw values are hidden until its data terms are confirmed; its errors are included in every score.</p>`}`;
+      ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's forecast values are not shown, because its data terms don't clearly allow publishing them; its errors are included in every score.</p>`}`;
     if (!rec) { el.querySelector(".chart").innerHTML = `<p class="empty">No recent data.</p>`; return; }
     const ds = [line("Measured", rec[`obs_${S.v}`], css("--obs"), { pointRadius: 0, borderWidth: 2 }),
                 line("Yr", rec[`yr_${S.v}`], css("--yr"), { pointRadius: 0 })];
