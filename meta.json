@@ -1,0 +1,426 @@
+{
+ "finalized_days": [
+  "2026-09-23",
+  "2026-09-24",
+  "2026-09-25"
+ ],
+ "first_fetch": "2026-09-23T20:30:02Z",
+ "runs": [
+  {
+   "fetched_at": "2026-09-23T20:30:02Z",
+   "yr_rows": 0,
+   "wn_rows": 0,
+   "obs_rows": 3529,
+   "errors": [
+    "Yr SN10380: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN1120: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN120: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN12590: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN13760: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN18700: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20925: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20949: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20961: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN25630: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN2970: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN33430: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN34130: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN41825: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN44610: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN50540: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN53101: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN57770: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN60980: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN63420: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)"
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:33:46Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: Caller does not have required permission to use project weatherapp-508323. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=weatherapp-508323 and then retry. Propagation of the new permission may take a few minutes."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:42:00Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: Caller does not have required permission to use project weatherapp-508323. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=weatherapp-508323 and then retry. Propagation of the new permission may take a few minutes."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:49:08Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-24T01:09:57Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3521,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p05deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p05deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T04:51:30Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3521,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T11:46:31Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3515,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3515,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T17:12:04Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3514,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3514,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T21:31:40Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3517,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3517,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T04:58:12Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3519,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3519,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T11:51:51Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3521,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T17:12:02Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3521,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T21:35:26Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3524,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3524,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T04:58:33Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3523,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3523,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T11:25:32Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3522,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3522,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T15:25:52Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3518,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3518,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T16:24:11Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3517,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3517,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  }
+ ]
+}
