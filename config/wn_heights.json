@@ -1,0 +1,409 @@
+{
+ "description": "WeatherNext model-cell height (GMTED2010 mean over the 0.05 degree cell) per station and sampling method. See cloud/heights.py and DECISIONS.md.",
+ "lapse_c_per_km": 6.5,
+ "stations": {
+  "SN10380": {
+   "name": "Røros",
+   "elev": 625.0,
+   "cell_nn5km": 731.4,
+   "cell_bilinear": 694.6,
+   "terrain_at_point": 640.0,
+   "offshore": false
+  },
+  "SN1120": {
+   "name": "FV220 ENNINGDALEN [SN1120]",
+   "elev": 49.0,
+   "cell_nn5km": 133.8,
+   "cell_bilinear": 132.1,
+   "terrain_at_point": 49.0,
+   "offshore": false
+  },
+  "SN120": {
+   "name": "FV2168 FLERMOBERGET [SN120]",
+   "elev": 580.0,
+   "cell_nn5km": 457.4,
+   "cell_bilinear": 496.4,
+   "terrain_at_point": 574.0,
+   "offshore": false
+  },
+  "SN12590": {
+   "name": "E6 MJØSBRUA [SN12590]",
+   "elev": 128.0,
+   "cell_nn5km": 164.3,
+   "cell_bilinear": 203.4,
+   "terrain_at_point": 123.0,
+   "offshore": false,
+   "note": "Next to Lake Mjøsa, which keeps nights warmer than the model's cell."
+  },
+  "SN13760": {
+   "name": "FV51 VALDRESFLYE [SN13760]",
+   "elev": 1390.0,
+   "cell_nn5km": 1354.6,
+   "cell_bilinear": 1322.2,
+   "terrain_at_point": 1389.0,
+   "offshore": false
+  },
+  "SN18700": {
+   "name": "Oslo",
+   "elev": 94.0,
+   "cell_nn5km": 158.1,
+   "cell_bilinear": 127.1,
+   "terrain_at_point": 97.0,
+   "offshore": false,
+   "note": "In the city; urban warmth at night is not in the model's cell."
+  },
+  "SN20925": {
+   "name": "WISTING [SN20925]",
+   "elev": 0.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN20949": {
+   "name": "GINA KROG [SN20949]",
+   "elev": 65.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN20961": {
+   "name": "ALVHEIM [SN20961]",
+   "elev": 40.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN25630": {
+   "name": "GEILO - OLDEBRÅTEN [SN25630]",
+   "elev": 772.0,
+   "cell_nn5km": 960.7,
+   "cell_bilinear": 981.1,
+   "terrain_at_point": 776.0,
+   "offshore": false
+  },
+  "SN2970": {
+   "name": "E16 ØYERMOEN [SN2970]",
+   "elev": 273.0,
+   "cell_nn5km": 322.5,
+   "cell_bilinear": 317.7,
+   "terrain_at_point": 282.0,
+   "offshore": false
+  },
+  "SN33430": {
+   "name": "E134 GRØNLIHEIA [SN33430]",
+   "elev": 692.0,
+   "cell_nn5km": 828.8,
+   "cell_bilinear": 796.7,
+   "terrain_at_point": 719.0,
+   "offshore": false
+  },
+  "SN34130": {
+   "name": "JOMFRULAND [SN34130]",
+   "elev": 3.0,
+   "cell_nn5km": 2.1,
+   "cell_bilinear": 2.1,
+   "terrain_at_point": 4.0,
+   "offshore": false
+  },
+  "SN41825": {
+   "name": "LYNGDAL [SN41825]",
+   "elev": 6.0,
+   "cell_nn5km": 85.2,
+   "cell_bilinear": 83.6,
+   "terrain_at_point": 4.0,
+   "offshore": false
+  },
+  "SN44610": {
+   "name": "KVITSØY - NORDBØ [SN44610]",
+   "elev": 21.0,
+   "cell_nn5km": 1.4,
+   "cell_bilinear": 0.7,
+   "terrain_at_point": 15.0,
+   "offshore": false
+  },
+  "SN50540": {
+   "name": "Bergen",
+   "elev": 12.0,
+   "cell_nn5km": 42.2,
+   "cell_bilinear": 154.2,
+   "terrain_at_point": 17.0,
+   "offshore": false
+  },
+  "SN53101": {
+   "name": "VANGSNES [SN53101]",
+   "elev": 49.0,
+   "cell_nn5km": 333.7,
+   "cell_bilinear": 242.2,
+   "terrain_at_point": 42.0,
+   "offshore": false
+  },
+  "SN57770": {
+   "name": "YTTERØYANE FYR [SN57770]",
+   "elev": 26.0,
+   "cell_nn5km": 0.2,
+   "cell_bilinear": 0.1,
+   "terrain_at_point": 9.0,
+   "offshore": false
+  },
+  "SN60980": {
+   "name": "FV5957 GISKEBRUA [SN60980]",
+   "elev": 17.0,
+   "cell_nn5km": 20.7,
+   "cell_bilinear": 12.2,
+   "terrain_at_point": 0.0,
+   "offshore": false
+  },
+  "SN63420": {
+   "name": "SUNNDALSØRA III [SN63420]",
+   "elev": 6.0,
+   "cell_nn5km": 140.4,
+   "cell_bilinear": 323.7,
+   "terrain_at_point": 1.0,
+   "offshore": false,
+   "note": "At sea level at a fjord head; nights are warmer than the model's cell."
+  },
+  "SN65940": {
+   "name": "SULA [SN65940]",
+   "elev": 5.0,
+   "cell_nn5km": 1.2,
+   "cell_bilinear": 1.1,
+   "terrain_at_point": 3.0,
+   "offshore": false
+  },
+  "SN68860": {
+   "name": "Trondheim",
+   "elev": 127.0,
+   "cell_nn5km": 154.5,
+   "cell_bilinear": 129.0,
+   "terrain_at_point": 128.0,
+   "offshore": false
+  },
+  "SN70850": {
+   "name": "SNÅSA - KJEVLIA [SN70850]",
+   "elev": 195.0,
+   "cell_nn5km": 422.5,
+   "cell_bilinear": 317.7,
+   "terrain_at_point": 204.0,
+   "offshore": false
+  },
+  "SN76245": {
+   "name": "FV17 VÅG [SN76245]",
+   "elev": 18.0,
+   "cell_nn5km": 45.1,
+   "cell_bilinear": 34.7,
+   "terrain_at_point": 26.0,
+   "offshore": false
+  },
+  "SN76909": {
+   "name": "JOHAN CASTBERG [SN76909]",
+   "elev": 53.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76922": {
+   "name": "STATFJORD A [SN76922]",
+   "elev": 71.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76929": {
+   "name": "YME [SN76929]",
+   "elev": 50.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76930": {
+   "name": "NORNE [SN76930]",
+   "elev": 33.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76933": {
+   "name": "ORMEN LANGE [SN76933]",
+   "elev": 0.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76938": {
+   "name": "ULA [SN76938]",
+   "elev": 111.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76939": {
+   "name": "VALHALL A [SN76939]",
+   "elev": 95.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76956": {
+   "name": "GOLIAT FPSO [SN76956]",
+   "elev": 46.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76957": {
+   "name": "TROLL B [SN76957]",
+   "elev": null,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN76963": {
+   "name": "KRISTINFELTET [SN76963]",
+   "elev": 45.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN77040": {
+   "name": "AASTA HANSTEEN [SN77040]",
+   "elev": 64.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 0.0,
+   "terrain_at_point": 0.0,
+   "offshore": true
+  },
+  "SN80102": {
+   "name": "SOLVÆR III [SN80102]",
+   "elev": 10.0,
+   "cell_nn5km": 0.2,
+   "cell_bilinear": 1.9,
+   "terrain_at_point": 2.0,
+   "offshore": false
+  },
+  "SN81790": {
+   "name": "E6 STØDI BRU [SN81790]",
+   "elev": 690.0,
+   "cell_nn5km": 760.9,
+   "cell_bilinear": 735.7,
+   "terrain_at_point": 687.0,
+   "offshore": false
+  },
+  "SN84210": {
+   "name": "LOSISTUA [SN84210]",
+   "elev": 740.0,
+   "cell_nn5km": 1165.0,
+   "cell_bilinear": 907.4,
+   "terrain_at_point": 728.0,
+   "offshore": false
+  },
+  "SN85890": {
+   "name": "RØST LUFTHAVN [SN85890]",
+   "elev": 4.0,
+   "cell_nn5km": 0.3,
+   "cell_bilinear": 0.8,
+   "terrain_at_point": 6.0,
+   "offshore": false
+  },
+  "SN86740": {
+   "name": "BØ I VESTERÅLEN III [SN86740]",
+   "elev": 8.0,
+   "cell_nn5km": 2.5,
+   "cell_bilinear": 3.4,
+   "terrain_at_point": 2.0,
+   "offshore": false
+  },
+  "SN87110": {
+   "name": "ANDØYA [SN87110]",
+   "elev": 10.0,
+   "cell_nn5km": 2.5,
+   "cell_bilinear": 5.0,
+   "terrain_at_point": 1.0,
+   "offshore": false
+  },
+  "SN89940": {
+   "name": "DIVIDALEN II [SN89940]",
+   "elev": 204.0,
+   "cell_nn5km": 368.3,
+   "cell_bilinear": 396.6,
+   "terrain_at_point": 205.0,
+   "offshore": false
+  },
+  "SN90450": {
+   "name": "Tromsø",
+   "elev": 100.0,
+   "cell_nn5km": 47.3,
+   "cell_bilinear": 38.7,
+   "terrain_at_point": 99.0,
+   "offshore": false
+  },
+  "SN92895": {
+   "name": "E6 LANGFJORDBOTN [SN92895]",
+   "elev": 40.0,
+   "cell_nn5km": 287.1,
+   "cell_bilinear": 314.4,
+   "terrain_at_point": 40.0,
+   "offshore": false
+  },
+  "SN93700": {
+   "name": "KAUTOKEINO [SN93700]",
+   "elev": 307.0,
+   "cell_nn5km": 369.9,
+   "cell_bilinear": 345.8,
+   "terrain_at_point": 320.0,
+   "offshore": false
+  },
+  "SN94190": {
+   "name": "REVSBOTN - DANIELSVIKA [SN94190]",
+   "elev": 12.0,
+   "cell_nn5km": 0.0,
+   "cell_bilinear": 144.3,
+   "terrain_at_point": 0.0,
+   "offshore": false
+  },
+  "SN96310": {
+   "name": "MEHAMN LUFTHAVN [SN96310]",
+   "elev": 13.0,
+   "cell_nn5km": 50.9,
+   "cell_bilinear": 64.4,
+   "terrain_at_point": 15.0,
+   "offshore": false
+  },
+  "SN97251": {
+   "name": "KARASJOK - MARKANNJARGA [SN97251]",
+   "elev": 131.0,
+   "cell_nn5km": 290.8,
+   "cell_bilinear": 235.0,
+   "terrain_at_point": 140.0,
+   "offshore": false
+  },
+  "SN98550": {
+   "name": "VARDØ RADIO [SN98550]",
+   "elev": 10.0,
+   "cell_nn5km": 1.5,
+   "cell_bilinear": 2.3,
+   "terrain_at_point": 8.0,
+   "offshore": false
+  },
+  "SN99540": {
+   "name": "NYRUD [SN99540]",
+   "elev": 56.0,
+   "cell_nn5km": 64.1,
+   "cell_bilinear": 67.0,
+   "terrain_at_point": 54.0,
+   "offshore": false
+  }
+ }
+}
