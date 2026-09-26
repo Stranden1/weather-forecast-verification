@@ -6,6 +6,26 @@ written and may be superseded by later ones. Before that date `PROJECT_STATUS.md
 `NEXT_STEPS.md` also carried dated sections summarizing the same work; their full text
 is in Git history (commit `7e01378`). Paths under `work/` and `outputs/` are local-only evidence.
 
+## Documentation cleanup — 2026-09-26 (Claude)
+
+Done, following REVIEW_2026-09-23 §4:
+
+- `PROJECT_STATUS.md` rewritten as current state only (about one page, keeps a `## Summary`
+  heading, which Project HQ's overview reads).
+- `NEXT_STEPS.md` rewritten as open items only. Items already done were dropped. Checked
+  facts: cloud WeatherNext works since 25 Sep 04:58 UTC; cloud 23 Sep is empty, 24 Sep has Yr
+  only, 25 Sep has WeatherNext from 05 UTC; `--strict` exists but the workflow does not use it.
+- The old work log moved to `CHANGELOG.md`, newest first, wording unchanged. A script checked
+  that every line is there. The old dated sections of PROJECT_STATUS/NEXT_STEPS are in Git
+  history (commit `7e01378`).
+- README: removed "rainfall is not yet scored", added the cloud pipeline and Project HQ.
+- AGENTS.md and CLAUDE.md: the new rules for these files.
+- Project HQ committed first as its own commit (`7e01378`, Codex's work, unchanged).
+
+No code, data, history or schedule changed. 79 local + 43 cloud + 8 HQ tests pass.
+Pushed 26 Sep 14:59 UTC with all earlier local commits, after merging three CI scored-day
+files from `origin/main`. GitHub's cloud tests passed on the push.
+
 ## WeatherNext cold bias: sampling fix and height-adjusted line — 2026-09-26 (Claude)
 
 Investigation (deep-thinker, read-only EE): `INVESTIGATION_COLD_BIAS_2026-09-26.md`. Cause:

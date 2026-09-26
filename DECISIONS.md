@@ -260,6 +260,14 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
 - Frost fetch window (4 days) and observation retention (12 days) are now separate settings.
 - health.json publishes statuses and counts only, never raw error messages.
 
+## One-off fill of the first cloud days — 2026-09-26 (Claude, user's decision)
+
+- The cloud day files for 23 and 24 Sep had no WeatherNext (the service account had no access
+  yet; 23 Sep was empty). With the user's OK they were replaced once from the PC database with
+  `migrate_sqlite --from 2026-09-23 --until 2026-09-25 --fill-missing-wn`: 7,910 and 8,274 rows,
+  all with WeatherNext, marked `wn_sampling = nn5km`. This is the only exception so far to
+  "history files are written once". 25 Sep already had WeatherNext and was kept.
+
 ## WeatherNext sampling and station height — 2026-09-26 (Claude)
 
 Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
