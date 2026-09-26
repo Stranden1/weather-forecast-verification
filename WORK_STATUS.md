@@ -14,9 +14,12 @@ Done:
   under the real-time terms: internal use, value-added services, and only controlled sharing
   of the data itself.
 
-Remaining (see NEXT_STEPS item 1):
-- **The public `state` branch holds 10,900 future WeatherNext forecast rows** in
-  `pending.csv.gz` (checked 26 Sep ~15:10 UTC). Proposed fix, not yet approved: encrypt the
-  state files with a key in a GitHub secret.
-- Then update the page attribution to the exact CC BY citation and decide
-  `WX_PUBLISH_FORECAST_VALUES`.
+- Fixed the same day: the public `state` branch held future WeatherNext forecasts. State files
+  are now Fernet-encrypted (`cloud/store.py`, key `WX_STATE_KEY` as a GitHub secret and in local
+  `.env`); plain files stay readable. Verified after a manual run at 15:25 UTC: both files
+  encrypted, readable with the key, all sources OK, new rows `bilinear`. 44 cloud tests pass.
+  Old plain versions may stay reachable on GitHub by commit hash for a while.
+- Page attribution now uses WeatherNext's exact CC BY citation; `FINDINGS_2026-09-26.md`
+  committed with it.
+
+Remaining: the user sets `WX_PUBLISH_FORECAST_VALUES=1` (NEXT_STEPS item 1).
