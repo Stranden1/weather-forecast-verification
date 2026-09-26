@@ -102,6 +102,18 @@ ATTRIBUTION = [
     "WeatherNext 3 was generated using data and products of the European Centre for "
     "Medium-Range Weather Forecasts (ECMWF), as well as additional third-party providers: "
     "https://storage.googleapis.com/weathernext-public/weathernext-3-attributions-acknowledgements.pdf",
+    # ECMWF IFS/AIFS via Open-Meteo (collected, not shown yet). Open-Meteo's licence page
+    # requires "Weather data by Open-Meteo.com" linked to https://open-meteo.com/; ECMWF's
+    # licence asks services for this copyright, source, licence and disclaimer wording and a
+    # note of modifications.
+    "Weather data by Open-Meteo.com (https://open-meteo.com/), licensed CC BY 4.0.",
+    "This service is based on data and products of the European Centre for Medium-Range "
+    "Weather Forecasts (ECMWF). Source: www.ecmwf.int. This data is published under a Creative "
+    "Commons Attribution 4.0 International (CC BY 4.0) https://creativecommons.org/licenses/by/4.0/. "
+    "ECMWF does not accept any liability whatsoever for any error or omission in the data, their "
+    "availability, or for any loss or damage arising from their use. Modified: Open-Meteo "
+    "interpolates the IFS and AIFS forecasts to hourly values and adjusts temperature to each "
+    "station's height.",
 ]
 
 

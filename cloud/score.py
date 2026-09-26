@@ -19,9 +19,14 @@ from .config import (FINALIZE_DELAY_HOURS, HORIZON_TOLERANCE, HORIZONS, OBS_KEEP
 
 YR_COLS = ["t", "t_p10", "t_p90", "w", "w_p10", "w_p90", "p", "p_min", "p_max", "p_prob"]
 WN_COLS = ["t", "t_p10", "t_p50", "t_p90", "w", "w_p10", "w_p50", "w_p90", "p", "p_p50", "p_p90"]
+# ECMWF IFS HRES and AIFS Single (Open-Meteo). They ride along with the row Yr and
+# WeatherNext already select (same fetch), so the pairing rules are unchanged.
+EXTRA_PROVIDERS = ("ifs", "aifs")
+EXTRA_COLS = ["t", "w", "p"]
 SCORED_COLUMNS = (["target", "station", "h", "lead_h", "fetched_at", "yr_issued", "wn_issued",
                    "obs_t", "obs_w", "obs_p", "base_t", "base_w", "base_p"]
-                  + [f"yr_{c}" for c in YR_COLS] + [f"wn_{c}" for c in WN_COLS] + ["wn_sampling"])
+                  + [f"yr_{c}" for c in YR_COLS] + [f"wn_{c}" for c in WN_COLS] + ["wn_sampling"]
+                  + [f"{p}_{c}" for p in EXTRA_PROVIDERS for c in ["issued"] + EXTRA_COLS])
 # Observations needed before a day to give every horizon its naive baseline.
 BASELINE_LOOKBACK_DAYS = 11
 
@@ -82,6 +87,10 @@ def score_targets(pending: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
     both["lead_h"] = both["lead_h"].fillna(both.pop("lead_h_wn"))
     both["has_both"] = both["yr_t"].notna() & both["wn_t"].notna()
     both = both.rename(columns={"yr_issued_at": "yr_issued", "wn_issued_at": "wn_issued"})
+    for name in EXTRA_PROVIDERS:
+        extra = _provider(pending, name, EXTRA_COLS).drop(columns="lead_h")
+        both = both.merge(extra.rename(columns={f"{name}_issued_at": f"{name}_issued"}),
+                          on=["station", "target", "fetched_at"], how="left")
 
     picks = []
     for h in HORIZONS:
@@ -95,7 +104,8 @@ def score_targets(pending: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
         c = c.drop_duplicates(["station", "target"], keep="first")
         if h not in PRECIP_HORIZONS:
             for col in [f"yr_{x}" for x in YR_COLS if x.startswith("p")] + \
-                       [f"wn_{x}" for x in WN_COLS if x.startswith("p")]:
+                       [f"wn_{x}" for x in WN_COLS if x.startswith("p")] + \
+                       [f"{n}_p" for n in EXTRA_PROVIDERS]:
                 c[col] = pd.NA
         picks.append(c)
     if not picks:

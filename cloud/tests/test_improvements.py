@@ -239,6 +239,7 @@ class HealthTest(unittest.TestCase):
                 mock.patch.object(runmod, "load_stations", return_value=stations), \
                 mock.patch.object(runmod.yr, "collect", return_value=([], many_yr)), \
                 mock.patch.object(runmod.weathernext, "collect", side_effect=RuntimeError("no access")), \
+                mock.patch.object(runmod.openmeteo, "collect", return_value=([], [])), \
                 mock.patch.object(runmod.frost, "collect",
                                   return_value=([ob(NOW, 1.0)], [])):
             st = State(Path(tmp) / "state")

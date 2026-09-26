@@ -3,25 +3,17 @@
 _The latest task's checkpoint only. When a new task finishes, move this entry to the top of
 `CHANGELOG.md` and replace it._
 
-## Early cloud days filled; WeatherNext terms read — 2026-09-26 (Claude)
+## ECMWF IFS and AIFS added to the cloud collector — 2026-09-27 (Claude)
 
-Done:
-- 23 and 24 Sep cloud day files replaced once from the PC database (user's OK), recorded in
-  DECISIONS.md. 7,910 / 8,274 rows, all with WeatherNext, marked `nn5km`. `weather.db` only read.
-- WeatherNext terms read: catalog page "Terms of Use" and the real-time terms PDF
-  (https://storage.googleapis.com/weathernext-public/terms-of-use.pdf, last modified 3 Sep 2026).
-  Data for times ≥ 1 hour ago is CC BY 4.0 with a fixed citation. Newer and future data falls
-  under the real-time terms: internal use, value-added services, and only controlled sharing
-  of the data itself.
+Done (DECISIONS.md, "ECMWF IFS and AIFS via Open-Meteo"):
+- `cloud/openmeteo.py` collects `ecmwf_ifs` and `ecmwf_aifs025_single` from Open-Meteo in the
+  same run as Yr/WeatherNext, same horizon windows, with station heights (`elevation`).
+- New scored columns `ifs_issued/t/w/p`, `aifs_issued/t/w/p`, filled from the fetch Yr and
+  WeatherNext already select; pairing rules unchanged; old history files untouched.
+- Attribution: Open-Meteo and ECMWF lines added to `ATTRIBUTION`. Not shown on the page otherwise.
+- Tests: `cloud/tests/test_openmeteo.py` with a recorded response
+  (`cloud/tests/fixtures/openmeteo_ecmwf.json`, Oslo + Troll B, 26 Sep 22:08 UTC). A health test
+  that had started calling Open-Meteo live now mocks it. 132 tests (80 local + 52 cloud) and 8 HQ pass.
+- Live dry run (no state written): 50 stations, 4,600 rows, 4.4 s, no errors.
 
-- Fixed the same day: the public `state` branch held future WeatherNext forecasts. State files
-  are now Fernet-encrypted (`cloud/store.py`, key `WX_STATE_KEY` as a GitHub secret and in local
-  `.env`); plain files stay readable. Verified after a manual run at 15:25 UTC: both files
-  encrypted, readable with the key, all sources OK, new rows `bilinear`. 44 cloud tests pass.
-  Old plain versions may stay reachable on GitHub by commit hash for a while.
-- Attribution updated to Google's current wording (terms PDF 4(b) citation naming Google Earth
-  Engine, catalog CC BY citation, ECMWF acknowledgement link), shown one per line with clickable
-  links; same text in `FINDINGS_2026-09-26.md`. DECISIONS.md "WeatherNext terms" quotes the
-  clauses. Policy: error statistics only; `WX_PUBLISH_FORECAST_VALUES` stays off.
-
-Remaining: none. Publishing values would need Google's confirmation first (NEXT_STEPS item 1).
+Remaining: push (user's OK). After that, check the first cloud run records `ecmwf` rows.

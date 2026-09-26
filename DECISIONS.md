@@ -260,6 +260,31 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
 - Frost fetch window (4 days) and observation retention (12 days) are now separate settings.
 - health.json publishes statuses and counts only, never raw error messages.
 
+## ECMWF IFS and AIFS via Open-Meteo — 2026-09-27 (Claude)
+
+- Two more providers are collected in the cloud run, in the same fetch as Yr and WeatherNext
+  and for the same horizon windows: `ifs` = ECMWF IFS HRES (`ecmwf_ifs`, 9 km, hourly to 90 h)
+  and `aifs` = ECMWF AIFS Single (`ecmwf_aifs025_single`, 0.25°, 6-hourly, interpolated to
+  hours by Open-Meteo), from `https://api.open-meteo.com/v1/ecmwf` (`cloud/openmeteo.py`).
+- Each station's `elevation_m` is sent as `elevation`, so Open-Meteo adapts temperature to the
+  station's height ("nan" when unknown: grid-cell height). Wind in m/s at 10 m. `precipitation`
+  is the preceding-hour sum, so its time is the interval end, like Frost, Yr and WeatherNext.
+  AIFS hourly rain is a 6-hour amount spread over the hours; treat its hourly rain scores with care.
+- Issue time = the model's `last_run_initialisation_time` from Open-Meteo's metadata at fetch
+  time (informative only; leads are measured from the fetch, as for the others).
+- Scored rows gain `ifs_issued/t/w/p` and `aifs_issued/t/w/p`. They come from the same fetch
+  as the row Yr and WeatherNext select; pairing and scoring rules are unchanged. Rain columns
+  are blanked beyond 48 h as for the others. Existing history files are not rewritten, so the
+  columns start empty.
+- Not shown on the page yet; health records them as source `ecmwf` (not drawn).
+- Terms: Open-Meteo's free API is for non-commercial use (this site has no ads or
+  subscriptions), under CC BY 4.0, with limits of 600 calls/min, 5,000/hour and 10,000/day. One
+  location with up to 10 variables and 2 weeks is one call, so a run is ~50 calls (~200/day).
+  Requests go in batches of 25 stations, 1 s apart, with back-off on 429/5xx. Attribution:
+  "Weather data by Open-Meteo.com" with a link (Open-Meteo licence page) and ECMWF's wording for
+  services built on its data, with a note of Open-Meteo's changes (ECMWF licence). ECMWF open
+  data (IFS and AIFS) is CC BY 4.0. Turn off with `OPENMETEO_ENABLED=0`.
+
 ## WeatherNext terms — 2026-09-26 (Claude)
 
 Sources read on 26 Sep 2026: the real-time terms

@@ -26,6 +26,11 @@ stations. Two systems run side by side while the new one is proven:
   health line. WeatherNext's forecast values are hidden until its data terms are read;
   its errors are in every score.
 
+## ECMWF (from 27 Sep)
+
+ECMWF IFS HRES and AIFS Single are collected via Open-Meteo in every cloud run and scored
+into new `ifs_*` / `aifs_*` columns. They are not on the page yet, while data builds up.
+
 ## Pushed 26 Sep (live from the next scheduled cloud run, ~18:17 UTC)
 
 - **Bilinear WeatherNext sampling** on the native grid, recorded per row (`wn_sampling`).

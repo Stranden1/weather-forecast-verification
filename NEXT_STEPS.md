@@ -24,6 +24,9 @@ Updated 2026-09-26._
    failing source makes the run red.
 
 ### Features
+- **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
+  a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
+  a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
 7. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
 8. **WeatherNext median as the headline rain value**, with the average as the dashed line
    (FINDINGS recommendation 2).
