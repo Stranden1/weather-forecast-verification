@@ -27,7 +27,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import SCORED_DIR, wanted_leads
+from .config import LOCAL_BILINEAR_SINCE, SCORED_DIR, WN_SAMPLING, WN_SAMPLING_OLD, wanted_leads
 from .score import obs_window, score_targets
 from .store import scored_path, write_scored
 
@@ -86,10 +86,15 @@ def station_pending(con, loc_id: int, station: str) -> pd.DataFrame:
         s = s[s.col.isin(["t", "t_p10", "t_p50", "t_p90", "w", "w_p10", "w_p50", "w_p90",
                           "p", "p_p50", "p_p90"])]
         avail = s.groupby("run_id").retrieved_at.max().pipe(ts).rename("available")
+        # A run counts as bilinear only if every value was retrieved after the switch.
+        first = s.groupby("run_id").retrieved_at.min().pipe(ts)
+        sampling = (first >= pd.Timestamp(LOCAL_BILINEAR_SINCE)).map(
+            {True: WN_SAMPLING, False: WN_SAMPLING_OLD}).rename("sampling")
         wide = s.pivot_table(index=["run_id", "valid_at"], columns="col", values="value",
                              aggfunc="first").reset_index()
         wide["target"] = ts(wide.valid_at)
-        wn_runs = wn_runs.merge(avail, left_on="id", right_index=True)
+        wn_runs = wn_runs.merge(avail, left_on="id", right_index=True) \
+                         .merge(sampling, left_on="id", right_index=True)
         rows = []
         for fetch in sorted(met.retrieved.dropna().unique()):
             fetch = pd.Timestamp(fetch)
@@ -104,7 +109,8 @@ def station_pending(con, loc_id: int, station: str) -> pd.DataFrame:
             if w.empty:
                 continue
             w = w.assign(fetched_at=fetch.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                         issued_at=run.issued.strftime("%Y-%m-%dT%H:%M:%SZ"))
+                         issued_at=run.issued.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                         sampling=run.sampling)
             rows.append(w)
         if rows:
             wn = pd.concat(rows, ignore_index=True)

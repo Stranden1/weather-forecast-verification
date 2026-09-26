@@ -10,13 +10,17 @@ from database import connect, utc_now_iso
 PROVIDER = 'WeatherNext3-mean'
 PREFIX = 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_'
 STATS = ('mean', 'p10', 'p25', 'p50', 'p75', 'p90')
+# Bilinear interpolation on the native grid at the station point, read at this small scale.
+# The earlier scale=5000/10000 made Earth Engine resample first and could return a
+# neighbouring cell (DECISIONS.md, 2026-09-26; cloud.config.LOCAL_BILINEAR_SINCE).
+POINT_SCALE_M = 100
 FIELDS = {
-    'air_temperature': (PREFIX + '0p05deg', 'station_head_temperature_2m', 5000),
-    'wind_speed': (PREFIX + '0p1deg', 'wind_speed_10m', 10000),
-    'precipitation_1h': (PREFIX + '0p1deg', 'total_precipitation_1hr', 10000),
-    'wind_u': (PREFIX + '0p1deg', 'u_component_of_wind_10m', 10000),
-    'wind_v': (PREFIX + '0p1deg', 'v_component_of_wind_10m', 10000),
-    'air_pressure_at_sea_level': (PREFIX + '0p1deg', 'mean_sea_level_pressure', 10000),
+    'air_temperature': (PREFIX + '0p05deg', 'station_head_temperature_2m', POINT_SCALE_M),
+    'wind_speed': (PREFIX + '0p1deg', 'wind_speed_10m', POINT_SCALE_M),
+    'precipitation_1h': (PREFIX + '0p1deg', 'total_precipitation_1hr', POINT_SCALE_M),
+    'wind_u': (PREFIX + '0p1deg', 'u_component_of_wind_10m', POINT_SCALE_M),
+    'wind_v': (PREFIX + '0p1deg', 'v_component_of_wind_10m', POINT_SCALE_M),
+    'air_pressure_at_sea_level': (PREFIX + '0p1deg', 'mean_sea_level_pressure', POINT_SCALE_M),
 }
 METRIC_STATS = {m: STATS if m in ('air_temperature','wind_speed','precipitation_1h') else ('mean',) for m in FIELDS}
 UNITS = {'air_temperature':'degC','wind_speed':'m/s','precipitation_1h':'mm',
@@ -171,7 +175,7 @@ class EarthEngineSource:
             .filter(ee.Filter.inList('forecast_hour',hours)).filterBounds(points.geometry()).select(bands))
         def reduce(image):
             image=ee.Image(image)
-            result=image.reduceRegions(collection=points,reducer=ee.Reducer.first(),scale=scale,tileScale=4)
+            result=image.resample('bilinear').reduceRegions(collection=points,reducer=ee.Reducer.first(),scale=scale,tileScale=4)
             return result.map(lambda feature: ee.Feature(None,feature.toDictionary()).set({
                 'start_time':image.get('start_time'),'end_time':image.get('end_time'),
                 'forecast_hour':image.get('forecast_hour'),'asset_id':image.id()}))
@@ -206,7 +210,7 @@ class EarthEngineSource:
         image = ee.Image(filtered.first()).select([band+'_'+s for s in STATS])
         points = ee.FeatureCollection([ee.Feature(ee.Geometry.Point([l['longitude'],l['latitude']]),
                                                  {'location_id':l['id']}) for l in locations])
-        reduced = image.reduceRegions(collection=points,reducer=ee.Reducer.first(),scale=scale,tileScale=4)
+        reduced = image.resample('bilinear').reduceRegions(collection=points,reducer=ee.Reducer.first(),scale=scale,tileScale=4)
         def metadata(feature):
             return feature.set({'start_time':image.get('start_time'), 'end_time':image.get('end_time'),
                                 'forecast_hour':image.get('forecast_hour'), 'asset_id':image.id()})

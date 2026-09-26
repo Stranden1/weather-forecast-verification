@@ -259,3 +259,28 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
   three quantiles; Yr's main value is its p50. The "inside range" hit rate stays per provider.
 - Frost fetch window (4 days) and observation retention (12 days) are now separate settings.
 - health.json publishes statuses and counts only, never raw error messages.
+
+## WeatherNext sampling and station height — 2026-09-26 (Claude)
+
+Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
+
+- WeatherNext values are now **interpolated bilinearly from the native grid** (0.05° for
+  temperature, 0.1° for wind/rain/pressure) at the station point, as in Google's own station
+  verification. Before, `reduceRegions(scale=5000/10000)` without a grid made Earth Engine
+  resample first, and 15 of 50 stations got a neighbouring cell (e.g. Losistua 1165 m
+  instead of its own 858 m cell). Verified live: all 50 stations match a hand-computed
+  bilinear value within 0.03 K / 0.01 m/s.
+- The change applies from a dated cutoff, never to written history. Scored rows carry
+  `wn_sampling` (`bilinear`, or `nn5km` for the old method; empty in files written before
+  the change means `nn5km`). The cloud collector marks its rows directly. The PC collector
+  switched at `LOCAL_BILINEAR_SINCE` = 2026-09-26 16:00 UTC (between its 10:10 and 16:10
+  UTC runs); `migrate_sqlite` marks a WeatherNext run `bilinear` only if every value was
+  retrieved after that time. `weather.db` values already stored are not re-fetched.
+- As-published WeatherNext stays the primary score, and no station is dropped.
+- A **height-adjusted** WeatherNext temperature is shown as a separate, labelled line:
+  `wn_t + 6.5 °C/km × (model cell height − station height)`, land stations only. The cell
+  height is the GMTED2010 mean over the cell (Google does not publish its grid heights),
+  bilinearly weighted for `bilinear` rows. It is our adjustment, not Google's product.
+- Stations with a cell–station height difference of ≥ 100 m are flagged on the page.
+  E6 Mjøsbrua, Sunndalsøra III and Oslo-Blindern are flagged as not explained by height
+  (night-time lake / fjord-head / urban warmth).

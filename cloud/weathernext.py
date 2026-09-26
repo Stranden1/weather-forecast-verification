@@ -13,15 +13,19 @@ import math
 import os
 from datetime import datetime, timedelta, timezone
 
-from .config import wanted_leads
+from .config import WN_SAMPLING, wanted_leads
 from .timeutil import hours_between, iso, parse
 
 PREFIX = "projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_"
+# Values are interpolated bilinearly from the native grid (0.05° or 0.1°) at the
+# station point, read at this small scale. A coarse scale without a grid makes
+# Earth Engine resample first and can return a neighbouring cell (DECISIONS.md).
+POINT_SCALE_M = 100
 # column prefix -> (collection, band, scale m, statistics)
 FIELDS = {
-    "t": (PREFIX + "0p05deg", "station_head_temperature_2m", 5000, ("mean", "p10", "p50", "p90")),
-    "w": (PREFIX + "0p1deg", "wind_speed_10m", 10000, ("mean", "p10", "p50", "p90")),
-    "p": (PREFIX + "0p1deg", "total_precipitation_1hr", 10000, ("mean", "p50", "p90")),
+    "t": (PREFIX + "0p05deg", "station_head_temperature_2m", POINT_SCALE_M, ("mean", "p10", "p50", "p90")),
+    "w": (PREFIX + "0p1deg", "wind_speed_10m", POINT_SCALE_M, ("mean", "p10", "p50", "p90")),
+    "p": (PREFIX + "0p1deg", "total_precipitation_1hr", POINT_SCALE_M, ("mean", "p50", "p90")),
 }
 HOURLY_MAX = 48
 SYNOPTIC_MAX = 360
@@ -69,8 +73,8 @@ class EarthEngineSource:
 
         def reduce(image):
             image = ee.Image(image)
-            res = image.reduceRegions(collection=points, reducer=ee.Reducer.first(),
-                                      scale=scale, tileScale=4)
+            res = image.resample("bilinear").reduceRegions(collection=points, reducer=ee.Reducer.first(),
+                                                           scale=scale, tileScale=4)
             return res.map(lambda f: ee.Feature(None, f.toDictionary()).set({
                 "end_time": image.get("end_time"), "forecast_hour": image.get("forecast_hour")}))
 
@@ -144,7 +148,8 @@ def collect(stations: list[dict], fetched: datetime, source=None,
                     lead = hours_between(parse(target), fetched)
                     row = rows.setdefault((pr["station"], target), {
                         "provider": "wn", "station": pr["station"], "fetched_at": iso(fetched),
-                        "issued_at": init, "target": target, "lead_h": round(lead, 3)})
+                        "issued_at": init, "target": target, "lead_h": round(lead, 3),
+                        "sampling": WN_SAMPLING})
                     for c in cols:
                         for s in FIELDS[c][3]:
                             raw = pr.get(f"{FIELDS[c][1]}_{s}")

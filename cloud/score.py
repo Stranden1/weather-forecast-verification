@@ -21,7 +21,7 @@ YR_COLS = ["t", "t_p10", "t_p90", "w", "w_p10", "w_p90", "p", "p_min", "p_max", 
 WN_COLS = ["t", "t_p10", "t_p50", "t_p90", "w", "w_p10", "w_p50", "w_p90", "p", "p_p50", "p_p90"]
 SCORED_COLUMNS = (["target", "station", "h", "lead_h", "fetched_at", "yr_issued", "wn_issued",
                    "obs_t", "obs_w", "obs_p", "base_t", "base_w", "base_p"]
-                  + [f"yr_{c}" for c in YR_COLS] + [f"wn_{c}" for c in WN_COLS])
+                  + [f"yr_{c}" for c in YR_COLS] + [f"wn_{c}" for c in WN_COLS] + ["wn_sampling"])
 # Observations needed before a day to give every horizon its naive baseline.
 BASELINE_LOOKBACK_DAYS = 11
 
@@ -59,8 +59,9 @@ def add_baseline(scored: pd.DataFrame, obs: pd.DataFrame) -> pd.DataFrame:
 
 def _provider(pending: pd.DataFrame, name: str, cols: list[str]) -> pd.DataFrame:
     df = pending[pending.provider == name]
-    keep = ["station", "target", "fetched_at", "lead_h", "issued_at"] + cols
-    df = df[keep].rename(columns={c: f"{name}_{c}" for c in cols + ["issued_at"]})
+    meta = ["issued_at"] + (["sampling"] if name == "wn" else [])
+    keep = ["station", "target", "fetched_at", "lead_h"] + meta + cols
+    df = df[keep].rename(columns={c: f"{name}_{c}" for c in cols + meta})
     return df.drop_duplicates(["station", "target", "fetched_at"])
 
 

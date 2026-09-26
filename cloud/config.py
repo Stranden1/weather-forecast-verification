@@ -53,14 +53,25 @@ PROVIDERS = {
     "wn50": "Google WeatherNext 3 (ensemble median)",
 }
 
+# How WeatherNext grid values are read at a station (DECISIONS.md, 2026-09-26).
+# "bilinear": interpolated from the four surrounding cells of the native grid.
+# "nn5km": the earlier method (scale=5000/10000 without a grid), which Earth Engine
+# resampled onto a coarser grid, so 15 of 50 stations got a neighbouring cell.
+# Rows without a value (all history before the change) used "nn5km".
+WN_SAMPLING = "bilinear"
+WN_SAMPLING_OLD = "nn5km"
+# The PC collector (collectors/weathernext.py) switched to bilinear at this time;
+# migrate_sqlite marks WeatherNext runs retrieved from then on as bilinear.
+LOCAL_BILINEAR_SINCE = "2026-09-26T16:00:00Z"
+
 # Pending snapshot columns (one row per provider, station, target hour).
-PENDING_COLUMNS = [
-    "provider", "station", "fetched_at", "issued_at", "target", "lead_h",
+VALUE_COLUMNS = [
     "t", "t_p10", "t_p50", "t_p90",
     "w", "w_p10", "w_p50", "w_p90",
     "p", "p_p50", "p_p90", "p_min", "p_max", "p_prob",
 ]
-VALUE_COLUMNS = PENDING_COLUMNS[6:]
+PENDING_COLUMNS = (["provider", "station", "fetched_at", "issued_at", "target", "lead_h"]
+                   + VALUE_COLUMNS + ["sampling"])
 
 OBS_COLUMNS = ["station", "time", "t", "w", "p"]
 
