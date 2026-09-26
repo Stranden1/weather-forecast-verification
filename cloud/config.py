@@ -82,10 +82,16 @@ OBS_COLUMNS = ["station", "time", "t", "w", "p"]
 # them, publish only aggregated error statistics, not WeatherNext forecast values.
 PUBLISH_FORECAST_VALUES = os.getenv("WX_PUBLISH_FORECAST_VALUES", "0") == "1"
 
+# Everything on the page is about times that have passed, so WeatherNext falls under its
+# CC BY 4.0 "historic data" licence, which requires this exact citation (Earth Engine catalog).
 ATTRIBUTION = [
     "Forecasts and observations from MET Norway (Yr, Frost), licensed CC BY 4.0.",
-    "WeatherNext 3 experimental forecasts © DeepMind Technologies Limited, via Google "
-    "Earth Engine. Experimental data, not intended, validated or approved for real-world use.",
+    "WeatherNext accessed via Google Earth Engine. © 2026 DeepMind Technologies Limited's "
+    "machine learning models used to create the experimental data made available at "
+    "https://developers.google.com/earth-engine/datasets/catalog/"
+    "projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg "
+    "under CC BY 4.0 licence terms. This data is intended for experimental modelling only "
+    "and is not intended, validated, or approved for real world use.",
 ]
 
 
