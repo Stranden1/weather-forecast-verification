@@ -3,41 +3,38 @@
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
 Updated 2026-09-26._
 
-## Open items — 2026-09-26
+## Open items — 2026-09-27
 
 ### Needs the user
 1. **WeatherNext forecast values stay off** (policy in DECISIONS.md, "WeatherNext terms"): the
    terms don't clearly say values for past times may be published. To change that, first ask
    weathernext@google.com. Storm replays (PLAN_REPLAYS step 2) show Yr and measured values only
    until then.
-2. **Decide what to do with `FINDINGS_2026-09-26.md`**, the untracked first-results note:
-   commit it or delete it.
-3. **Stop the Windows task** after the parallel week: compare cloud and local results around
+2. **Stop the Windows task** after the parallel week: compare cloud and local results around
    2 Oct (a week of complete cloud data), then stop it. Keep `data/weather.db`.
 
-### After the push (pushed 26 Sep 14:59 UTC)
-4. Check the page shows the height-adjusted line and station notes (cloud rows are already
-   marked `bilinear`, checked 26 Sep 15:26 UTC).
-5. Check the local 16:10 UTC run on 26 Sep: `weather.db` WeatherNext values for that run should
-   look sane, and `migrate_sqlite` should mark them `bilinear`.
-6. Turn on `--strict` in `.github/workflows/collect.yml` now that all sources work, so a
+### Pipeline
+3. Turn on `--strict` in `.github/workflows/collect.yml` now that all sources work, so a
    failing source makes the run red.
+4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
+   27 Sep). Runs still come ~6 h apart, so scoring is fine. If a gap ever exceeds 9 h the page's
+   health line warns; consider an external trigger then.
 
 ### Features
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
   a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
-7. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
-8. **WeatherNext median as the headline rain value**, with the average as the dashed line
+5. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
+6. **WeatherNext median as the headline rain value**, with the average as the dashed line
    (FINDINGS recommendation 2).
-9. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
+7. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
    the height adjustment over-warms cold valley stations (Røros, Dividalen, Grønliheia).
 
 ### Housekeeping
-10. `scoring/scorer.py` still holds the old hour-floored join (`strftime` on `observed_at`),
-    off the dashboard path. Mark it deprecated or remove it.
-11. `work/` holds ~20 MB of local evidence. Keep `work/temperature-backfill/first-run.json` and
-    `second-run.json` (original availability metadata); the rest can be archived.
+8. `scoring/scorer.py` still holds the old hour-floored join (`strftime` on `observed_at`),
+   off the dashboard path. Mark it deprecated or remove it.
+9. `work/` holds ~20 MB of local evidence. Keep `work/temperature-backfill/first-run.json` and
+   `second-run.json` (original availability metadata); the rest can be archived.
 
 ## Standing reminders
 - The `state` branch is encrypted with `WX_STATE_KEY` (GitHub secret, copy in local `.env`).

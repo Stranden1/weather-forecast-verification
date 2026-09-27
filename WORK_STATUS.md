@@ -16,4 +16,4 @@ Done (DECISIONS.md, "ECMWF IFS and AIFS via Open-Meteo"):
   that had started calling Open-Meteo live now mocks it. 132 tests (80 local + 52 cloud) and 8 HQ pass.
 - Live dry run (no state written): 50 stations, 4,600 rows, 4.4 s, no errors.
 
-Remaining: push (user's OK). After that, check the first cloud run records `ecmwf` rows.
+Pushed. Confirmed on 27 Sep: the 05:19 UTC cloud run stored 4,800 ECMWF rows with no errors, and the page shows the new credit lines. The local task's runs since 26 Sep 16:10 UTC use bilinear sampling (Losistua's WeatherNext temperature rose ~1.2 °C from the old higher cell). First scored day with ECMWF: 27 Sep.
