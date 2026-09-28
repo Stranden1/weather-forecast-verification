@@ -33,11 +33,13 @@ HORIZON_TOLERANCE = 3.0
 PRECIP_HORIZONS = [6, 12, 24, 48]
 # How long a finished UTC day waits for late Frost observations before scoring.
 FINALIZE_DELAY_HOURS = 6
+MIN_OBSERVATION_COVERAGE = 0.8
+FINALIZE_MAX_AGE_DAYS = 3  # measured from the end of the UTC target day
 # Observations kept in working state (days). The naive baseline for the 10-day
 # horizon needs the observation 10 days before each target (~15k rows, still small).
-OBS_KEEP_DAYS = 12
+OBS_KEEP_DAYS = 15  # 11-day baseline lookback + three-day finalization delay + margin
 # Each run re-fetches this many recent days from Frost, to catch late observations.
-OBS_FETCH_DAYS = 4
+OBS_FETCH_DAYS = 5  # refetch the complete oldest day still waiting for coverage
 
 WET_THRESHOLD_MM = 0.1  # strictly greater than -> wet hour (same as the local app)
 

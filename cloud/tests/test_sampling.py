@@ -14,6 +14,17 @@ from cloud.tests.test_pipeline import F0, FakeEE
 from cloud.timeutil import iso
 
 UTC = timezone.utc
+from cloud.tests.crypto_fixture import test_key
+
+
+def setUpModule():
+    global crypto_env
+    crypto_env = test_key()
+    crypto_env.start()
+
+
+def tearDownModule():
+    crypto_env.stop()
 
 
 class CollectorTest(unittest.TestCase):

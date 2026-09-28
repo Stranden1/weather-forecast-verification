@@ -11,6 +11,18 @@ from cloud.store import State, load_scored, write_scored
 from cloud.timeutil import iso
 
 UTC = timezone.utc
+from cloud.tests.crypto_fixture import test_key
+
+
+def setUpModule():
+    global crypto_env
+    crypto_env = test_key()
+    crypto_env.start()
+
+
+def tearDownModule():
+    crypto_env.stop()
+
 F0 = datetime(2026, 10, 1, 6, 10, tzinfo=UTC)
 
 
@@ -133,16 +145,19 @@ class ScoreTest(unittest.TestCase):
             f = target - timedelta(hours=6)
             st.add_pending([pend("yr", f, target, 1.0), pend("wn", f, target, 2.0),
                             pend("yr", f, target + timedelta(days=2), 1.0)])
-            st.add_obs([{"station": "SN1", "time": iso(target), "t": 1.5, "w": None, "p": None}])
+            st.add_obs([{"station": "SN1", "time": iso(target.replace(hour=h)), "t": 1.5, "w": None, "p": None}
+                        for h in range(24)])
             m = st.meta(); m["first_fetch"] = iso(f); st.save_meta(m)
-            got = {}
+            root = Path(tmp) / "history"
             done = score.finalize(st, now=datetime(2026, 10, 3, 7, tzinfo=UTC),
-                                  write=lambda d, df: got.setdefault(d, df))
+                                  root=root, stations=[{"station_id": "SN1"}])
             self.assertEqual(done, ["2026-10-02"])
-            self.assertEqual(len(got[day]), 1)
+            self.assertEqual(len(load_scored(root)), 1)
+            self.assertEqual(len(st.pending()), 3)  # preparation never prunes
+            score.confirm_finalized(st, {"2026-10-02": st.meta()["days"]["2026-10-02"]})
             self.assertEqual(len(st.pending()), 1)  # future target kept
             self.assertEqual(score.finalize(st, now=datetime(2026, 10, 3, 8, tzinfo=UTC),
-                                            write=lambda d, df: 1 / 0), [])
+                                            root=root, stations=[{"station_id": "SN1"}]), [])
 
 
 def synthetic_scored(days=20, stations=("SN1", "SN2", "SN3"), seed=0, wn_extra=0.0):

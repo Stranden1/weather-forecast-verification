@@ -21,11 +21,18 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      WX_STATE_DIR: state
+      WX_STATE_KEY: ${{ secrets.WX_STATE_KEY }}
+      GH_TOKEN: ${{ github.token }}
+      WX_PUBLISH_FORECAST_VALUES: '0'
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # cloud.persistence supplies scoped auth through environment
 
       - uses: actions/setup-python@v5
         with:
@@ -35,12 +42,8 @@ jobs:
 
       - run: pip install -r cloud/requirements.txt
 
-      - name: Restore working state
-        run: |
-          git clone --depth 1 --branch state \
-            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" state \
-            || mkdir -p state
-          rm -rf state/.git
+      - name: Restore and validate working state (only a missing branch starts fresh)
+        run: python -m cloud.persistence restore
 
       - name: Collect, score, export
         env:
@@ -49,32 +52,13 @@ jobs:
           EARTH_ENGINE_PROJECT: ${{ secrets.EARTH_ENGINE_PROJECT }}
           EE_SERVICE_ACCOUNT_KEY: ${{ secrets.EE_SERVICE_ACCOUNT_KEY }}
           WEATHERNEXT_ENABLED: ${{ vars.WEATHERNEXT_ENABLED || '1' }}
-          WX_PUBLISH_FORECAST_VALUES: ${{ vars.WX_PUBLISH_FORECAST_VALUES || '0' }}
-          WX_STATE_DIR: state
-          WX_STATE_KEY: ${{ secrets.WX_STATE_KEY }}  # encrypts future forecasts on the public state branch
         run: python -m cloud.run all
 
-      - name: Save working state (single commit, replaced each run)
-        run: |
-          cd state
-          git init -q -b state
-          git config user.name "weather-bot"
-          git config user.email "weather-bot@users.noreply.github.com"
-          git add -A
-          git commit -q -m "state $(date -u +%FT%TZ)"
-          git push -q --force \
-            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" state
+      - name: Push encrypted history, confirm origin, then prune and push leased state
+        run: python -m cloud.persistence publish
 
-      - name: Commit newly scored days
-        run: |
-          git config user.name "weather-bot"
-          git config user.email "weather-bot@users.noreply.github.com"
-          git add history
-          if ! git diff --cached --quiet; then
-            git commit -q -m "Scored days $(date -u +%F)"
-            git pull -q --rebase origin "${GITHUB_REF_NAME}"
-            git push -q origin "HEAD:${GITHUB_REF_NAME}"
-          fi
+      - name: Rebuild page from confirmed history and state
+        run: python -m cloud.run export
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -82,3 +66,6 @@ jobs:
           path: site
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      - name: Report source failures after preserving data and publishing health
+        run: python -m cloud.run check

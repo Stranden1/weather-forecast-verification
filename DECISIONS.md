@@ -1,6 +1,6 @@
 # Decisions
 
-_Updated 2026-09-26_
+_Updated 2026-09-28_
 
 - SQLite remains the local source of truth; WeatherNext extends the existing
   forecast model rather than introducing a separate datastore.
@@ -334,7 +334,13 @@ transmission or supply to clearly identified and known third parties".
   real-time 4(b) citation naming Google Earth Engine, the historic CC BY citation and the
   acknowledgement link (`ATTRIBUTION` in `cloud/config.py`, rendered with clickable links).
 - Raw WeatherNext forecast values stay off: `WX_PUBLISH_FORECAST_VALUES` remains unset/0.
-- Future forecasts never go public: the `state` branch is encrypted (`WX_STATE_KEY`).
+- Both working state and scored `history/` day files are encrypted with `WX_STATE_KEY`.
+  CI authenticates/decrypts in memory to build aggregate page data. Public workflow
+  exports force forecast values off; the repository's current day files expose ciphertext.
+- Encryption at the current branch tip does not erase past plaintext Git objects.
+  Previously published history/state copies may remain available via old commits or
+  caches until a coordinated repository-history cleanup. Do not claim encryption alone
+  removes those copies. No history rewrite or force-push of main is authorized by this task.
 
 **Are values older than one hour clearly publishable?** Not clearly. The preamble says data that
 "relates to a time 1 hour ago or more" is CC BY 4.0, which suggests forecasts for past times may
@@ -379,3 +385,34 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   raises the effective cell height at some coastal stations (Sunndalsøra 134 → 318 m, Bergen
   30 → 142 m), so their published WeatherNext values may read colder from 26 Sep on. The
   height-adjusted line accounts for that per row.
+
+## Encrypted history and recoverable publication — 2026-09-28
+
+- User authorized encrypting existing committed day files as a storage-only exception
+  to write-once history. Encrypt original gzip bytes, verify exact decryption equality,
+  and never rescore or alter existing observations/forecasts during conversion.
+- Every new scored day requires `WX_STATE_KEY`; missing/invalid keys stop writes.
+  Existing plaintext remains readable only for controlled migration. The existing
+  `.csv.gz` paths now contain Fernet ciphertext. Local decrypt copies belong only in
+  ignored `outputs/`; see SETUP_CLOUD.md. Losing the key now loses access to scored
+  history as well as pending forecasts; retain the separate secret backup.
+- Coverage is unique configured station × exact UTC hour slots with at least one
+  finite Frost temperature, wind or rain value, divided by 24 × configured stations.
+  The denominator is independent of surviving forecast rows. At day-end +6h, prepare
+  a day only at >=80% coverage; otherwise retry until day-end +72h, then prepare the
+  available data and set `late_finalized=true`. Record coverage and counts in day meta.
+- Preparing a day never deletes pending rows. Write its coverage sidecar before the
+  encrypted day, so interrupted writes can retry without losing provenance. Existing
+  legacy days have unknown coverage, never fabricated values.
+- Publish history to main without force, fetch origin and verify encrypted day blobs
+  and matching metadata, then prune only those exact days and publish encrypted state.
+  Main push/confirmation failures never reach pruning or state publication. A failed
+  state push leaves previous remote state recoverable; reruns reuse immutable history.
+- State restore may initialize only when `git ls-remote --exit-code` returns 2 for a
+  missing state ref. Authentication/network/clone/decryption/schema failures abort.
+  State replacement uses an explicit force-with-lease against the restored commit.
+- Keep observations 15 days (longer if retained pending days need their baselines),
+  and refetch five UTC calendar days. Report source failures after persistence and
+  health publication, rather than using `--strict` to skip those steps.
+- Validation uses temporary Git remotes and disposable state. This change is committed
+  locally for review; deployment/push remains pending the user's instruction.

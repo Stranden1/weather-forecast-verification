@@ -1,23 +1,29 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-09-26._
+Updated 2026-09-28._
 
-## Open items — 2026-09-27
+## Open items
 
 ### Needs the user
 1. **WeatherNext forecast values stay off** (policy in DECISIONS.md, "WeatherNext terms"): the
    terms don't clearly say values for past times may be published. To change that, first ask
    weathernext@google.com. Storm replays (PLAN_REPLAYS step 2) show Yr and measured values only
    until then.
+   Current day files have been encrypted locally. Older plaintext Git commits/caches
+   remain accessible: coordinate historical cleanup before claiming raw values are
+   no longer publicly retrievable. No main-history rewrite or push has been performed.
 2. **Stop the Windows task** after the parallel week: compare cloud and local results around
-   2 Oct (a week of complete cloud data), then stop it. Keep `data/weather.db`.
+   2 Oct (a week of complete cloud data), and deploy/verify the recovery fixes below
+   before stopping it. Keep `data/weather.db`.
 
 ### Pipeline
-3. Turn on `--strict` in `.github/workflows/collect.yml` now that all sources work, so a
-   failing source makes the run red.
+3. Review the local reliability/encryption commit, then authorize pushing and verify
+   the first deployed run: authenticated restore, encrypted days, coverage metadata,
+   history confirmation before state pruning, and page health. All implementation
+   and failure-injection tests are complete; production deployment is pending.
 4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
-   27 Sep). Runs still come ~6 h apart, so scoring is fine. If a gap ever exceeds 9 h the page's
+   27 Sep). Recent gaps also reached about 8.1–8.5 h. If a gap exceeds 9 h the page's
    health line warns; consider an external trigger then.
 
 ### Features
@@ -37,8 +43,8 @@ Updated 2026-09-26._
    `second-run.json` (original availability metadata); the rest can be archived.
 
 ## Standing reminders
-- The `state` branch is encrypted with `WX_STATE_KEY` (GitHub secret, copy in local `.env`).
-  Losing both copies means losing unscored forecasts, not history. Keep the key backed up.
+- Both working state and scored history use `WX_STATE_KEY` (GitHub secret, local `.env`).
+  Losing all key copies means losing access to both. Keep a separate secure key backup.
 - Restart the local Streamlit dashboard before any manual WeatherNext fetch from Admin; a
   running process keeps old code in memory.
 - If Yr collection becomes Delayed or Stale, check promptly: missed Yr history cannot be recovered.

@@ -1,81 +1,56 @@
 # Project status
 
-_Current state only, rewritten at the end of each task. Updated 2026-09-26. History: `CHANGELOG.md`._
+_Updated 2026-09-28. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-WeatherApp checks which forecast is more accurate in Norway: **Yr** (MET Norway) or Google's
-AI model **WeatherNext 3**. Both are compared with **Frost** station measurements at 50
-stations. Two systems run side by side while the new one is proven:
+WeatherApp compares Yr/MET and WeatherNext with Frost at 50 Norwegian stations.
+The cloud pipeline/public dashboard and local Windows collector run in parallel;
+ECMWF IFS/AIFS are also collected but not yet ranked on the page. The requested
+reliability and encrypted-history fixes are implemented and tested locally.
+Push/deployment awaits user review; older public plaintext Git copies still need
+coordinated cleanup before publication protection can be considered complete.
 
-| | Cloud pipeline (the future) | Local app (being phased out) |
-|---|---|---|
-| Where | GitHub Actions every 6 h → public page on GitHub Pages | Windows scheduled task every 6 h → Streamlit `app.py` |
-| Stores | Only the scored rows: `history/YYYY/*.csv.gz` (~90 MB/year) | Everything: `data/weather.db`, now 3.08 GB |
-| Code | `cloud/`, `site/`, `.github/workflows/` | `app.py`, `collectors/`, `scoring/` |
-| Plan | `PLAN_WEBPAGE.md` | `SCORING.md`, `WEATHERNEXT.md` |
+## Current capabilities
 
-## Cloud pipeline
+- Local: authoritative data/weather.db, full forecasts/observations, Streamlit
+  comparisons and six-hourly collection. This task did not modify that system.
+- Cloud: paired horizon snapshots, daily scoring, encrypted immutable history,
+  aggregate page JSON, trends, maps, uncertainty and baseline diagnostics.
+- Sampling method is recorded; height-adjusted WeatherNext remains a separate
+  labelled temperature comparison. Steadiness is exported but not displayed.
+- Project HQ provides a local read-only viewer of handoff documents.
 
-- All three sources have worked on every run since **25 Sep 04:58 UTC**, when WeatherNext
-  access for the service account started working (before that only Yr and Frost).
-- Scored days: 5–22 Sep migrated from the local database; 23 Sep empty (first run was that
-  evening); 24 Sep Yr only; 25 Sep with WeatherNext from 05 UTC. From 26 Sep, complete days.
-- The page shows error by horizon, trend, a station map, weather/terrain patterns,
-  uncertainty ranges, rain detection, a naive "same as before" baseline with skill, and a
-  health line. WeatherNext's forecast values are hidden until its data terms are read;
-  its errors are in every score.
+## Reliability changes ready for deployment
 
-## ECMWF (from 27 Sep)
+- All 23 current history files are encrypted with WX_STATE_KEY. Exact original
+  compressed bytes and 126,109 rows are preserved. CI decrypts in memory; public
+  exports force forecast values off. Local decrypt is documented in SETUP_CLOUD.md.
+- Prepare a day at >=80% coverage of configured stations x24 UTC hours. Retry
+  incomplete days until day-end +72h, then record coverage and late-finalization.
+- Push history first, verify exact files/metadata in origin, then prune only the
+  confirmed days and publish encrypted state with a lease. Failures remain recoverable.
+- Only an absent state branch starts fresh; restore/decryption failures abort.
+  Source failures mark the run red after saving data and publishing health.
 
-ECMWF IFS HRES and AIFS Single are collected via Open-Meteo in every cloud run and scored
-into new `ifs_*` / `aifs_*` columns. They are not on the page yet, while data builds up.
+## Verification and last checked live state
 
-## Pushed 26 Sep (live from the next scheduled cloud run, ~18:17 UTC)
+154 local/cloud tests pass. Project HQ: 7 passed, 1 Windows symlink skip. Failure
+recovery was exercised with temporary Git remotes. All 58 generated page JSON
+files match pre-encryption exports except generation time; original scores unchanged.
 
-- **Bilinear WeatherNext sampling** on the native grid, recorded per row (`wn_sampling`).
-  The local collector already uses it from 26 Sep 16:00 UTC.
-- **Height-adjusted WeatherNext temperature** as a separate, labelled line, plus height
-  notes for 15 stations. Published values stay the main score; no station is dropped.
-- **Forecast steadiness** numbers (`steadiness.json`, not yet shown on the page).
-- **Project HQ** (`project_hq/`), a local read-only viewer of these documents: run
-  `.\.venv\Scripts\python.exe -B project_hq\run.py` and open http://127.0.0.1:8510.
+Last checked live cloud run (28 Sep 13:55 UTC): all sources successful; summaries
+cover 23 dates through 27 Sep. Local collection finished 16:18 UTC with status ok.
+The local checkout includes scored-day commits through be13ed1. New fixes have not
+been pushed; live scheduling and behavior still use the previous implementation.
 
-## First results (preliminary: about one week with both services)
+## Limits and next actions
 
-From `FINDINGS_2026-09-26.md` and `INVESTIGATION_COLD_BIAS_2026-09-26.md`:
+Review/authorize deployment, then verify a live cycle before retiring the PC
+collector. Current-file encryption does not remove old plaintext commits/caches;
+coordinate that cleanup separately. Preserve a secure backup of WX_STATE_KEY,
+which now protects scored history as well as pending forecasts.
 
-- **Temperature:** Yr ahead at short range as published. WeatherNext reads too cold at
-  stations whose ~5 km grid area is much higher than the station; after a standard height
-  adjustment WeatherNext is ahead at 12 h–1 day (0.78/0.80 vs Yr 0.84/0.89 °C).
-- **Wind:** WeatherNext ahead at 1–2 days, especially in stronger wind.
-- **Rain:** Yr has the lower average error; WeatherNext's average catches more rain but gives
-  many false alarms, and its median is about as good as Yr.
-- **Steadiness:** WeatherNext changes its forecast about half as much as Yr between runs.
-- WeatherNext's uncertainty ranges are too narrow for wind (50% inside vs 80% ideal).
-
-## Validation
-
-Tests: 79 local-app, 43 cloud-pipeline and 8 Project HQ tests pass (26 Sep).
-Run: `.\.venv\Scripts\python.exe -m unittest discover -s . -p "test_*.py"` (local + cloud)
-and `.\.venv\Scripts\python.exe -B -m unittest discover -s project_hq -p "test_*.py"`.
-
-## Known limits
-
-- Only about a week of paired data: treat every result as preliminary. Verdicts need 7 days.
-- Yr has a home advantage: its first 2–3 days are corrected with these stations' data.
-- Hourly rain is scored only up to 2 days ahead; the 10-day horizon has almost no data yet.
-- Pressure, wind direction and cloud cover are not scored (no matching observations).
-
-## Where to find things
-
-| File | What it holds |
-|---|---|
-| `NEXT_STEPS.md` | Open items only |
-| `WORK_STATUS.md` | The latest task's checkpoint |
-| `CHANGELOG.md` | Everything done so far, newest first |
-| `DECISIONS.md` | Rules and choices that must be kept |
-| `SCORING.md`, `PRECIPITATION.md` | How the local app matches and scores forecasts |
-| `PLAN_WEBPAGE.md`, `SETUP_CLOUD.md` | Cloud pipeline design and setup |
-| `PLAN_REPLAYS.md` | Next feature: storm replays and steadiness |
-| `REVIEW_2026-09-23.md`, `INVESTIGATION_*.md`, `FINDINGS_*.md` | Reviews and analyses |
+Model findings remain preliminary, especially after the sampling change and for
+ECMWF. Height adjustment uses proxy terrain and a fixed lapse rate; AIFS hourly
+rain is interpolated. NEXT_STEPS.md holds open work; DECISIONS.md holds policies.

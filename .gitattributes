@@ -1,0 +1,2 @@
+# Day archives contain encrypted gzip bytes; never normalize or render text diffs.
+history/**/*.csv.gz binary

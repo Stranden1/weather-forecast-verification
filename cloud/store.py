@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import io
+import hashlib
 import json
 import os
 from datetime import date
@@ -14,16 +15,41 @@ from .config import OBS_COLUMNS, PENDING_COLUMNS, SCORED_DIR, STATE_DIR
 # The working state holds forecasts for future times. WeatherNext's real-time terms don't
 # allow publishing those, and the `state` branch is public, so state files are encrypted
 # when WX_STATE_KEY (a Fernet key) is set. Reading accepts plain and encrypted files.
-# Scored history is about past times (CC BY 4.0) and stays plain.
+# Scored history is also encrypted: only aggregate errors are public.
 FERNET_PREFIX = b"gAAAAA"
 
 
-def _fernet():
+def _fernet(required: bool = False):
     key = os.getenv("WX_STATE_KEY", "").strip()
     if not key:
+        if required:
+            raise RuntimeError("WX_STATE_KEY is required for encrypted history/public persistence")
         return None
     from cryptography.fernet import Fernet
     return Fernet(key.encode())
+
+
+def plaintext_bytes(data: bytes) -> bytes:
+    """Authenticate encrypted gzip; legacy gzip remains readable for migration."""
+    if data.startswith(FERNET_PREFIX):
+        return _fernet(required=True).decrypt(data)
+    return data
+
+
+def read_scored(path: Path) -> pd.DataFrame:
+    return pd.read_csv(io.BytesIO(plaintext_bytes(Path(path).read_bytes())),
+                       dtype={"station": str}, compression="gzip")
+
+
+def atomic_bytes(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    tmp.replace(path)
+
+
+def atomic_json(path: Path, obj: dict) -> None:
+    atomic_bytes(path, json.dumps(obj, indent=1, allow_nan=False).encode("utf-8"))
 
 
 def _read(path: Path, columns: list[str], secret: bool = False) -> pd.DataFrame:
@@ -45,14 +71,18 @@ def _read(path: Path, columns: list[str], secret: bool = False) -> pd.DataFrame:
     return df[columns]
 
 
-def _write(df: pd.DataFrame, path: Path, secret: bool = False) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    df.to_csv(tmp, index=False, float_format="%.3f", compression="gzip")
-    f = _fernet() if secret else None
+def _frame_bytes(df: pd.DataFrame, secret: bool = False, required: bool = False) -> bytes:
+    f = _fernet(required=required) if secret else None
+    buf = io.BytesIO()
+    df.to_csv(buf, index=False, float_format="%.3f", compression="gzip")
+    data = buf.getvalue()
     if f is not None:
-        tmp.write_bytes(f.encrypt(tmp.read_bytes()))
-    tmp.replace(path)  # atomic: a crash never leaves half a file
+        data = f.encrypt(data)
+    return data
+
+
+def _write(df: pd.DataFrame, path: Path, secret: bool = False, required: bool = False) -> None:
+    atomic_bytes(path, _frame_bytes(df, secret, required))
 
 
 class State:
@@ -103,18 +133,25 @@ class State:
     def save_meta(self, meta: dict) -> None:
         self.root.mkdir(parents=True, exist_ok=True)
         meta["runs"] = meta.get("runs", [])[-60:]
-        self.meta_path.write_text(json.dumps(meta, indent=1), encoding="utf-8")
+        atomic_json(self.meta_path, meta)
 
 
 def scored_path(day: date, root: Path = SCORED_DIR) -> Path:
     return Path(root) / f"{day:%Y}" / f"{day:%Y-%m-%d}.csv.gz"
 
 
-def write_scored(day: date, df: pd.DataFrame, root: Path = SCORED_DIR) -> Path:
+def write_scored(day: date, df: pd.DataFrame, root: Path = SCORED_DIR,
+                 metadata: dict | None = None) -> Path:
     path = scored_path(day, root)
     if path.exists():
         raise FileExistsError(f"{path} already exists; scored days are written once")
-    _write(df, path)
+    data = _frame_bytes(df, secret=True, required=True)
+    if metadata is not None:
+        # Metadata FIRST. A retry may replace an orphan sidecar only while the day
+        # does not exist; a completed day can never lack its preparation metadata.
+        sidecar = path.with_name(path.name.replace(".csv.gz", ".meta.json"))
+        atomic_json(sidecar, {**metadata, "sha256": hashlib.sha256(data).hexdigest()})
+    atomic_bytes(path, data)
     return path
 
 
@@ -122,4 +159,4 @@ def load_scored(root: Path = SCORED_DIR) -> pd.DataFrame:
     files = sorted(Path(root).glob("*/*.csv.gz"))
     if not files:
         return pd.DataFrame()
-    return pd.concat([pd.read_csv(f, dtype={"station": str}) for f in files], ignore_index=True)
+    return pd.concat([read_scored(f) for f in files], ignore_index=True)

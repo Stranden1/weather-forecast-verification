@@ -1,7 +1,7 @@
 """Command-line entry point used by GitHub Actions (and locally).
 
     python -m cloud.run collect    # Yr + WeatherNext + ECMWF snapshot, recent Frost obs
-    python -m cloud.run score      # score finished days, prune working data
+    python -m cloud.run score      # prepare finished days; no pruning before remote confirmation
     python -m cloud.run export     # rebuild site/data/*.json
     python -m cloud.run all        # all three, in order
 
@@ -18,7 +18,7 @@ from datetime import timedelta
 
 from . import frost, health, openmeteo, score, summarize, weathernext, yr
 from .config import OBS_FETCH_DAYS, SITE_DATA_DIR, load_stations
-from .store import State, load_scored
+from .store import State, _fernet, load_scored
 from .timeutil import iso, now_utc
 
 
@@ -44,7 +44,9 @@ def collect(state: State) -> list[str]:
         except Exception as exc:
             ec_err = [f"ECMWF (Open-Meteo) failed: {exc}"]
     try:
-        obs, frost_err = frost.collect(stations, fetched - timedelta(days=OBS_FETCH_DAYS - 1),
+        fetch_start = (fetched - timedelta(days=OBS_FETCH_DAYS - 1)).replace(
+            hour=0, minute=0, second=0, microsecond=0)
+        obs, frost_err = frost.collect(stations, fetch_start,
                                        fetched, os.getenv("FROST_CLIENT_ID", ""))
     except Exception as exc:
         obs, frost_err = [], [f"Frost failed: {exc}"]
@@ -72,15 +74,22 @@ def collect(state: State) -> list[str]:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["collect", "score", "export", "all"])
+    ap.add_argument("step", choices=["collect", "score", "export", "all", "check"])
     ap.add_argument("--strict", action="store_true", help="exit 1 if any source reported errors")
     a = ap.parse_args(argv)
+    _fernet(required=True)
     state = State()
+    if a.step == "check":
+        runs = state.meta().get("runs", [])
+        if not runs:
+            return 1
+        # CI runs this only AFTER saving successful sources and deploying health.
+        return int(any(s.get("errors", 0) for s in runs[-1].get("sources", {}).values()))
     errors = []
     if a.step in ("collect", "all"):
         errors = collect(state)
     if a.step in ("score", "all"):
-        print("scored days:", score.finalize(state) or "none ready")
+        print("prepared days (pending retained until origin confirmation):", score.finalize(state) or "none ready")
     if a.step in ("export", "all"):
         summarize.build(load_scored())
         h = health.write(state.meta(), SITE_DATA_DIR)

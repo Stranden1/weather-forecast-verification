@@ -1,5 +1,40 @@
 # Changelog
 
+## Project health and Claude change review — 2026-09-28 (Codex)
+
+Done:
+- Reviewed cloud collectors, scoring, sampling/height changes, encryption,
+  workflow recovery, and the handoff documents. Findings: REVIEW_2026-09-28.md.
+- Verified live cloud collection (28 Sep 13:55 UTC): all four sources succeeded;
+  23 scored dates / 126,109 rows through 27 Sep. Local collection also succeeded.
+- Ran 132 local/cloud tests: all passed. HQ: 7 passed, 1 Windows symlink skip.
+- Reproduced empty-day finalization in disposable state; verified public history
+  includes WeatherNext values despite the documented statistics-only policy.
+- Archived the preceding checkpoint and refreshed status/open items.
+
+Remaining:
+- Resolve public scored-data storage versus the forecast-publication policy.
+- Fix observation-outage finalization, state-restore failure handling, persistence
+  ordering, and failure reporting before cloud-only cutover. See the review.
+
+Review only: no application, database, history, secret, or schedule changes. No
+pull, commit, or push. Local HEAD remains 17ae2a8; remote main has two newer scored-day commits.
+
+## ECMWF IFS and AIFS added to the cloud collector — 2026-09-27 (Claude)
+
+Done (DECISIONS.md, "ECMWF IFS and AIFS via Open-Meteo"):
+- `cloud/openmeteo.py` collects `ecmwf_ifs` and `ecmwf_aifs025_single` from Open-Meteo in the
+  same run as Yr/WeatherNext, same horizon windows, with station heights (`elevation`).
+- New scored columns `ifs_issued/t/w/p`, `aifs_issued/t/w/p`, filled from the fetch Yr and
+  WeatherNext already select; pairing rules unchanged; old history files untouched.
+- Attribution: Open-Meteo and ECMWF lines added to `ATTRIBUTION`. Not shown on the page otherwise.
+- Tests: `cloud/tests/test_openmeteo.py` with a recorded response
+  (`cloud/tests/fixtures/openmeteo_ecmwf.json`, Oslo + Troll B, 26 Sep 22:08 UTC). A health test
+  that had started calling Open-Meteo live now mocks it. 132 tests (80 local + 52 cloud) and 8 HQ pass.
+- Live dry run (no state written): 50 stations, 4,600 rows, 4.4 s, no errors.
+
+Pushed. Confirmed on 27 Sep: the 05:19 UTC cloud run stored 4,800 ECMWF rows with no errors, and the page shows the new credit lines. The local task's runs since 26 Sep 16:10 UTC use bilinear sampling (Losistua's WeatherNext temperature rose ~1.2 °C from the old higher cell). First scored day with ECMWF: 27 Sep.
+
 Dated record of completed work, newest first. Moved here from `WORK_STATUS.md` on
 2026-09-26 with the wording unchanged; entries describe the state at the time they were
 written and may be superseded by later ones. Before that date `PROJECT_STATUS.md` and

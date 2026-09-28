@@ -29,7 +29,7 @@ import pandas as pd
 
 from .config import LOCAL_BILINEAR_SINCE, SCORED_DIR, WN_SAMPLING, WN_SAMPLING_OLD, wanted_leads
 from .score import obs_window, score_targets
-from .store import scored_path, write_scored
+from .store import read_scored, scored_path, write_scored
 
 WN = "WeatherNext3-mean"
 WN_METRICS = {"air_temperature": "t", "wind_speed": "w", "precipitation_1h": "p"}
@@ -135,7 +135,7 @@ def observations(con, loc_id: int, station: str) -> pd.DataFrame:
 
 
 def has_wn(path: Path) -> bool:
-    df = pd.read_csv(path, usecols=lambda c: c == "wn_t")
+    df = read_scored(path)
     return "wn_t" in df and df.wn_t.notna().any()
 
 

@@ -13,6 +13,17 @@ import pandas as pd
 from cloud import health, score, summarize
 from cloud.config import PENDING_COLUMNS
 from cloud.store import State, load_scored
+from cloud.tests.crypto_fixture import test_key
+
+
+def setUpModule():
+    global crypto_env
+    crypto_env = test_key()
+    crypto_env.start()
+
+
+def tearDownModule():
+    crypto_env.stop()
 from cloud.timeutil import iso
 
 UTC = timezone.utc
@@ -69,19 +80,21 @@ class BaselineTest(unittest.TestCase):
         self.assertEqual(r.base_t, 6.0)
         self.assertLessEqual(pd.Timestamp(r.target) - pd.Timedelta(hours=48), pd.Timestamp(r.fetched_at))
 
-    def test_finalize_uses_earlier_days_and_keeps_12_days_of_observations(self):
+    def test_finalize_uses_earlier_days_and_keeps_15_days_of_observations(self):
         with tempfile.TemporaryDirectory() as tmp:
             st = State(Path(tmp) / "state")
             target = datetime(2026, 10, 12, 12, tzinfo=UTC)
             f = target - timedelta(hours=6)
             st.add_pending([pend("yr", f, target, 1.0), pend("wn", f, target, 2.0)])
             now = datetime(2026, 10, 13, 7, tzinfo=UTC)
-            st.add_obs([ob(target, 1.5), ob(target - timedelta(days=1), 0.5),
-                        ob(now - timedelta(days=11), 3.0), ob(now - timedelta(days=13), 4.0)])
+            st.add_obs([ob(target.replace(hour=h), 1.5) for h in range(24)] +
+                       [ob(target - timedelta(days=1), 0.5),
+                        ob(now - timedelta(days=14), 3.0), ob(now - timedelta(days=16), 4.0)])
             m = st.meta(); m["first_fetch"] = iso(f); st.save_meta(m)
-            got = {}
-            score.finalize(st, now=now, write=lambda d, df: got.setdefault(d, df))
-            self.assertEqual(got[date(2026, 10, 12)].iloc[0].base_t, 0.5)
+            root = Path(tmp) / "history"
+            score.finalize(st, now=now, root=root, stations=[{"station_id": "SN1"}])
+            self.assertEqual(load_scored(root).iloc[0].base_t, 0.5)
+            score.confirm_finalized(st, {"2026-10-12": st.meta()["days"]["2026-10-12"]}, now=now)
             kept = set(st.obs().t)
             self.assertIn(3.0, kept)
             self.assertNotIn(4.0, kept)
@@ -241,9 +254,11 @@ class HealthTest(unittest.TestCase):
                 mock.patch.object(runmod.weathernext, "collect", side_effect=RuntimeError("no access")), \
                 mock.patch.object(runmod.openmeteo, "collect", return_value=([], [])), \
                 mock.patch.object(runmod.frost, "collect",
-                                  return_value=([ob(NOW, 1.0)], [])):
+                                  return_value=([ob(NOW, 1.0)], [])) as frost_call:
             st = State(Path(tmp) / "state")
             runmod.collect(st)
+            self.assertEqual(frost_call.call_args.args[1].hour, 0)
+            self.assertEqual(frost_call.call_args.args[1].minute, 0)
             src = st.meta()["runs"][-1]["sources"]
             self.assertEqual((src["yr"]["errors"], src["wn"]["errors"], src["frost"]["rows"]), (30, 1, 1))
             self.assertIn("no access", src["wn"]["error"])  # not lost behind 30 Yr errors
@@ -251,6 +266,10 @@ class HealthTest(unittest.TestCase):
             self.assertTrue((Path(tmp) / "site" / "health.json").exists())
             self.assertFalse(h["last_run_failed"])  # Frost still delivered
             self.assertEqual(h["sources"]["yr"]["status"], "error")
+            before = st.meta_path.read_bytes()
+            with mock.patch.object(runmod, "State", return_value=st):
+                self.assertEqual(runmod.main(["check"]), 1)
+            self.assertEqual(st.meta_path.read_bytes(), before)  # status check cannot mutate saved state
 
 
 if __name__ == "__main__":

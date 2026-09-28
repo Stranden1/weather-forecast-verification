@@ -1,19 +1,29 @@
 # Work status
 
-_The latest task's checkpoint only. When a new task finishes, move this entry to the top of
-`CHANGELOG.md` and replace it._
+## Cloud reliability and encrypted history — 2026-09-28 (Codex)
 
-## ECMWF IFS and AIFS added to the cloud collector — 2026-09-27 (Claude)
+Done:
+- Read DECISIONS/PLAN_WEBPAGE; used current model and a separate read-only reviewer
+  with user approval because Claude Opus was unavailable.
+- Pulled only the two newer scored-day commits (base be13ed1), preserving review notes.
+- Encrypted all 23 current day files with the existing key. Exact original gzip
+  bytes and all 126,109 rows verified; 58 generated page JSON files unchanged
+  except generation time. Local decrypt documented in SETUP_CLOUD.md.
+- Day preparation requires >=80% configured station-hour coverage, retries to
+  UTC day-end +72h, then records coverage/late_finalized. Metadata is written
+  before the day; pending forecasts stay until exact origin confirmation.
+- Restore starts fresh only for an absent branch; clone/decrypt/schema errors
+  abort. History is pushed first, confirmed in origin, then exact days are pruned
+  and encrypted state is pushed with a lease. Source errors are reported after saves.
+- Failure tests cover missing observations, boundaries/timeout, interrupted file
+  writes, failed restore/history push, interruption between pushes, retry, and leases.
+- Validation: 154 local/cloud tests pass. HQ: 7 pass, 1 Windows symlink skip.
+- Handoff/policy/setup docs updated. Completed locally for review; no push. See Git log for the commit.
 
-Done (DECISIONS.md, "ECMWF IFS and AIFS via Open-Meteo"):
-- `cloud/openmeteo.py` collects `ecmwf_ifs` and `ecmwf_aifs025_single` from Open-Meteo in the
-  same run as Yr/WeatherNext, same horizon windows, with station heights (`elevation`).
-- New scored columns `ifs_issued/t/w/p`, `aifs_issued/t/w/p`, filled from the fetch Yr and
-  WeatherNext already select; pairing rules unchanged; old history files untouched.
-- Attribution: Open-Meteo and ECMWF lines added to `ATTRIBUTION`. Not shown on the page otherwise.
-- Tests: `cloud/tests/test_openmeteo.py` with a recorded response
-  (`cloud/tests/fixtures/openmeteo_ecmwf.json`, Oslo + Troll B, 26 Sep 22:08 UTC). A health test
-  that had started calling Open-Meteo live now mocks it. 132 tests (80 local + 52 cloud) and 8 HQ pass.
-- Live dry run (no state written): 50 stations, 4,600 rows, 4.4 s, no errors.
+Remaining:
+- User review before push; then validate the first deployed run and cloud/local coverage.
+- Old plaintext Git commits/caches remain publicly retrievable. Current-file
+  encryption does not erase them; coordinated historical cleanup remains necessary.
 
-Pushed. Confirmed on 27 Sep: the 05:19 UTC cloud run stored 4,800 ECMWF rows with no errors, and the page shows the new credit lines. The local task's runs since 26 Sep 16:10 UTC use bilinear sampling (Losistua's WeatherNext temperature rose ~1.2 °C from the old higher cell). First scored day with ECMWF: 27 Sep.
+No data/weather.db, local collectors, secrets or running scheduled tasks changed.
+Evidence: work/reliability-tests.txt and work/history-encryption-validation.json.

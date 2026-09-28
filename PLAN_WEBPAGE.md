@@ -21,11 +21,14 @@ file, heading for ~100 GB/year. Almost none of it is needed for scoring.
    6 h, 12 h, 1, 2, 3, 5, 7 and 10 days. Temperature, wind and hourly rain;
    WeatherNext mean/p10/p50/p90; Yr from the `complete` endpoint (adds Yr's
    own p10/p90 and rain min/max/probability).
-2. **Score once, then discard.** When a UTC day is over (plus 6 h for late
-   observations), each station/hour/horizon gets one row: Yr, WeatherNext and
-   the Frost measurement. The snapshots for that day are deleted.
+2. **Prepare, publish, then discard.** At UTC day-end +6h, prepare scored rows
+   if >=80% of configured station-hours have a finite Frost value. Otherwise
+   retry until day-end +72h, then record coverage and `late_finalized` with the
+   available rows. Pending snapshots stay until the encrypted day is confirmed
+   in origin; prune only those exact confirmed days.
 3. **Keep scored days forever** as `history/YYYY/YYYY-MM-DD.csv.gz`
-   (~50–60 KB/day, ~20 MB/year). Written once, never edited.
+   as Fernet-encrypted gzip using `WX_STATE_KEY`. Written once, never rescored.
+   The 28 Sep encryption conversion preserves existing gzip bytes exactly.
 4. **Webpage** (`site/`) reads small JSON summaries built from `history/`.
 
 ### Fairness rules (new)
@@ -47,21 +50,26 @@ file, heading for ~100 GB/year. Almost none of it is needed for scoring.
 
 | What | Where | Size |
 |---|---|---|
-| Pending snapshots + recent Frost obs | `state` branch, **replaced** each run (no history) | ~0.5 MB |
-| Scored days | `history/` on main, one file per day | ~20 MB/year |
+| Pending snapshots + recent Frost obs | encrypted `state` branch, replaced with an explicit lease | bounded working state |
+| Scored days | encrypted `history/` on main, one file per day plus coverage metadata | grows with scored days |
 | Webpage JSON | built in the workflow, deployed to Pages, **not committed** | <1 MB |
 
 ### Cloud collection
 
 GitHub Actions, every 6 h (`.github/workflows/collect.yml`): collect → score →
-export → deploy Pages. Secrets: `MET_USER_AGENT`, `FROST_CLIENT_ID`,
-`EARTH_ENGINE_PROJECT`, `EE_SERVICE_ACCOUNT_KEY`. Setup: `SETUP_CLOUD.md`.
+prepare → push history → verify origin → prune/push state → export → deploy Pages.
+Secrets: `MET_USER_AGENT`, `FROST_CLIENT_ID`, `EARTH_ENGINE_PROJECT`,
+`EE_SERVICE_ACCOUNT_KEY`, `WX_STATE_KEY`. Restore errors stop the job; only an absent
+state branch starts fresh. Source-error status is reported after data and health
+are saved. Setup and local decrypt instructions: `SETUP_CLOUD.md`.
 
 ### Licensing
 
 Yr/Frost: CC BY 4.0 with attribution (on the page). WeatherNext: terms read on
 26 Sep 2026, see DECISIONS.md "WeatherNext terms". The page publishes only error
-statistics, not WeatherNext forecast values (`WX_PUBLISH_FORECAST_VALUES=0`).
+statistics, not WeatherNext forecast values (CI forces `WX_PUBLISH_FORECAST_VALUES=0`).
+Current history files are encrypted too. Old plaintext commits/caches require a
+separate coordinated cleanup; a normal encryption commit cannot erase them.
 
 ## Webpage views
 
@@ -127,10 +135,14 @@ app can stay as a private deep-dive tool.
        0.8–1.3 °C rising with horizon, leads within ±3 h); not compared day-by-day with
        Streamlit, whose pairing rules differ by design.*
 - [ ] 10. After ~1 week of parallel running: compare, then remove the Windows task.
-- [ ] 11. Later: read WeatherNext real-time terms → decide `WX_PUBLISH_FORECAST_VALUES`.
-- [ ] 12. Later: consolidate handoff docs (current-state PROJECT_STATUS, open-items NEXT_STEPS, CHANGELOG).
+- [x] 11. Terms read; forecast values stay private (DECISIONS policy).
+- [x] 12. Handoff docs consolidated (26 Sep).
 - [x] 13. Naive baseline + skill, pinball score + range width, health line (see "Improvements").
        *2026-09-24: checked with demo data (light/dark, mobile 375 px, a failing-run health
        file) and with the real history (degrades cleanly). After review: baseline offset
        from the actual lead, skill shown as a percentage, horizon table trimmed. 25 cloud
        tests pass; pushed. No history files had been written with the earlier offset.*
+
+- [x] 14. Reliability/publication fixes implemented locally on 28 Sep: encrypted
+  history, coverage-gated preparation, fail-closed restore, and history-first
+  publication with origin confirmation. Push/deployment awaits user review.

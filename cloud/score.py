@@ -10,12 +10,16 @@ run is chosen.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+import hashlib
+import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from .config import (FINALIZE_DELAY_HOURS, HORIZON_TOLERANCE, HORIZONS, OBS_KEEP_DAYS,
-                     PRECIP_HORIZONS, VALUE_COLUMNS)
+from .config import (FINALIZE_DELAY_HOURS, FINALIZE_MAX_AGE_DAYS, MIN_OBSERVATION_COVERAGE,
+                     HORIZON_TOLERANCE, HORIZONS, OBS_KEEP_DAYS, SCORED_DIR,
+                     PRECIP_HORIZONS, VALUE_COLUMNS, load_stations)
 
 YR_COLS = ["t", "t_p10", "t_p90", "w", "w_p10", "w_p90", "p", "p_min", "p_max", "p_prob"]
 WN_COLS = ["t", "t_p10", "t_p50", "t_p90", "w", "w_p10", "w_p50", "w_p90", "p", "p_p50", "p_p90"]
@@ -140,27 +144,101 @@ def day_slice(df: pd.DataFrame, column: str, day: date) -> pd.Series:
     return df[column].astype(str).str.startswith(day.isoformat())
 
 
-def finalize(state, now: datetime | None = None, write=None) -> list[str]:
-    """Score all ready days, write each once, then drop their working data."""
+def observation_coverage(obs: pd.DataFrame, day: date, station_ids: list[str]) -> dict:
+    """Fraction of configured station × UTC-hour slots with any finite Frost value.
+
+    The denominator never shrinks when a collector fails. Duplicate observations,
+    unrelated stations, sub-hourly measurements and baseline hours cannot inflate it.
+    """
+    stations = set(station_ids)
+    expected = 24 * len(stations)
+    t = pd.to_datetime(obs.time, utc=True, errors="coerce")
+    start = pd.Timestamp(day, tz="UTC")
+    finite = np.isfinite(obs[["t", "w", "p"]].apply(pd.to_numeric, errors="coerce").astype(float)).any(axis=1)
+    mask = obs.station.isin(stations) & (t >= start) & (t < start + pd.Timedelta(days=1))
+    mask &= t.eq(t.dt.floor("h")) & finite
+    observed = len(obs.loc[mask, ["station"]].assign(time=t[mask]).drop_duplicates())
+    return {"coverage": observed / expected if expected else 0.0,
+            "observed_station_hours": observed, "expected_station_hours": expected}
+
+
+def day_metadata_path(path: Path) -> Path:
+    return path.with_name(path.name.replace(".csv.gz", ".meta.json"))
+
+
+def stored_day_record(path: Path) -> dict:
+    """Recover exact preparation metadata even if state publication was interrupted."""
+    from .store import read_scored
+    read_scored(path)  # fail closed on wrong key, corrupt CSV or gzip
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    sidecar = day_metadata_path(path)
+    if sidecar.exists():
+        record = json.loads(sidecar.read_text(encoding="utf-8"))
+        if record.get("sha256") != digest:
+            raise RuntimeError(f"Scored day metadata mismatch: {path.name}")
+        return record
+    # Legacy immutable days predate coverage metadata; do not invent historical coverage.
+    return {"coverage": None, "late_finalized": None, "legacy": True, "sha256": digest}
+
+
+def finalize(state, now: datetime | None = None, root: Path = SCORED_DIR,
+             stations: list[dict] | None = None) -> list[str]:
+    """Prepare eligible encrypted days, keeping ALL pending rows until origin confirms.
+
+    A day becomes eligible at end + 6h and waits for 80% coverage until end + 72h.
+    Only confirm_finalized, called after remote blob verification, may prune rows.
+    """
     from .store import scored_path, write_scored
-    exists = (lambda d: scored_path(d).exists()) if write is None else (lambda d: False)
-    write = write or write_scored
     now = now or datetime.now(timezone.utc)
     meta = state.meta()
     pending, obs = state.pending(), state.obs()
-    written = []
+    station_ids = [s["station_id"] for s in (load_stations() if stations is None else stations)]
+    if not station_ids:
+        raise ValueError("Cannot finalize without an expected station network")
+    records = meta.setdefault("days", {})
+    prepared = []
     for day in days_ready(now, meta.get("first_fetch"), meta["finalized_days"]):
+        key = day.isoformat()
+        path = scored_path(day, root)
+        if path.exists():
+            records[key] = {**stored_day_record(path), "status": "prepared"}
+            prepared.append(key)
+            continue
+        coverage = observation_coverage(obs, day, station_ids)
+        deadline = datetime.combine(day + timedelta(days=1 + FINALIZE_MAX_AGE_DAYS),
+                                    datetime.min.time(), tzinfo=timezone.utc)
+        late = coverage["coverage"] < MIN_OBSERVATION_COVERAGE
+        record = {**coverage, "late_finalized": late and now >= deadline,
+                  "expected_stations": station_ids}
+        if late and now < deadline:
+            records[key] = {**record, "status": "waiting"}
+            continue
         p = pending[day_slice(pending, "target", day)]
         o = obs_window(obs, day)
-        if not exists(day):  # e.g. already provided by the one-off migration
-            write(day, score_targets(p, o))
-        meta["finalized_days"].append(day.isoformat())
-        written.append(day.isoformat())
-        # Targets on or before this day are no longer needed.
-        pending = pending[pending.target.astype(str) >= (day + timedelta(days=1)).isoformat()]
-    if written:
-        state.replace_pending(pending)
-        cutoff = (now - timedelta(days=OBS_KEEP_DAYS)).strftime("%Y-%m-%d")
-        state.replace_obs(obs[obs.time.astype(str) >= cutoff])
-        state.save_meta(meta)
-    return written
+        record["prepared_at"] = now.isoformat()
+        write_scored(day, score_targets(p, o), root, metadata=record)
+        record = stored_day_record(path)
+        records[key] = {**record, "status": "prepared"}
+        prepared.append(key)
+    state.save_meta(meta)
+    return prepared
+
+
+def confirm_finalized(state, confirmed: dict[str, dict], now: datetime | None = None) -> None:
+    """Prune only exact days verified in origin by cloud.persistence; never by age."""
+    now = now or datetime.now(timezone.utc)
+    meta = state.meta()
+    pending, obs = state.pending(), state.obs()
+    pending = pending[~pending.target.astype(str).str[:10].isin(confirmed)]
+    for day, record in confirmed.items():
+        date.fromisoformat(day)
+        meta.setdefault("days", {})[day] = {**record, "status": "finalized"}
+    meta["finalized_days"] = sorted(set(meta["finalized_days"]) | set(confirmed))
+    cutoff = (now - timedelta(days=OBS_KEEP_DAYS)).strftime("%Y-%m-%d")
+    # If recovery is delayed, keep the baseline for every still-pending past day.
+    if not pending.empty:
+        oldest = date.fromisoformat(pending.target.astype(str).str[:10].min())
+        cutoff = min(cutoff, (oldest - timedelta(days=BASELINE_LOOKBACK_DAYS)).isoformat())
+    state.replace_pending(pending)
+    state.replace_obs(obs[obs.time.astype(str) >= cutoff])
+    state.save_meta(meta)
