@@ -18,10 +18,10 @@ Updated 2026-09-28._
    before stopping it. Keep `data/weather.db`.
 
 ### Pipeline
-3. Review the local reliability/encryption commit, then authorize pushing and verify
-   the first deployed run: authenticated restore, encrypted days, coverage metadata,
-   history confirmation before state pruning, and page health. All implementation
-   and failure-injection tests are complete; a 30-minute heartbeat will check Actions and page health, report results, then pause.
+3. Verify the first deployed run of the reliability/encryption commit (pushed 3e6ec36):
+   authenticated restore, encrypted days, coverage metadata, history confirmation before
+   state pruning, and page health. A 30-minute heartbeat checks Actions and page health,
+   reports, then pauses. After the monthly-summary push, also check that `summary.json` deploys.
 4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
    27 Sep). Recent gaps also reached about 8.1–8.5 h. If a gap exceeds 9 h the page's
    health line warns; consider an external trigger then.
@@ -31,8 +31,8 @@ Updated 2026-09-28._
   a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
 5. **Storm replays and steadiness on the page:** `PLAN_REPLAYS.md` steps 2–5 (step 1 done).
-6. **WeatherNext median as the headline rain value**, with the average as the dashed line
-   (FINDINGS recommendation 2).
+6. **Rain median on the remaining rain views:** the map, "Over time" chart and "Patterns" table still
+   use WeatherNext's average; the headline views now lead with the median (done 28 Sep).
 7. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
    the height adjustment over-warms cold valley stations (Røros, Dividalen, Grønliheia).
 

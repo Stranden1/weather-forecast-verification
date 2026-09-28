@@ -1,5 +1,16 @@
 # Changelog
 
+## Reliability changes pushed — 2026-09-28 (Codex)
+
+Done:
+- User authorized deployment; pushed 3e6ec36 to origin/main around 20:24 UTC.
+- Confirmed clean checkout, no newer remote main commits, and evidence of 154 passing tests.
+- Created heartbeat verify-weatherapp-reliability-deployment to check every 30 minutes.
+
+Remaining (carried to NEXT_STEPS item 3):
+- Check the next scheduled run using the changes: Actions logs and published page health line.
+- Older plaintext Git commits/caches require separately coordinated cleanup.
+
 ## Cloud reliability and encrypted history — 2026-09-28 (Codex)
 
 Done:

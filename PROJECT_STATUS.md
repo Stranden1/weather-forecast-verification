@@ -7,9 +7,11 @@ _Updated 2026-09-28. Current state only; history is in CHANGELOG.md._
 WeatherApp compares Yr/MET and WeatherNext with Frost at 50 Norwegian stations.
 The cloud pipeline/public dashboard and local Windows collector run in parallel;
 ECMWF IFS/AIFS are also collected but not yet ranked on the page. The requested
-reliability and encrypted-history fixes are implemented and tested locally.
-Pushed as 3e6ec36 at about 20:24 UTC; next scheduled run verification pending; older public plaintext Git copies still need
+reliability and encrypted-history fixes were pushed as 3e6ec36 (about 20:24 UTC); next
+scheduled run verification pending; older public plaintext Git copies still need
 coordinated cleanup before publication protection can be considered complete.
+A monthly summary paragraph and a rain view led by WeatherNext's median are committed
+locally, not yet pushed (see WORK_STATUS.md).
 
 ## Current capabilities
 
@@ -17,6 +19,9 @@ coordinated cleanup before publication protection can be considered complete.
   comparisons and six-hourly collection. This task did not modify that system.
 - Cloud: paired horizon snapshots, daily scoring, encrypted immutable history,
   aggregate page JSON, trends, maps, uncertainty and baseline diagnostics.
+- Page top: a fixed-template paragraph per calendar month (this month "so far", earlier
+  months collapsed) from `summary.json`, naming a winner only where the bootstrap verdict does.
+  Rain views lead with WeatherNext's median; temperature and wind with its average.
 - Sampling method is recorded; height-adjusted WeatherNext remains a separate
   labelled temperature comparison. Steadiness is exported but not displayed.
 - Project HQ provides a local read-only viewer of handoff documents.
@@ -35,14 +40,13 @@ coordinated cleanup before publication protection can be considered complete.
 
 ## Verification and last checked live state
 
-154 local/cloud tests pass. Project HQ: 7 passed, 1 Windows symlink skip. Failure
+177 local/cloud tests pass (154 before the monthly summary). Project HQ: 7 passed, 1 Windows symlink skip. Failure
 recovery was exercised with temporary Git remotes. All 58 generated page JSON
 files match pre-encryption exports except generation time; original scores unchanged.
 
 Last checked live cloud run (28 Sep 13:55 UTC): all sources successful; summaries
 cover 23 dates through 27 Sep. Local collection finished 16:18 UTC with status ok.
-The local checkout includes scored-day commits through be13ed1. New fixes have not
-been pushed; live scheduling and behavior still use the previous implementation.
+The reliability fixes are live from 3e6ec36; the monthly summary is not yet pushed.
 
 ## Limits and next actions
 

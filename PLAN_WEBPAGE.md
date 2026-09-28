@@ -106,6 +106,15 @@ separate coordinated cleanup; a normal encryption commit cannot erase them.
    and first error per source, so one source's errors can't hide another's.
    Raw error messages stay out of the published JSON.
 
+## Improvements — 2026-09-28
+
+1. **Monthly summary** at the top of the page (`cloud/monthly.py` → `summary.json`): one
+   fixed-template paragraph per UTC calendar month, the current month "so far" then a collapsed
+   "Earlier months". Same pairing, bootstrap verdicts and 7-day minimum, counted within the month.
+   See DECISIONS.md "Monthly summary and rain median headline".
+2. **Rain leads with WeatherNext's median** (solid line, headline value and verdict), the average
+   dashed, in the tiles, horizon chart/table and "Catching rain".
+
 ## Existing local app
 
 Unchanged. `app.py`, the Windows task and `data/weather.db` keep working. Run
@@ -146,4 +155,5 @@ app can stay as a private deep-dive tool.
 - [x] 14. Reliability/publication fixes implemented locally on 28 Sep: encrypted
   history, coverage-gated preparation, fail-closed restore, and history-first
   publication with origin confirmation. Pushed as 3e6ec36; next scheduled run verification pending.
+- [x] 15. Monthly summary and rain median headline (28 Sep). Committed locally; push pending the user's OK.
 

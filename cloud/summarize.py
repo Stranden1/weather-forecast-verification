@@ -84,7 +84,9 @@ def verdict(lo, hi) -> str:
     return "too_close"
 
 
-def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True) -> dict:
+def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True,
+          median_ci: bool = False) -> dict:
+    """`median_ci` adds a diff and verdict for WeatherNext's median (rain headlines it)."""
     out = {"n": int(len(d)), "days": int(d.day.nunique()) if len(d) else 0}
     if not len(d):
         return out
@@ -101,6 +103,11 @@ def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True) -> dict
         if "mae_wnh" in out:  # a second verdict for the height-adjusted line; the first stays primary
             lo, hi = bootstrap_diff(d.assign(e_wn=d.e_wnh))
             out.update(ci_h_lo=_r(lo), ci_h_hi=_r(hi), verdict_h=verdict(lo, hi))
+        if median_ci and d.get("e_wn50") is not None and d.e_wn50.notna().any():
+            dm = d[d.e_wn50.notna()]  # like for like: only forecasts that have a median
+            lo, hi = bootstrap_diff(dm.assign(e_wn=dm.e_wn50))
+            out.update(diff_50=_r(dm.e_wn50.abs().mean() - dm.e_yr.abs().mean()),
+                       ci_50_lo=_r(lo), ci_50_hi=_r(hi), verdict_50=verdict(lo, hi))
     if with_base and (b := baseline(d)):
         out["base"] = b
     return out
@@ -110,13 +117,18 @@ def events(d: pd.DataFrame) -> dict:
     """Wet-hour detection (> 0.1 mm/h): probability of detection, false alarms, CSI."""
     wet = d.obs_p > WET_THRESHOLD_MM
     out = {"wet_hours": int(wet.sum()), "dry_hours": int((~wet).sum())}
-    for p in ("yr", "wn"):
-        f = d[f"{p}_p"] > WET_THRESHOLD_MM
-        hits, misses, fa = int((f & wet).sum()), int((~f & wet).sum()), int((f & ~wet).sum())
+    # wn50 = WeatherNext's median: the headline rain value; wn = its average.
+    for p, col in (("yr", "yr_p"), ("wn", "wn_p"), ("wn50", "wn_p_p50")):
+        if col not in d:
+            continue
+        dd = d[d[col].notna()]  # a missing forecast must not count as "no rain"
+        wet_p = dd.obs_p > WET_THRESHOLD_MM
+        f = dd[col] > WET_THRESHOLD_MM
+        hits, misses, fa = int((f & wet_p).sum()), int((~f & wet_p).sum()), int((f & ~wet_p).sum())
         out[p] = {"pod": _r(hits / (hits + misses)) if hits + misses else None,
                   "far": _r(fa / (hits + fa)) if hits + fa else None,
                   "csi": _r(hits / (hits + misses + fa)) if hits + misses + fa else None,
-                  "wet_mae": _r(d.loc[wet, f"e_{p}"].abs().mean()) if wet.any() else None}
+                  "wet_mae": _r(dd.loc[wet_p, f"e_{p}"].abs().mean()) if wet_p.any() else None}
     return out
 
 
@@ -196,7 +208,8 @@ def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
 
 
 def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
-          publish_values: bool = PUBLISH_FORECAST_VALUES, heights: dict | None = None) -> dict:
+          publish_values: bool = PUBLISH_FORECAST_VALUES, heights: dict | None = None,
+          now: pd.Timestamp | None = None) -> dict:
     out_dir = Path(out_dir)
     (out_dir / "recent").mkdir(parents=True, exist_ok=True)
     stations = stations or load_stations()
@@ -228,7 +241,8 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
             if d.empty:
                 continue
             key = str(h)
-            board[var][key] = {"all": stats(d), "last30": stats(d[d.day.isin(last30)])}
+            board[var][key] = {"all": stats(d, median_ci=var == "p"),
+                               "last30": stats(d[d.day.isin(last30)], median_ci=var == "p")}
             t = d.groupby("day").agg(n=("e_yr", "size"), mae_yr=("e_yr", lambda s: s.abs().mean()),
                                      mae_wn=("e_wn", lambda s: s.abs().mean())).reset_index()
             trend[var][key] = [{"day": r.day, "n": int(r.n), "yr": _r(r.mae_yr), "wn": _r(r.mae_wn)}
@@ -256,6 +270,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
 
     from .replay import steadiness
     dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})
+
+    from .monthly import build_summary
+    dump("summary.json", build_summary(scored, now))
 
     # Recent hourly series at the 24 h horizon for the "predicted vs actual" chart.
     recent = scored[(scored.h == 24) & scored.target.astype(str).str[:10].isin(days[-7:])]

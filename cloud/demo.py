@@ -71,7 +71,8 @@ def fake_meta(now: datetime) -> dict:
 
 if __name__ == "__main__":
     out = Path(sys.argv[1] if len(sys.argv) > 1 else "site/data_demo")
-    build(fake_scored(), out, publish_values=True)
+    # The made-up days run from 1 Sep to 15 Oct, so treat 16 Oct as "now": October is in progress.
+    build(fake_scored(), out, publish_values=True, now=pd.Timestamp("2026-10-16", tz="UTC"))
     meta = json.loads((out / "meta.json").read_text(encoding="utf-8"))
     meta["demo"] = True
     (out / "meta.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")

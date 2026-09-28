@@ -13,6 +13,13 @@
   <p class="eyebrow">Forecast scorecard · Norway</p>
   <h1>Yr vs WeatherNext</h1>
   <p class="health" id="health" role="status" hidden></p>
+  <section class="summary" id="summary" aria-labelledby="summary-h" hidden>
+    <h2 id="summary-h">Month by month</h2>
+    <div id="summary-now"></div>
+    <details id="summary-earlier"><summary>Earlier months</summary><div id="summary-list"></div></details>
+    <p class="muted summary-note">A service is only named ahead where the 95% test below says so, and not before
+      7 days of data in the month. Rain compares WeatherNext's average and its median with Yr.</p>
+  </section>
   <p class="lede">Every six hours we save what <b class="yr">Yr</b> and Google's AI model
     <b class="wn">WeatherNext</b> predict for 50 weather stations. Once the weather has happened,
     we check both forecasts against the measurements. Lower error is better.</p>
@@ -29,6 +36,8 @@
   </div>
 
   <section class="tiles" id="tiles" aria-live="polite"></section>
+  <p class="muted rain-why" id="rain-why" hidden>For rain we lead with WeatherNext's median, because averaging many
+    scenarios spreads light drizzle across nearly every hour.</p>
 
   <section class="card">
     <h2>Error by how far ahead</h2>
@@ -79,8 +88,9 @@
       <li><b>Yr has a home advantage.</b> For the first 2–3 days, Yr's forecasts are corrected using
         measurements from Norwegian weather stations, including many of these ones. WeatherNext is not.
         That's fair if you ask "which is best for Norway today?", not if you ask "which model is better in general?".</li>
-      <li><b>WeatherNext averages many possible outcomes.</b> Its average (solid orange) smooths out extremes,
-        which tends to lower the average error. The dashed line shows its median instead.</li>
+      <li><b>WeatherNext averages many possible outcomes.</b> For temperature and wind its average (solid orange)
+        smooths out extremes, which tends to lower the average error. The dashed line shows its median instead.
+        For rain the two swap places, as explained under the rain tiles.</li>
       <li><b>"Too close to call"</b> means the 95% uncertainty range of the difference still includes zero.
         Days are the unit: errors from nearby stations on the same day are not independent.</li>
       <li><b>A naive guess sets the bar.</b> "Same as before" predicts the value measured at the same time of day

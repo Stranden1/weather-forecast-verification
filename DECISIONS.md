@@ -386,6 +386,26 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   30 → 142 m), so their published WeatherNext values may read colder from 26 Sep on. The
   height-adjusted line accounts for that per row.
 
+## Monthly summary and rain median headline — 2026-09-28 (Claude)
+
+- `site/data/summary.json` is built at export from decrypted history, one entry per UTC calendar
+  month (by target day): the current month "so far" plus every completed month. It reuses
+  `summarize.paired`/`stats` unchanged: same pairing, 95% day-block bootstrap, 7-day minimum
+  (counted within the month). Horizons 6 h, 1, 2, 3, 5 days for temperature and wind; 6 h, 1, 2 days
+  for rain (hourly rain is not scored beyond 48 h). It holds verdicts and text only, never forecast
+  values, and ECMWF is not shown.
+- The text is fixed templates. A winner is named only where the verdict says so; otherwise "too close
+  to call" or "not enough days yet". Horizons with the same verdict are grouped ("1–2 days out",
+  "from 3 days"). Temperature uses as-published WeatherNext; one "height-adjusted temperature
+  differs" clause appears only for horizons where the adjusted verdict differs. Winner clauses are
+  ordered by winner name, then temperature before wind. Rain gives two lenses: WeatherNext's average
+  and its median, each against Yr. A tie is written "too close to call", not "about equal".
+- Rain views lead with WeatherNext's median (solid line, headline value, headline verdict); the
+  average is the dashed line and a second verdict line. Reason (FINDINGS 2026-09-26, rec. 2):
+  averaging many scenarios spreads light drizzle everywhere. The median verdict is a new statistic
+  (`verdict_50`, `diff_50`, `ci_50_*`) computed on forecasts that have a median; scoring, pairing and
+  history are unchanged. Temperature and wind keep the average as the main value.
+
 ## Encrypted history and recoverable publication — 2026-09-28
 
 - User authorized encrypting existing committed day files as a storage-only exception

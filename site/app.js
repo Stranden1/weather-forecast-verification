@@ -23,11 +23,19 @@
     return p === 0 ? "same" : `${p}% ${x > 0 ? "better" : "worse"}`; };
   const skillSentence = x => skillPct(x) === "same" ? "About the same as a naive guess" : `${skillPct(x)} than a naive guess`;
   const unit = () => D.meta.variables[S.v].unit;
+  // Rain leads with WeatherNext's median (its average spreads drizzle everywhere); the average is the dashed line.
+  // Temperature and wind lead with the average. `wnPick` returns the headline and secondary numbers of a stats block.
+  const isRain = () => S.v === "p";
+  const wnPick = s => isRain()
+    ? { main: s.mae_wn50, alt: s.mae_wn, bias: s.bias_wn50, diff: s.diff_50, lo: s.ci_50_lo, hi: s.ci_50_hi, verdict: s.verdict_50,
+        skill: s.base?.skill_wn50, altVerdict: s.verdict, altWord: "average" }
+    : { main: s.mae_wn, alt: s.mae_wn50, bias: s.bias_wn, diff: s.diff, lo: s.ci_lo, hi: s.ci_hi, verdict: s.verdict,
+        skill: s.base?.skill_wn, altVerdict: null, altWord: "median" };
   const hs = () => (S.v === "p" ? D.meta.precip_horizons : D.meta.horizons);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health"];
+    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary"];
     const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
@@ -78,24 +86,29 @@
     const h = hs().includes(24) ? 24 : hs()[0];
     const s = D.leaderboard?.[S.v]?.[h]?.[S.period];
     const el = document.getElementById("tiles");
+    document.getElementById("rain-why").hidden = !isRain();
     if (!s || !s.n) { el.innerHTML = `<div class="tile empty" style="grid-column:1/-1">No scored forecasts yet for this selection.</div>`; return; }
-    const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
-    const ci = s.ci_lo != null ? `95% range of the difference: ${fmt(s.ci_lo)} to ${fmt(s.ci_hi)} ${unit()}` :
+    const w = wnPick(s);
+    const [vt, cls] = VERDICT[w.verdict] || VERDICT.not_enough_data;
+    const ci = w.lo != null ? `95% range of the difference: ${fmt(w.lo)} to ${fmt(w.hi)} ${unit()}` :
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
-    const skill = p => s.base?.[`skill_${p}`] == null ? "" :
-      `<div class="d">${skillSentence(s.base[`skill_${p}`])} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
+    const skill = (p, x) => x == null ? "" :
+      `<div class="d">${skillSentence(x)} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
     // Temperature only: WeatherNext moved to each station's height (our adjustment, secondary).
     const adj = s.mae_wnh == null ? "" : `<div class="d">Height-adjusted (our estimate): ${fmt(s.mae_wnh)} ${unit()}</div>`;
     const [vh, clsh] = VERDICT[s.verdict_h] || VERDICT.not_enough_data;
-    const adjVerdict = s.mae_wnh == null ? "" :
+    // A second verdict: the height-adjusted one for temperature, the average-based one for rain.
+    const [va, clsa] = VERDICT[w.altVerdict] || VERDICT.not_enough_data;
+    const adjVerdict = isRain() ? `<div class="d">Using WeatherNext's average instead: <span class="badge ${clsa}">${va}</span></div>`
+      : s.mae_wnh == null ? "" :
       `<div class="d">After a standard height adjustment: <span class="badge ${clsh}">${vh}</span></div>`;
     el.innerHTML = `
       <div class="tile"><p class="k"><span class="dot yr"></span>Yr · 1 day ahead</p>
         <div class="v">${fmt(s.mae_yr)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr")}</div>
-      <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext · 1 day ahead</p>
-        <div class="v">${fmt(s.mae_wn)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(s.bias_wn)} ${unit()} · median version ${fmt(s.mae_wn50)}</div>${skill("wn")}${adj}</div>
+        <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr", s.base?.skill_yr)}</div>
+      <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext${isRain() ? " (median)" : ""} · 1 day ahead</p>
+        <div class="v">${fmt(w.main)} <small>${unit()} avg. error</small></div>
+        <div class="d">Bias ${fmt(w.bias)} ${unit()} · ${w.altWord} version ${fmt(w.alt)}</div>${skill("wn", w.skill)}${adj}</div>
       <div class="tile"><p class="k">Verdict · ${s.days} days, ${s.n.toLocaleString()} forecasts</p>
         <div class="v" style="font-size:24px"><span class="badge ${cls}" style="font-size:15px">${vt}</span></div>
         <div class="d">${ci}</div>${adjVerdict}</div>`;
@@ -107,10 +120,11 @@
     const g = k => H.map(h => b[h][S.period][k]);
     const base = H.map(h => b[h][S.period].base?.mae ?? null);
     const o = baseOptions(`Average error (${unit()})`);
+    const rain = isRain();
     const ds = [
       line("Yr", g("mae_yr"), css("--yr")),
-      line("WeatherNext (average)", g("mae_wn"), css("--wn")),
-      line("WeatherNext (median)", g("mae_wn50"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", pointRadius: 4, backgroundColor: css("--surface") }),
+      line(`WeatherNext (${rain ? "median" : "average"})`, g(rain ? "mae_wn50" : "mae_wn"), css("--wn")),
+      line(`WeatherNext (${rain ? "average" : "median"})`, g(rain ? "mae_wn" : "mae_wn50"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", pointRadius: 4, backgroundColor: css("--surface") }),
     ];
     if (base.some(x => x != null))
       ds.push(line("Naive guess (same as before)", base, css("--ink-3"), { borderDash: [2, 3], pointStyle: "rect", pointRadius: 3 }));
@@ -119,15 +133,15 @@
       ds.push(line("WeatherNext, height-adjusted (our estimate)", adj, css("--wn"), { borderDash: [1, 3], borderWidth: 2, pointStyle: "triangle", pointRadius: 4, backgroundColor: css("--surface") }));
     chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
-      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext</th><th>Median</th>${hasAdj ? "<th>Height-adj.</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
+      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext${rain ? " (median)" : ""}</th><th>${rain ? "Average" : "Median"}</th>${hasAdj ? "<th>Height-adj.</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
         <th>Naive guess</th><th>Yr vs naive</th><th>WeatherNext vs naive</th></tr>
-      ${H.map(h => { const s = b[h][S.period]; const [vt, cls] = VERDICT[s.verdict] || VERDICT.not_enough_data;
-        return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(s.mae_wn)}</td><td>${fmt(s.mae_wn50)}</td>
+      ${H.map(h => { const s = b[h][S.period]; const w = wnPick(s); const [vt, cls] = VERDICT[w.verdict] || VERDICT.not_enough_data;
+        return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(w.main)}</td><td>${fmt(w.alt)}</td>
         ${hasAdj ? `<td>${fmt(s.mae_wnh)}</td>` : ""}
-        <td>${fmt(s.diff)}</td><td>${s.ci_lo == null ? "–" : fmt(s.ci_lo) + " to " + fmt(s.ci_hi)}</td>
+        <td>${fmt(w.diff)}</td><td>${w.lo == null ? "–" : fmt(w.lo) + " to " + fmt(w.hi)}</td>
         <td><span class="badge ${cls}">${vt}</span></td>
-        <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(s.base?.skill_wn)}</td></tr>`; }).join("")}
-      </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
+        <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(w.skill)}</td></tr>`; }).join("")}
+      </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext${rain ? " (median)" : ""} error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
       ${hasAdj ? `Height-adj. = WeatherNext moved to each station's height at 6.5 °C per km (our adjustment, not Google's); the difference, range and verdict use the published values.` : ""}
       Naive guess = the value measured at the same time of day on the latest day already known when the forecast was made.
       "36% better" means the forecast's average error was 36% smaller than the naive guess's, counting only forecasts that have a naive value.</p>`;
@@ -247,11 +261,12 @@
         : `<p class="muted">No data yet.</p>`}`;
 
     const rain = S.v === "p" ? D.rain?.[S.patH] : null;
+    const RAIN_ROW = { yr: ["yr", "Yr"], wn50: ["wn", "WeatherNext (median)"], wn: ["wn", "WeatherNext (average)"] };
     document.getElementById("rain").innerHTML = !rain ? "" : `<h3>Catching rain</h3>
       <p class="sub" style="font-size:14px">A wet hour is more than 0.1 mm. ${rain.wet_hours.toLocaleString()} wet and
       ${rain.dry_hours.toLocaleString()} dry hours so far.</p>
       <div class="table-scroll"><table><tr><th>Service</th><th>Rain caught</th><th>False alarms</th><th>Overall skill</th><th>Error when wet</th></tr>
-      ${["yr", "wn"].map(p => `<tr><td><span class="dot ${p}"></span> ${p === "yr" ? "Yr" : "WeatherNext"}</td>
+      ${["yr", "wn50", "wn"].filter(p => rain[p]).map(p => `<tr><td><span class="dot ${RAIN_ROW[p][0]}"></span> ${RAIN_ROW[p][1]}</td>
         <td>${rain[p].pod == null ? "–" : Math.round(rain[p].pod * 100) + "%"}</td>
         <td>${rain[p].far == null ? "–" : Math.round(rain[p].far * 100) + "%"}</td>
         <td>${fmt(rain[p].csi)}</td><td>${fmt(rain[p].wet_mae)} mm</td></tr>`).join("")}</table></div>
@@ -294,6 +309,20 @@
     el.innerHTML = (warn ? `<span class="warn-label">Check:</span> ` : "") + parts.map(esc).join(" · ");
   }
 
+  // Month paragraphs are fixed-template text built at export (cloud/monthly.py); "September (5–27, 23 days): …"
+  function renderSummary() {
+    const months = D.summary?.months || [];
+    const el = document.getElementById("summary");
+    if (!months.length) return;
+    const para = m => { const i = m.text.indexOf(": ");
+      return `<p><b>${esc(m.text.slice(0, i))}</b>: ${esc(m.text.slice(i + 2))}</p>`; };
+    el.hidden = false;
+    document.getElementById("summary-now").innerHTML = para(months[0]);
+    const older = months.slice(1);
+    document.getElementById("summary-earlier").hidden = !older.length;
+    document.getElementById("summary-list").innerHTML = older.map(para).join("");
+  }
+
   function render() {
     renderTiles(); renderHorizon(); renderTrend(); renderMap(); renderPatterns();
   }
@@ -301,6 +330,7 @@
   load().then(() => {
     const m = D.meta || {};
     renderHealth();
+    renderSummary();
     if (!m.variables) { document.getElementById("fresh").textContent = "No data published yet."; return; }
     const updated = D.health?.generated_at ? "" : ` · updated ${m.generated_at.replace("T", " ").slice(0, 16)} UTC`;
     document.getElementById("fresh").textContent = m.days
