@@ -8,7 +8,7 @@ WeatherApp compares Yr/MET and WeatherNext with Frost at 50 Norwegian stations.
 The cloud pipeline/public dashboard and local Windows collector run in parallel;
 ECMWF IFS/AIFS are also collected but not yet ranked on the page. The requested
 reliability and encrypted-history fixes are implemented and tested locally.
-Push/deployment awaits user review; older public plaintext Git copies still need
+Pushed as 3e6ec36 at about 20:24 UTC; next scheduled run verification pending; older public plaintext Git copies still need
 coordinated cleanup before publication protection can be considered complete.
 
 ## Current capabilities
@@ -21,7 +21,7 @@ coordinated cleanup before publication protection can be considered complete.
   labelled temperature comparison. Steadiness is exported but not displayed.
 - Project HQ provides a local read-only viewer of handoff documents.
 
-## Reliability changes ready for deployment
+## Reliability changes pushed; live verification pending
 
 - All 23 current history files are encrypted with WX_STATE_KEY. Exact original
   compressed bytes and 126,109 rows are preserved. CI decrypts in memory; public
@@ -46,7 +46,7 @@ been pushed; live scheduling and behavior still use the previous implementation.
 
 ## Limits and next actions
 
-Review/authorize deployment, then verify a live cycle before retiring the PC
+Verify the next scheduled live cycle before retiring the PC
 collector. Current-file encryption does not remove old plaintext commits/caches;
 coordinate that cleanup separately. Preserve a secure backup of WX_STATE_KEY,
 which now protects scored history as well as pending forecasts.
@@ -54,3 +54,4 @@ which now protects scored history as well as pending forecasts.
 Model findings remain preliminary, especially after the sampling change and for
 ECMWF. Height adjustment uses proxy terrain and a fixed lapse rate; AIFS hourly
 rain is interpolated. NEXT_STEPS.md holds open work; DECISIONS.md holds policies.
+

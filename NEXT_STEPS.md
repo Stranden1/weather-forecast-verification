@@ -10,9 +10,9 @@ Updated 2026-09-28._
    terms don't clearly say values for past times may be published. To change that, first ask
    weathernext@google.com. Storm replays (PLAN_REPLAYS step 2) show Yr and measured values only
    until then.
-   Current day files have been encrypted locally. Older plaintext Git commits/caches
+   Current day files are encrypted and pushed. Older plaintext Git commits/caches
    remain accessible: coordinate historical cleanup before claiming raw values are
-   no longer publicly retrievable. No main-history rewrite or push has been performed.
+   no longer publicly retrievable. No main-history rewrite has been performed.
 2. **Stop the Windows task** after the parallel week: compare cloud and local results around
    2 Oct (a week of complete cloud data), and deploy/verify the recovery fixes below
    before stopping it. Keep `data/weather.db`.
@@ -21,7 +21,7 @@ Updated 2026-09-28._
 3. Review the local reliability/encryption commit, then authorize pushing and verify
    the first deployed run: authenticated restore, encrypted days, coverage metadata,
    history confirmation before state pruning, and page health. All implementation
-   and failure-injection tests are complete; production deployment is pending.
+   and failure-injection tests are complete; a 30-minute heartbeat will check Actions and page health, report results, then pause.
 4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
    27 Sep). Recent gaps also reached about 8.1–8.5 h. If a gap exceeds 9 h the page's
    health line warns; consider an external trigger then.
@@ -51,3 +51,4 @@ Updated 2026-09-28._
 - Revalidate wind height/unit metadata when changing the station network or collectors.
 - Keep separate backups of `data/weather.db` and credentials; GitHub holds neither.
 - Setting GitHub secrets from PowerShell 5.1 by piping adds a BOM; use `gh secret set --body`.
+

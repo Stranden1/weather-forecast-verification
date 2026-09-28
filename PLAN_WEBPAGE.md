@@ -145,4 +145,5 @@ app can stay as a private deep-dive tool.
 
 - [x] 14. Reliability/publication fixes implemented locally on 28 Sep: encrypted
   history, coverage-gated preparation, fail-closed restore, and history-first
-  publication with origin confirmation. Push/deployment awaits user review.
+  publication with origin confirmation. Pushed as 3e6ec36; next scheduled run verification pending.
+
