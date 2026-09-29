@@ -73,9 +73,19 @@ class MonthSplitTest(unittest.TestCase):
 
     def test_month_in_progress_is_marked_so_far_and_others_are_not(self):
         cur, sep, _ = self.s["months"]
-        self.assertTrue(cur["text"].startswith("October so far (1–2, 2 days): "))
-        self.assertTrue(sep["text"].startswith("September (1–10, 10 days): "))
+        self.assertTrue(cur["text"].startswith("October so far (1–2 Oct; both models compared on 2 days)\n"))
+        self.assertTrue(sep["text"].startswith("September (1–10 Sep; both models compared on 10 days)\n"))
         self.assertNotIn("so far", sep["text"])
+
+    def test_header_counts_only_days_with_both_models(self):
+        early = frame(days("2026-09-05", "2026-09-14")).assign(wn_t=None, wn_w=None, wn_p=None)
+        df = pd.concat([early, frame(days("2026-09-15", "2026-09-27"))], ignore_index=True)
+        head = monthly.build_summary(df, self.NOW)["months"][0]["text"].split("\n")[0]
+        self.assertEqual(head, "September (5–27 Sep; both models compared from 15 Sep, 13 days)")
+        none = monthly.build_summary(early, self.NOW)["months"][0]["text"].split("\n")[0]
+        self.assertEqual(none, "September (5–14 Sep; no days with both models yet)")
+        one = monthly.build_summary(frame(["2026-09-05"]), self.NOW)["months"][0]["text"].split("\n")[0]
+        self.assertEqual(one, "September (5 Sep; both models compared on 1 day)")
 
     def test_boundary_is_midnight_utc_by_target_time(self):
         df = pd.concat([frame(["2026-08-31"]).assign(target="2026-08-31T23:00:00Z"),
@@ -123,38 +133,58 @@ class VerdictGroupingTest(unittest.TestCase):
         # Neighbours are neighbours in that variable's own horizon list (rain has only 3).
         self.assertEqual(horizon_phrase([24, 48], [6, 24, 48]), "from 1 day")
 
-    def test_same_verdict_horizons_are_grouped_and_winners_come_first(self):
+    CMP = days("2026-09-05", "2026-09-30")  # both models on every day
+
+    def describe(self, v):
+        return describe("September", False, "2026-09-05", "2026-09-30", self.CMP, v)
+
+    def test_one_line_per_variable_winners_first_then_too_close(self):
         v = verdicts(t=dict(zip(ALL, ["yr", "yr", "too_close", "too_close", "too_close"])),
                      w=dict(zip(ALL, ["weathernext", "weathernext", "too_close", "too_close", "too_close"])))
-        text = describe("September", False, "2026-09-05", "2026-09-30", 26, v)
-        self.assertEqual(text, "September (5–30, 26 days): WeatherNext ahead on wind 6 hours to 1 day out; "
-                               "Yr ahead on temperature 6 hours to 1 day out; too close to call from 2 days. "
-                               "Rain: too close to call on average error; WeatherNext's median too close to call.")
+        self.assertEqual(self.describe(v).split("\n"), [
+            "September (5–30 Sep; both models compared on 26 days)",
+            "Temperature: Yr ahead 6 hours to 1 day out; too close to call from 2 days.",
+            "Wind: WeatherNext ahead 6 hours to 1 day out; too close to call from 2 days.",
+            "Rain: WeatherNext's median too close to call at all horizons; too close to call against WeatherNext's average."])
 
-    def test_different_gaps_per_variable_name_the_variable(self):
-        v = verdicts(t=dict(zip(ALL, ["yr", "too_close", "too_close", "too_close", "too_close"])),
-                     w=dict(zip(ALL, ["too_close", "weathernext", "weathernext", "too_close", "too_close"])))
-        text = describe("September", False, "2026-09-05", "2026-09-30", 26, v)
-        self.assertIn("WeatherNext ahead on wind 1–2 days out; Yr ahead on temperature 6 hours out; ", text)
-        self.assertIn("too close to call on temperature from 1 day; "
-                      "too close to call on wind at 6 hours out and from 3 days", text)
+    def test_both_winners_ordered_by_shortest_horizon(self):
+        v = verdicts(t=dict(zip(ALL, ["too_close", "weathernext", "too_close", "yr", "yr"])))
+        self.assertIn("Temperature: WeatherNext ahead 1 day out; Yr ahead from 3 days; "
+                      "too close to call at 6 hours and 2 days out.", self.describe(v))
 
-    def test_height_adjusted_clause_only_when_its_verdict_differs(self):
+    def test_not_enough_days_go_in_one_final_line(self):
+        v = verdicts(t=dict(zip(ALL, ["yr", "too_close", "too_close", "not_enough_data", "not_enough_data"])),
+                     w=dict(zip(ALL, ["too_close", "too_close", "too_close", "not_enough_data", "not_enough_data"])))
+        lines = self.describe(v).split("\n")
+        self.assertEqual(lines[1], "Temperature: Yr ahead 6 hours out; too close to call at 1–2 days out.")
+        self.assertEqual(lines[-1], "Not enough days yet from 3 days.")
+        self.assertEqual(sum("not enough" in l.lower() for l in lines), 1)
+
+    def test_not_enough_line_names_variables_when_they_differ(self):
+        v = verdicts(t=dict(zip(ALL, ["yr", "yr", "yr", "yr", "not_enough_data"])),
+                     w=dict(zip(ALL, ["yr", "yr", "yr", "not_enough_data", "not_enough_data"])))
+        self.assertTrue(self.describe(v).endswith(
+            "\nNot enough days yet: temperature at 5 days out; wind from 3 days."))
+
+    def test_height_adjusted_sentence_only_when_it_differs(self):
         same = verdicts(adj={h: "too_close" for h in ALL})
-        self.assertNotIn("height-adjusted", describe("September", False, "2026-09-05", "2026-09-30", 26, same))
+        self.assertNotIn("Height-adjusted", self.describe(same))
         v = verdicts(adj=dict(zip(ALL, ["weathernext", "weathernext", "too_close", "too_close", "not_enough_data"])))
-        text = describe("September", False, "2026-09-05", "2026-09-30", 26, v)
-        self.assertEqual(text.count("height-adjusted"), 1)  # one clause, however many horizons
-        self.assertIn("height-adjusted temperature differs: WeatherNext ahead 6 hours to 1 day out, "
-                      "not enough days yet at 5 days out.", text)
+        self.assertIn("Temperature: too close to call at all horizons. "
+                      "Height-adjusted: WeatherNext ahead 6 hours to 1 day out.\n", self.describe(v))
 
-    def test_rain_groups_horizons_when_verdicts_differ_between_them(self):
+    def test_rain_leads_with_the_median_then_the_average(self):
         rain = {6: {"mean": "yr", "median": "too_close"}, 24: {"mean": "yr", "median": "too_close"},
                 48: {"mean": "yr", "median": "weathernext"}}
-        text = describe("September", False, "2026-09-05", "2026-09-30", 26, verdicts(p=rain))
-        self.assertTrue(text.endswith(
-            "Rain: Yr ahead on average error; WeatherNext's median too close to call at 6 hours to 1 day out; "
-            "WeatherNext's median ahead 2 days out."))
+        self.assertIn("\nRain: WeatherNext's median ahead 2 days out, too close to call at 6 hours to 1 day out; "
+                      "Yr beats WeatherNext's average.", self.describe(verdicts(p=rain)))
+
+    def test_rain_average_names_horizons_when_its_verdicts_differ(self):
+        rain = {6: {"mean": "yr", "median": "yr"}, 24: {"mean": "too_close", "median": "too_close"},
+                48: {"mean": "too_close", "median": "too_close"}}
+        self.assertIn("Rain: WeatherNext's median behind Yr 6 hours out, too close to call from 1 day; "
+                      "Yr beats WeatherNext's average 6 hours out; "
+                      "too close to call against WeatherNext's average from 1 day.", self.describe(verdicts(p=rain)))
 
 
 class WordingTest(unittest.TestCase):
@@ -165,25 +195,28 @@ class WordingTest(unittest.TestCase):
 
     def test_tie_says_too_close_to_call_and_names_no_winner(self):
         text = self.text(frame(days("2026-09-01", "2026-09-10"), yr=1.0, wn=1.0))
-        self.assertEqual(text, "September (1–10, 10 days): too close to call at all horizons. "
-                               "Rain: too close to call on average error; WeatherNext's median too close to call.")
+        self.assertEqual(text.split("\n"), [
+            "September (1–10 Sep; both models compared on 10 days)",
+            "Temperature: too close to call at all horizons.",
+            "Wind: too close to call at all horizons.",
+            "Rain: WeatherNext's median too close to call at all horizons; too close to call against WeatherNext's average."])
         self.assertNotIn("ahead", text)
 
     def test_fewer_than_seven_days_says_not_enough_days_yet_even_with_a_gap(self):
         text = self.text(frame(days("2026-09-01", "2026-09-05"), yr=1.0, wn=0.1))
-        self.assertEqual(text, "September (1–5, 5 days): not enough days yet at all horizons. "
-                               "Rain: not enough days yet.")
+        self.assertEqual(text, "September (1–5 Sep; both models compared on 5 days)\n"
+                               "Not enough days yet at all horizons.")
         self.assertNotIn("ahead", text)
 
     def test_exactly_seven_days_is_enough(self):
         text = self.text(frame(days("2026-09-01", "2026-09-07"), yr=1.0, wn=0.1))
-        self.assertIn("WeatherNext ahead on temperature at all horizons", text)
-        self.assertNotIn("not enough", text)
+        self.assertIn("Temperature: WeatherNext ahead at all horizons.", text)
+        self.assertNotIn("not enough", text.lower())
 
     def test_winner_is_named_only_when_the_verdict_says_so(self):
         text = self.text(frame(days("2026-09-01", "2026-09-10"), yr=0.5, wn=1.0))
-        self.assertIn("Yr ahead on temperature at all horizons", text)
-        self.assertIn("Yr ahead on wind at all horizons", text)
+        self.assertIn("Temperature: Yr ahead at all horizons.", text)
+        self.assertIn("Wind: Yr ahead at all horizons.", text)
         self.assertNotIn("WeatherNext ahead", text)
 
     def test_only_some_horizons_have_enough_data(self):
@@ -191,14 +224,13 @@ class WordingTest(unittest.TestCase):
         df = pd.concat([frame(days("2026-09-01", "2026-09-10"), hs=[6, 24, 48], yr=1.0, wn=1.0),
                         frame(days("2026-09-01", "2026-09-05"), hs=[72, 120], yr=1.0, wn=1.0)])
         text = self.text(df)
-        self.assertIn("too close to call at 6 hours to 2 days out; not enough days yet from 3 days", text)
+        self.assertIn("Temperature: too close to call at 6 hours to 2 days out.", text)
+        self.assertTrue(text.endswith("\nNot enough days yet from 3 days."))
 
-    def test_height_adjusted_clause_appears_when_only_the_adjusted_line_wins(self):
+    def test_height_adjusted_sentence_appears_when_only_the_adjusted_line_wins(self):
         df = frame(days("2026-09-01", "2026-09-10"), yr=1.0, wn=1.0, adj=0.2)
-        text = self.text(df)
-        self.assertIn("too close to call at all horizons; height-adjusted temperature differs: "
-                      "WeatherNext ahead at all horizons.", text)
-
+        self.assertIn("Temperature: too close to call at all horizons. "
+                      "Height-adjusted: WeatherNext ahead at all horizons.", self.text(df))
 
 class RainMedianTest(unittest.TestCase):
     def rain(self, **kw):
@@ -217,8 +249,8 @@ class RainMedianTest(unittest.TestCase):
 
     def test_monthly_rain_sentence_names_the_median_separately(self):
         df = frame(days("2026-09-01", "2026-09-10"), yr=1.0, wn=2.0, wn50=0.2)
-        rain = monthly.build_summary(df, pd.Timestamp("2026-10-20T00:00:00Z"))["months"][0]["text"].split("Rain: ")[1]
-        self.assertEqual(rain, "Yr ahead on average error; WeatherNext's median ahead.")
+        rain = monthly.build_summary(df, pd.Timestamp("2026-10-20T00:00:00Z"))["months"][0]["text"].split("Rain: ")[1].split("\n")[0]
+        self.assertEqual(rain, "WeatherNext's median ahead at all horizons; Yr beats WeatherNext's average.")
 
     def test_wet_hour_scores_include_the_median_and_ignore_missing_medians(self):
         d = self.rain(yr=1.0, wn=1.0, wn50=1.0)

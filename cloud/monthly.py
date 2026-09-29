@@ -20,6 +20,7 @@ VAR_NAME = {"t": "temperature", "w": "wind"}
 WINNER = {"yr": "Yr", "weathernext": "WeatherNext"}
 NO_WINNER = {"too_close": "too close to call", "not_enough_data": "not enough days yet"}
 NOT_ENOUGH = "not_enough_data"
+TOO_CLOSE = "too_close"
 
 
 def _spans(subset: list[int], all_h: list[int]) -> list[list[int]]:
@@ -68,71 +69,115 @@ def _group(verdicts: dict[int, str]) -> dict[str, list[int]]:
     return out
 
 
-def _temperature_wind(v: dict) -> list[str]:
-    """Winners first, then "too close to call", then "not enough days yet"."""
-    groups = {var: _group(v[var]) for var in VAR_NAME}
-    all_h = {var: list(v[var]) for var in VAR_NAME}
-    wins = []
-    for order, var in enumerate(VAR_NAME):
-        for verdict, hs in groups[var].items():
-            if verdict in WINNER:
-                wins.append((WINNER[verdict], order, min(hs),
-                             f"{WINNER[verdict]} ahead on {VAR_NAME[var]} {horizon_phrase(hs, all_h[var])}"))
-    clauses = [c for *_, c in sorted(wins)]
-    for verdict, label in NO_WINNER.items():
-        t, w = groups["t"].get(verdict), groups["w"].get(verdict)
-        if t and w and t == w:  # same horizons for both: no need to name the variable
-            clauses.append(f"{label} {at(horizon_phrase(t, all_h['t']))}")
-        else:
-            clauses += [f"{label} on {VAR_NAME[var]} {at(horizon_phrase(hs, all_h[var]))}"
-                        for var, hs in (("t", t), ("w", w)) if hs]
-    # Height-adjusted WeatherNext: one clause, and only where its verdict differs.
-    differs = {h: a for h, a in v.get("t_adj", {}).items() if a is not None and a != v["t"].get(h)}
-    if differs:
-        bits = []
-        for verdict, hs in _group(differs).items():
-            what = f"{WINNER[verdict]} ahead" if verdict in WINNER else NO_WINNER[verdict]
-            phrase = horizon_phrase(hs, all_h["t"])
-            bits.append(f"{what} {at(phrase) if verdict in NO_WINNER else phrase}")
-        clauses.append("height-adjusted temperature differs: " + ", ".join(bits))
-    return clauses
+def _clauses(groups: dict[str, list[int]], all_h: list[int], words: dict[str, str]) -> list[str]:
+    """Winners first (by their shortest horizon), then "too close to call".
+
+    `words` maps a verdict to its wording; "not enough days yet" is left out here
+    because it goes in the month's final line.
+    """
+    wins = sorted((min(hs), f"{words[v]} {horizon_phrase(hs, all_h)}")
+                  for v, hs in groups.items() if v in WINNER)
+    out = [c for _, c in wins]
+    if TOO_CLOSE in groups:
+        out.append(f"{words[TOO_CLOSE]} {at(horizon_phrase(groups[TOO_CLOSE], all_h))}")
+    return out
 
 
-RAIN_LENS = {  # mean = WeatherNext's average, median = WeatherNext's median
-    "mean": {"yr": "Yr ahead on average error", "weathernext": "WeatherNext ahead on average error",
-             "too_close": "too close to call on average error",
-             NOT_ENOUGH: "not enough days yet on average error"},
-    "median": {"yr": "Yr ahead of WeatherNext's median", "weathernext": "WeatherNext's median ahead",
-               "too_close": "WeatherNext's median too close to call",
-               NOT_ENOUGH: "not enough days yet for WeatherNext's median"},
-}
+def _variable_line(v: dict, var: str) -> str | None:
+    """"Temperature: Yr ahead 6 hours out; too close to call at 1 day out." or None."""
+    all_h = list(v[var])
+    words = {"yr": "Yr ahead", "weathernext": "WeatherNext ahead", TOO_CLOSE: "too close to call"}
+    clauses = _clauses(_group(v[var]), all_h, words)
+    if not clauses:
+        return None
+    line = f"{VAR_NAME[var].capitalize()}: {'; '.join(clauses)}."
+    if var == "t":  # height-adjusted WeatherNext: a short second sentence, only where it differs
+        differs = {h: a for h, a in v.get("t_adj", {}).items()
+                   if a not in (None, NOT_ENOUGH) and a != v["t"].get(h)}
+        if differs:
+            line += f" Height-adjusted: {'; '.join(_clauses(_group(differs), all_h, words))}."
+    return line
 
 
-def _rain(v: dict[int, dict[str, str]]) -> str:
+# Rain leads with WeatherNext's median; its average comes second.
+RAIN_MEDIAN = {"weathernext": "ahead", "yr": "behind Yr", TOO_CLOSE: "too close to call"}
+RAIN_MEAN = {"yr": "Yr beats WeatherNext's average", "weathernext": "WeatherNext's average beats Yr",
+             TOO_CLOSE: "too close to call against WeatherNext's average"}
+
+
+def _rain_line(v: dict[int, dict[str, str]]) -> str | None:
     all_h = list(v)
-    if all(x == NOT_ENOUGH for lens in v.values() for x in lens.values()):
-        return "not enough days yet"
     parts = []
-    for lens in ("mean", "median"):
-        groups = _group({h: v[h][lens] for h in all_h})
-        for verdict, hs in sorted(groups.items(), key=lambda kv: min(kv[1])):
-            phrase = horizon_phrase(hs, all_h)
-            where = "" if len(groups) == 1 else " " + (at(phrase) if verdict in NO_WINNER else phrase)
-            parts.append(RAIN_LENS[lens][verdict] + where)
-    return "; ".join(parts)
+    median = _clauses(_group({h: v[h]["median"] for h in all_h}), all_h, RAIN_MEDIAN)
+    if median:
+        parts.append("WeatherNext's median " + ", ".join(median))
+    mean = _group({h: v[h]["mean"] for h in all_h})
+    decided = [x for x in mean if x != NOT_ENOUGH]
+    if len(decided) == 1 and NOT_ENOUGH not in mean:  # one verdict everywhere: no horizons needed
+        parts.append(RAIN_MEAN[decided[0]])
+    else:
+        parts += _clauses(mean, all_h, RAIN_MEAN)
+    return f"Rain: {'; '.join(parts)}." if parts else None
+
+
+def _not_enough_line(v: dict) -> str | None:
+    """All "not enough days yet" horizons in one line, naming variables only if they differ."""
+    per_var = {"temperature": [h for h, x in v["t"].items() if x == NOT_ENOUGH],
+               "wind": [h for h, x in v["w"].items() if x == NOT_ENOUGH],
+               "rain": [h for h, x in v["p"].items() if NOT_ENOUGH in x.values()]}
+    all_h = {"temperature": list(v["t"]), "wind": list(v["w"]), "rain": list(v["p"])}
+    phrases = {k: at(horizon_phrase(hs, all_h[k])) for k, hs in per_var.items() if hs}
+    if not phrases:
+        return None
+    if len(set(phrases.values())) == 1 and len(phrases) == len(per_var):
+        return f"Not enough days yet {next(iter(phrases.values()))}."
+    if set(phrases) <= {"temperature", "wind"} and len(set(phrases.values())) == 1 \
+            and per_var["temperature"] == per_var["wind"]:
+        return f"Not enough days yet {phrases['temperature']}."
+    return "Not enough days yet: " + "; ".join(f"{k} {p}" for k, p in phrases.items()) + "."
 
 
 def day_range(first: str, last: str) -> str:
+    """"5–27 Sep", or "5 Sep" for a single day."""
     a, b = int(first[8:10]), int(last[8:10])
-    return str(a) if a == b else f"{a}–{b}"
+    mon = MONTH_NAMES[int(last[5:7]) - 1][:3]
+    return f"{a} {mon}" if a == b else f"{a}–{b} {mon}"
 
 
-def describe(label: str, in_progress: bool, first_day: str, last_day: str, days: int,
+def compared_phrase(first_day: str, compared: list[str]) -> str:
+    """How many days had both Yr and WeatherNext for the same forecast."""
+    n = len(compared)
+    if not n:
+        return "no days with both models yet"
+    unit = "day" if n == 1 else "days"
+    if compared[0] == first_day:
+        return f"both models compared on {n} {unit}"
+    first = compared[0]
+    return f"both models compared from {int(first[8:10])} {MONTH_NAMES[int(first[5:7]) - 1][:3]}, {n} {unit}"
+
+
+def describe(label: str, in_progress: bool, first_day: str, last_day: str, compared: list[str],
              verdicts: dict) -> str:
-    """The month's paragraph. `verdicts` is what `month_verdicts` returns."""
+    """The month's text: a header line, one line per variable, then "not enough days yet".
+
+    `compared` lists the days with both Yr and WeatherNext; `verdicts` is what
+    `month_verdicts` returns. Lines are separated by newlines.
+    """
     head = (f"{label}{' so far' if in_progress else ''} "
-            f"({day_range(first_day, last_day)}, {days} day{'' if days == 1 else 's'})")
-    return f"{head}: {'; '.join(_temperature_wind(verdicts))}. Rain: {_rain(verdicts['p'])}."
+            f"({day_range(first_day, last_day)}; {compared_phrase(first_day, compared)})")
+    lines = [_variable_line(verdicts, "t"), _variable_line(verdicts, "w"), _rain_line(verdicts["p"]),
+             _not_enough_line(verdicts)]
+    return "\n".join([head] + [x for x in lines if x])
+
+
+def compared_days(df: pd.DataFrame) -> list[str]:
+    """Days with at least one row where Yr, WeatherNext and the measurement all exist."""
+    both = pd.Series(False, index=df.index)
+    for var in ("t", "w", "p"):
+        cols = [f"obs_{var}", f"yr_{var}", f"wn_{var}"]
+        if all(c in df for c in cols):
+            both |= df[cols].notna().all(axis=1)
+    return sorted(df.loc[both, "target"].astype(str).str[:10].unique()) if len(df) else []
 
 
 def month_verdicts(df: pd.DataFrame) -> dict:
@@ -171,13 +216,14 @@ def build_summary(scored: pd.DataFrame, now: pd.Timestamp | None = None) -> dict
             in_month = target.str[:7] == key
             df = scored[in_month]
             days = sorted(target[in_month].str[:10].unique())
+            compared = compared_days(df)
             verdicts = month_verdicts(df)
             in_progress = key == this_month
             label = MONTH_NAMES[int(key[5:7]) - 1]
             months.append({
                 "month": key, "label": label, "in_progress": in_progress,
                 "first_day": days[0], "last_day": days[-1], "days": len(days),
-                "text": describe(label, in_progress, days[0], days[-1], len(days), verdicts),
+                "text": describe(label, in_progress, days[0], days[-1], compared, verdicts),
                 "verdicts": {k: {str(h): x for h, x in val.items()} for k, val in verdicts.items()},
             })
     return {"as_of": f"{now:%Y-%m-%d}", "horizons": SUMMARY_HORIZONS, "months": months}

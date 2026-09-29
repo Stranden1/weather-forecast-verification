@@ -314,8 +314,11 @@
     const months = D.summary?.months || [];
     const el = document.getElementById("summary");
     if (!months.length) return;
-    const para = m => { const i = m.text.indexOf(": ");
-      return `<p><b>${esc(m.text.slice(0, i))}</b>: ${esc(m.text.slice(i + 2))}</p>`; };
+    // Header line in bold, then one line per variable with its label ("Temperature:") in bold.
+    const line = s => { const i = s.indexOf(": ");
+      return i < 0 ? esc(s) : `<b>${esc(s.slice(0, i))}</b>: ${esc(s.slice(i + 2))}`; };
+    const para = m => { const [head, ...rest] = m.text.split("\n");
+      return `<p><b>${esc(head)}</b>${rest.map(r => `<br>${line(r)}`).join("")}</p>`; };
     el.hidden = false;
     document.getElementById("summary-now").innerHTML = para(months[0]);
     const older = months.slice(1);
