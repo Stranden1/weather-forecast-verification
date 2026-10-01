@@ -56,7 +56,7 @@ file, heading for ~100 GB/year. Almost none of it is needed for scoring.
 
 ### Cloud collection
 
-GitHub Actions, every 6 h (`.github/workflows/collect.yml`): collect → score →
+GitHub Actions, every 3 h (`.github/workflows/collect.yml`): collect → score →
 prepare → push history → verify origin → prune/push state → export → deploy Pages.
 Secrets: `MET_USER_AGENT`, `FROST_CLIENT_ID`, `EARTH_ENGINE_PROJECT`,
 `EE_SERVICE_ACCOUNT_KEY`, `WX_STATE_KEY`. Restore errors stop the job; only an absent
@@ -125,7 +125,7 @@ app can stay as a private deep-dive tool.
 
 - [x] 1. Cloud pipeline code: `cloud/` (collectors, snapshot store, scoring, summaries). 8 unit tests pass.
 - [x] 2. Static webpage: `site/` (vendored Chart.js + Leaflet, light/dark, mobile). Previewed with demo data.
-- [x] 3. Workflows: `collect.yml` (every 6 h) and `tests.yml`.
+- [x] 3. Workflows: `collect.yml` (every 3 h since 1 Oct; 6 h before) and `tests.yml`.
 - [x] 4. Migration script: `cloud/migrate_sqlite.py` (read-only on weather.db).
 - [x] 5. **User/Claude Code, locally:** check Git history for secrets, then make the repo public
        and enable Pages (SETUP_CLOUD.md steps 1–2). *2026-09-23: no secrets found; public; Pages

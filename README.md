@@ -6,7 +6,7 @@ hourly precipitation are scored. Start with [PROJECT_STATUS.md](PROJECT_STATUS.m
 
 It has two parts:
 
-- **Cloud pipeline** (`cloud/`, `site/`, `.github/workflows/`): collects every 6 hours on
+- **Cloud pipeline** (`cloud/`, `site/`, `.github/workflows/`): collects every 3 hours on
   GitHub Actions, keeps only scored rows in `history/`, and publishes a static scorecard on
   GitHub Pages. See [PLAN_WEBPAGE.md](PLAN_WEBPAGE.md) and [SETUP_CLOUD.md](SETUP_CLOUD.md).
 - **Local app** (this page, below): a Windows scheduled task stores full forecast history in

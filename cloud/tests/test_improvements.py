@@ -199,9 +199,9 @@ NO_ACCESS = ("WeatherNext failed: ImageCollection.load: ImageCollection asset 'x
              "(does not exist or caller does not have access).")
 
 
-def run(hours_ago, yr=1400, wn=0, frost=3500, wn_err=NO_ACCESS, yr_err=0):
+def run(hours_ago, yr=1400, wn=0, frost=3500, wn_err=NO_ACCESS, yr_err=0, now=NOW):
     src = lambda rows, n, e=None: {"rows": rows, "errors": n, "error": e, "enabled": True}
-    return {"fetched_at": iso(NOW - timedelta(hours=hours_ago)),
+    return {"fetched_at": iso(now - timedelta(hours=hours_ago)),
             "sources": {"yr": src(yr, yr_err, "Yr SN1: boom" if yr_err else None),
                         "wn": src(wn, 1 if wn_err else 0, wn_err),
                         "frost": src(frost, 0)}}
@@ -218,21 +218,36 @@ class HealthTest(unittest.TestCase):
         self.assertEqual(health.status("wn", {"rows": 0, "errors": 0, "enabled": False}), "paused")
 
     def test_build_latest_run_and_counts(self):
-        runs = [run(h) for h in (50, 42, 36, 30, 24, 18, 12, 6)] + [run(1, yr=0, frost=0, yr_err=50)]
+        runs = [run(h) for h in range(51, 3, -3)] + [run(1, yr=0, frost=0, yr_err=50)]
         h = health.build({"first_fetch": runs[0]["fetched_at"], "runs": runs}, NOW)
         self.assertTrue(h["last_run_failed"])
         self.assertEqual(h["last_success"], iso(NOW - timedelta(hours=6)))
         self.assertEqual(h["sources"]["yr"]["status"], "error")
         self.assertEqual(h["sources"]["wn"]["status"], "no_access")
-        self.assertEqual((h["runs_48h"], h["expected_48h"]), (8, 8))
+        self.assertEqual((h["runs_48h"], h["expected_48h"]), (16, 16))  # 51 h ago is outside
         self.assertNotIn("error", h["sources"]["wn"])  # raw messages are never published
 
     def test_expected_runs_right_after_start(self):
         runs = [run(7), run(1)]
         h = health.build({"first_fetch": runs[0]["fetched_at"], "runs": runs}, NOW)
-        self.assertEqual((h["runs_48h"], h["expected_48h"]), (2, 2))
+        self.assertEqual((h["runs_48h"], h["expected_48h"]), (2, 3))  # slots 7, 4 and 1 h ago
         self.assertFalse(h["last_run_failed"])
         self.assertEqual(h["sources"]["yr"]["status"], "ok")
+
+    def test_expected_runs_across_the_change_from_6_to_3_hours(self):
+        changed = health.RUN_EVERY_CHANGED_AT
+        long_ago = iso(changed - timedelta(days=9))
+        # 12 h after the change: 36 h of 6-hourly runs (6) + 12 h of 3-hourly runs (4).
+        now = changed + timedelta(hours=12)
+        self.assertEqual(health.expected_runs(health.parse(long_ago), now), 10)
+        runs = [run(h, now=now) for h in (47, 41, 35, 29, 23, 17, 11, 8, 5, 2)]
+        h = health.build({"first_fetch": long_ago, "runs": runs}, now)
+        self.assertEqual((h["runs_48h"], h["expected_48h"]), (10, 10))
+        # Two days on the window is entirely 3-hourly.
+        self.assertEqual(health.expected_runs(health.parse(long_ago), changed + timedelta(days=2)), 16)
+        # A start inside the window only counts time since the first run.
+        first = changed - timedelta(hours=6)
+        self.assertEqual(health.expected_runs(first, changed + timedelta(hours=3)), 3)
 
     def test_old_run_records_without_sources(self):
         old = {"fetched_at": iso(NOW), "yr_rows": 1400, "wn_rows": 0, "obs_rows": 3530,

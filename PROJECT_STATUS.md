@@ -16,8 +16,8 @@ A monthly summary paragraph and a rain view led by WeatherNext's median are live
 
 - Local: authoritative data/weather.db, full forecasts/observations, Streamlit
   comparisons and six-hourly collection. This task did not modify that system.
-- Cloud: paired horizon snapshots, daily scoring, encrypted immutable history,
-  aggregate page JSON, trends, maps, uncertainty and baseline diagnostics.
+- Cloud: collects every 3 h (since 1 Oct; 6 h before), paired horizon snapshots, daily scoring,
+  encrypted immutable history, aggregate page JSON, trends, maps, uncertainty and baseline diagnostics.
 - Page top: a fixed-template paragraph per calendar month (this month "so far", earlier
   months collapsed) from `summary.json`, naming a winner only where the bootstrap verdict does.
   Rain views lead with WeatherNext's median; temperature and wind with its average.

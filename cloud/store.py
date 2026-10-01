@@ -132,7 +132,7 @@ class State:
 
     def save_meta(self, meta: dict) -> None:
         self.root.mkdir(parents=True, exist_ok=True)
-        meta["runs"] = meta.get("runs", [])[-60:]
+        meta["runs"] = meta.get("runs", [])[-120:]  # 15 days of runs at 8 a day
         atomic_json(self.meta_path, meta)
 
 

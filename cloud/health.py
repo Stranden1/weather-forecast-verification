@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .config import SITE_DATA_DIR
@@ -16,9 +16,12 @@ from .timeutil import iso, parse
 
 SOURCES = {"yr": "Yr ", "wn": "WeatherNext", "frost": "Frost"}  # error-message prefixes
 ROW_KEYS = {"yr": "yr_rows", "wn": "wn_rows", "frost": "obs_rows"}
-RUN_EVERY_H = 6
+RUN_EVERY_H = 3  # keep in step with the cron in .github/workflows/collect.yml
 WINDOW_H = 48
-EXPECTED_IN_WINDOW = WINDOW_H // RUN_EVERY_H
+# The schedule was every 6 h until this time. Expected runs are counted per period, so the
+# 48 h after the change don't read as missed runs. Both can go once the window has passed.
+PREVIOUS_RUN_EVERY_H = 6
+RUN_EVERY_CHANGED_AT = datetime(2026, 10, 1, 18, tzinfo=timezone.utc)
 # Earth Engine's answers when the caller may not read WeatherNext yet.
 NO_ACCESS = re.compile(r"does not have access|does not have required permission|"
                        r"PERMISSION_DENIED|not authorized", re.I)
@@ -61,6 +64,20 @@ def failed(run: dict) -> bool:
     return not any(s.get("rows", 0) for s in srcs.values() if s.get("enabled", True))
 
 
+def expected_runs(first: datetime, now: datetime) -> int:
+    """Runs the schedule should have produced in the last WINDOW_H hours.
+
+    Right after the start fewer runs are possible, so only time since the first run counts.
+    """
+    def count(since: datetime) -> int:
+        hours = lambda a, b: max(0.0, (b - a).total_seconds() / 3600)
+        return (math.floor(hours(since, min(now, RUN_EVERY_CHANGED_AT)) / PREVIOUS_RUN_EVERY_H)
+                + math.floor(hours(max(since, RUN_EVERY_CHANGED_AT), now) / RUN_EVERY_H))
+
+    window_start = now - timedelta(hours=WINDOW_H)
+    return min(count(window_start), count(max(first, window_start)) + 1)
+
+
 def build(meta: dict, now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     runs = sorted(meta.get("runs") or [], key=lambda r: r["fetched_at"])
@@ -77,10 +94,7 @@ def build(meta: dict, now: datetime | None = None) -> dict:
                       for name, s in _sources(last).items()}
     hours = lambda r: (now - parse(r["fetched_at"])).total_seconds() / 3600
     out["runs_48h"] = sum(1 for r in runs if 0 <= hours(r) <= WINDOW_H)
-    # Right after the start fewer runs are possible; don't flag that as missing.
-    first = meta.get("first_fetch") or runs[0]["fetched_at"]
-    since = max(0.0, (now - parse(first)).total_seconds() / 3600)
-    out["expected_48h"] = min(EXPECTED_IN_WINDOW, math.floor(since / RUN_EVERY_H) + 1)
+    out["expected_48h"] = expected_runs(parse(meta.get("first_fetch") or runs[0]["fetched_at"]), now)
     return out
 
 

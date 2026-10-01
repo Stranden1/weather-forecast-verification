@@ -20,9 +20,11 @@ Updated 2026-09-28._
 ### Pipeline
 3. First reliability run and page health verified (36497119777). No new day was ready;
    check coverage metadata and new-day finalization when a future day is prepared.
-4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
-   27 Sep). The latest gap reached 9 h 21 min (28 Sep). If a gap exceeds 9 h the page's
-   health line warns; consider an external trigger then.
+4. GitHub started the old 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
+   27 Sep); the largest gap was 9 h 21 min (28 Sep). The schedule is now every 3 h (1 Oct) and the
+   page's health line warns when the last run is over 6 h old. Check the real gaps after a few
+   days; if delays keep tripping the warning, consider an external trigger.
+   After 3 Oct remove `PREVIOUS_RUN_EVERY_H` and `RUN_EVERY_CHANGED_AT` from `cloud/health.py`.
 
 ### Features
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once

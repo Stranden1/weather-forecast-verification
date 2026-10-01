@@ -386,6 +386,18 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   30 → 142 m), so their published WeatherNext values may read colder from 26 Sep on. The
   height-adjusted line accounts for that per row.
 
+## Cloud collection every 3 hours — 2026-10-01 (Claude)
+
+- The GitHub Actions collection runs every 3 hours at minute 17 (`17 */3 * * *`), was every 6 h.
+  Applies to the cloud pipeline only; the local Windows task and its health thresholds (6 h, OK ≤8 h)
+  are unchanged until the PC collector is retired.
+- Pairing, horizons and finalization are unchanged: lead is measured from each fetch and the closest run
+  to each horizon wins, so more runs only bring the lead closer to nominal. No history is rewritten.
+- Page health: 16 runs expected in a 48 h window; "collection may have stopped" after 6 h
+  (interval + 3 h for GitHub delays, the allowance the 9 h limit gave at 6 h). Expected runs are counted
+  per period across the change (`cloud/health.py`); drop that transition code after 3 Oct.
+- The run log keeps 120 records (15 days at 8 a day).
+
 ## Monthly summary and rain median headline — 2026-09-28 (Claude)
 
 - `site/data/summary.json` is built at export from decrypted history, one entry per UTC calendar
