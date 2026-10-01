@@ -1,21 +1,16 @@
 # Work status
 
-## Monthly summary + rain median headline — 2026-09-28 (Claude, Sonnet)
+## First scheduled reliability run verified — 2026-09-29 (Codex)
 
-Done (committed locally, not pushed):
-- `cloud/monthly.py` + `summarize.build` write `site/data/summary.json`: this month so far plus
-  every completed month (UTC, by target day), verdicts for temperature/wind at 6 h, 1, 2, 3, 5 days
-  and rain at 6 h, 1, 2 days, using the existing `paired`/`stats` (same pairing, bootstrap, 7-day
-  minimum). Text is fixed templates; verdicts and text only, no forecast values.
-- Page: "Month by month" block under the health line (current month, collapsed "Earlier months").
-- Rain views (tiles, horizon chart, table, "Catching rain") lead with WeatherNext's median (solid),
-  average dashed; one sentence explains why. Rain verdict/CI now also computed for the median
-  (`verdict_50`, `diff_50`, `ci_50_*`); the tile shows the average-based verdict as a second line.
-- 23 new tests (`cloud/tests/test_monthly.py`); 177 root+cloud tests and 8 HQ tests pass.
-  Checked with `?demo` (desktop dark, 375 px) and a real-data build (September text below).
+Done:
+- Run 36497119777 (28 Sep 23:16 UTC, commit 661ef8d, descendant of 3e6ec36) passed every step: restore, collect, history confirmation/state publication, export, Pages and final source check.
+- Zero source errors: Yr 1,350; WeatherNext 2,400; ECMWF 4,500; Frost 5,887 rows.
+- Live health.json matches collection at 23:16:55 UTC; rendered page shows fresh data, Yr/Frost/WeatherNext checkmarks and 7 of 8 runs in 48 h. Monthly summary is also live.
+- Follow-up completed; heartbeat paused. No collection schedules or local database changed.
 
 Remaining:
-- User to read the September text, then say whether to push.
-- Rain "Who wins where" map, "Over time" chart and "Patterns" table still use WeatherNext's average
-  (not in the requested list); change them if the headline should match everywhere.
-- Verify the deployed page after the first run that includes summary.json.
+- Scheduling gap reached 9 h 21 min; consider external triggering separately.
+- No new day was ready: new-day coverage metadata/finalization still needs a future live cycle (failure tests already passed).
+- Other feature work and old plaintext-history cleanup remain in NEXT_STEPS.md.
+
+Evidence: https://github.com/Stranden1/weather-forecast-verification/actions/runs/36497119777

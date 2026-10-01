@@ -154,6 +154,5 @@ app can stay as a private deep-dive tool.
 
 - [x] 14. Reliability/publication fixes implemented locally on 28 Sep: encrypted
   history, coverage-gated preparation, fail-closed restore, and history-first
-  publication with origin confirmation. Pushed as 3e6ec36; next scheduled run verification pending.
-- [x] 15. Monthly summary and rain median headline (28 Sep). Committed locally; push pending the user's OK.
-
+  publication with origin confirmation. Pushed as 3e6ec36; first scheduled run verified successfully (36497119777); no new day ready.
+- [x] 15. Monthly summary and rain median headline (28 Sep). Live in run 36497119777; monthly summary observed on the published page.

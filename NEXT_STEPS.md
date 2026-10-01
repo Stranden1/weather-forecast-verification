@@ -18,12 +18,10 @@ Updated 2026-09-28._
    before stopping it. Keep `data/weather.db`.
 
 ### Pipeline
-3. Verify the first deployed run of the reliability/encryption commit (pushed 3e6ec36):
-   authenticated restore, encrypted days, coverage metadata, history confirmation before
-   state pruning, and page health. A 30-minute heartbeat checks Actions and page health,
-   reports, then pauses. After the monthly-summary push, also check that `summary.json` deploys.
+3. First reliability run and page health verified (36497119777). No new day was ready;
+   check coverage metadata and new-day finalization when a future day is prepared.
 4. GitHub starts the 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
-   27 Sep). Recent gaps also reached about 8.1–8.5 h. If a gap exceeds 9 h the page's
+   27 Sep). The latest gap reached 9 h 21 min (28 Sep). If a gap exceeds 9 h the page's
    health line warns; consider an external trigger then.
 
 ### Features
@@ -51,4 +49,3 @@ Updated 2026-09-28._
 - Revalidate wind height/unit metadata when changing the station network or collectors.
 - Keep separate backups of `data/weather.db` and credentials; GitHub holds neither.
 - Setting GitHub secrets from PowerShell 5.1 by piping adds a BOM; use `gh secret set --body`.
-

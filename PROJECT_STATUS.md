@@ -7,11 +7,10 @@ _Updated 2026-09-28. Current state only; history is in CHANGELOG.md._
 WeatherApp compares Yr/MET and WeatherNext with Frost at 50 Norwegian stations.
 The cloud pipeline/public dashboard and local Windows collector run in parallel;
 ECMWF IFS/AIFS are also collected but not yet ranked on the page. The requested
-reliability and encrypted-history fixes were pushed as 3e6ec36 (about 20:24 UTC); next
-scheduled run verification pending; older public plaintext Git copies still need
+reliability and encrypted-history fixes were pushed as 3e6ec36 (about 20:24 UTC); first
+scheduled run verified successfully (28 Sep 23:16 UTC); older public plaintext Git copies still need
 coordinated cleanup before publication protection can be considered complete.
-A monthly summary paragraph and a rain view led by WeatherNext's median are committed
-locally, not yet pushed (see WORK_STATUS.md).
+A monthly summary paragraph and a rain view led by WeatherNext's median are live.
 
 ## Current capabilities
 
@@ -26,7 +25,7 @@ locally, not yet pushed (see WORK_STATUS.md).
   labelled temperature comparison. Steadiness is exported but not displayed.
 - Project HQ provides a local read-only viewer of handoff documents.
 
-## Reliability changes pushed; live verification pending
+## Reliability changes verified in the first scheduled run
 
 - All 23 current history files are encrypted with WX_STATE_KEY. Exact original
   compressed bytes and 126,109 rows are preserved. CI decrypts in memory; public
@@ -44,18 +43,17 @@ locally, not yet pushed (see WORK_STATUS.md).
 recovery was exercised with temporary Git remotes. All 58 generated page JSON
 files match pre-encryption exports except generation time; original scores unchanged.
 
-Last checked live cloud run (28 Sep 13:55 UTC): all sources successful; summaries
-cover 23 dates through 27 Sep. Local collection finished 16:18 UTC with status ok.
-The reliability fixes are live from 3e6ec36; the monthly summary is not yet pushed.
+Last checked live cloud run: 36497119777, 28 Sep 23:16 UTC, all steps and sources
+successful. Page health matches; 7 of 8 runs in 48 h after a 9 h 21 min gap.
+No new scored day was ready, so new coverage metadata was not exercised.
+Monthly summary is live. Verification heartbeat is paused.
 
 ## Limits and next actions
 
-Verify the next scheduled live cycle before retiring the PC
-collector. Current-file encryption does not remove old plaintext commits/caches;
+Compare cloud/local coverage before retiring the PC collector. Current-file encryption does not remove old plaintext commits/caches;
 coordinate that cleanup separately. Preserve a secure backup of WX_STATE_KEY,
 which now protects scored history as well as pending forecasts.
 
 Model findings remain preliminary, especially after the sampling change and for
 ECMWF. Height adjustment uses proxy terrain and a fixed lapse rate; AIFS hourly
 rain is interpolated. NEXT_STEPS.md holds open work; DECISIONS.md holds policies.
-
