@@ -22,7 +22,7 @@ Updated 2026-09-28._
    check coverage metadata and new-day finalization when a future day is prepared.
 4. GitHub started the old 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
    27 Sep); the largest gap was 9 h 21 min (28 Sep). The schedule is now every 3 h (1 Oct) and the
-   page's health line warns when the last run is over 6 h old. Check the real gaps after a few
+   page's health line warns when the last run is over 8 h old. Check the real gaps after a few
    days; if delays keep tripping the warning, consider an external trigger.
    After 3 Oct remove `PREVIOUS_RUN_EVERY_H` and `RUN_EVERY_CHANGED_AT` from `cloud/health.py`.
 

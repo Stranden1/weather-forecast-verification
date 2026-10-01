@@ -7,7 +7,7 @@
     ok: "✓", partial: "partly working", error: "failed", no_data: "no new data",
     no_access: "waiting for access", paused: "paused",
   };
-  const STALE_H = 6; // runs are every 3 h; allow 3 h for GitHub's schedule delays
+  const STALE_H = 8; // runs are every 3 h; allow 5 h for GitHub's schedule delays (seen 3-5 h)
   const H_LABEL = { 6: "6 h", 12: "12 h", 24: "1 day", 48: "2 days", 72: "3 days", 120: "5 days", 168: "7 days", 240: "10 days" };
   const VERDICT = {
     yr: ["Yr is ahead", "yr"], weathernext: ["WeatherNext is ahead", "wn"],

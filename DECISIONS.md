@@ -393,8 +393,8 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   are unchanged until the PC collector is retired.
 - Pairing, horizons and finalization are unchanged: lead is measured from each fetch and the closest run
   to each horizon wins, so more runs only bring the lead closer to nominal. No history is rewritten.
-- Page health: 16 runs expected in a 48 h window; "collection may have stopped" after 6 h
-  (interval + 3 h for GitHub delays, the allowance the 9 h limit gave at 6 h). Expected runs are counted
+- Page health: 16 runs expected in a 48 h window; "collection may have stopped" after 8 h
+  (3 h interval + 5 h for GitHub's schedule delays, seen at 3–5 h; user's choice). Expected runs are counted
   per period across the change (`cloud/health.py`); drop that transition code after 3 Oct.
 - The run log keeps 120 records (15 days at 8 a day).
 

@@ -8,7 +8,7 @@ Done:
   period (`expected_runs`, `RUN_EVERY_CHANGED_AT` = 1 Oct 18:00 UTC) so the 48 h after the change don't show a
   false "Check:" for the 6-hourly runs already in the log. Remove `PREVIOUS_RUN_EVERY_H` and
   `RUN_EVERY_CHANGED_AT` after 3 Oct.
-- `site/app.js` `STALE_H` 9 → 6 h (interval + the same 3 h allowance for GitHub delays).
+- `site/app.js` `STALE_H` 9 → 8 h (3 h interval + 5 h allowance for GitHub delays seen at 3–5 h; first set to 6 h, raised at the user's request).
 - `cloud/store.py` keeps 120 run records (was 60): the same 15 days at 8 runs/day.
 - Checked and left unchanged, nothing assumes 6-hourly runs: horizon windows (±3 h, closest lead per target, so
   denser runs only get closer to nominal), scoring/finalization (UTC-day based), pending/obs pruning (day based),
@@ -19,5 +19,5 @@ Done:
 Remaining:
 - Not touched, on purpose: the local Windows task, `install_background_task.ps1`, `collection_health.py` and the
   Streamlit health caption ("Expected every 6 h · OK ≤8 h"). The task is to be stopped after the parallel week.
-- Watch the first days: GitHub may still start slots late, and a gap over 6 h makes the page warn. Pending state
+- Watch the first days: GitHub may still start slots late, and a gap over 8 h makes the page warn. Pending state
   now grows about twice as fast (more runs per day); check its size after a few days.
