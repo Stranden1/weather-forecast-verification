@@ -1,21 +1,21 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-09-28._
+Updated 2026-10-02._
 
 ## Open items
 
 ### Needs the user
-1. **WeatherNext forecast values stay off** (policy in DECISIONS.md, "WeatherNext terms"): the
-   terms don't clearly say values for past times may be published. To change that, first ask
-   weathernext@google.com. Storm replays (PLAN_REPLAYS step 2) show Yr and measured values only
-   until then.
-   Current day files are encrypted and pushed. Older plaintext Git commits/caches
-   remain accessible: coordinate historical cleanup before claiming raw values are
-   no longer publicly retrievable. No main-history rewrite has been performed.
-2. **Stop the Windows task** after the parallel week: compare cloud and local results around
-   2 Oct (a week of complete cloud data), and deploy/verify the recovery fixes below
-   before stopping it. Keep `data/weather.db`.
+1. **Turn on WeatherNext values** (user's decision of 2 Oct, DECISIONS.md "WeatherNext terms"):
+   `gh variable set WX_PUBLISH_FORECAST_VALUES --body 1 --repo Stranden1/weather-forecast-verification`.
+   Claude cannot set repository variables. Effective from the next run; set it to 0 to remove
+   the values again (e.g. if Google asks). Older plaintext Git commits/caches remain accessible;
+   no main-history rewrite has been performed.
+2. **Windows task kept running (2 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
+   rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
+   ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
+   Re-run the comparison around 5 Oct for 2-4 Oct (first days with 3-hourly runs); stop the
+   task with `remove_background_task.bat` if the cloud then matches. Keep `data/weather.db`.
 
 ### Pipeline
 3. First reliability run and page health verified (36497119777). No new day was ready;

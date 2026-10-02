@@ -1,23 +1,25 @@
 # Work status
 
-## Cloud collection every 3 hours — 2026-10-01 (Claude, Sonnet)
+_The latest task's checkpoint only. When a new task finishes, move this entry to the top of
+`CHANGELOG.md` and replace it._
 
-Done:
-- `collect.yml` cron `17 */6 * * *` → `17 */3 * * *` (00:17, 03:17 … 21:17 UTC). Page copy and README say "every 3 hours".
-- `cloud/health.py`: `RUN_EVERY_H = 3`, so a full 48 h window expects 16 runs. Expected runs are counted per
-  period (`expected_runs`, `RUN_EVERY_CHANGED_AT` = 1 Oct 18:00 UTC) so the 48 h after the change don't show a
-  false "Check:" for the 6-hourly runs already in the log. Remove `PREVIOUS_RUN_EVERY_H` and
-  `RUN_EVERY_CHANGED_AT` after 3 Oct.
-- `site/app.js` `STALE_H` 9 → 8 h (3 h interval + 5 h allowance for GitHub delays seen at 3–5 h; first set to 6 h, raised at the user's request).
-- `cloud/store.py` keeps 120 run records (was 60): the same 15 days at 8 runs/day.
-- Checked and left unchanged, nothing assumes 6-hourly runs: horizon windows (±3 h, closest lead per target, so
-  denser runs only get closer to nominal), scoring/finalization (UTC-day based), pending/obs pruning (day based),
-  WeatherNext init choice (lead is measured from each fetch), ECMWF/Open-Meteo calls (~400/day vs 10,000 limit).
-- Tests: 182 pass (one new health test for the cadence change; existing health tests moved to 3 h spacing).
-- The Codex handoff docs left uncommitted were committed unchanged first (0db42e8).
+## Past WeatherNext values and storm replays — 2026-10-02 (Claude)
 
-Remaining:
-- Not touched, on purpose: the local Windows task, `install_background_task.ps1`, `collection_health.py` and the
-  Streamlit health caption ("Expected every 6 h · OK ≤8 h"). The task is to be stopped after the parallel week.
-- Watch the first days: GitHub may still start slots late, and a gap over 8 h makes the page warn. Pending state
-  now grows about twice as fast (more runs per day); check its size after a few days.
+Done (not pushed; shown to the user first):
+- DECISIONS.md "WeatherNext terms": the user's decision to publish past WeatherNext values under
+  CC BY 4.0, our reading, the open ambiguity, the 26 Sep email to weathernext@google.com as the
+  user reported it (no reply), and removal if Google asks.
+- Values only for targets at least `PUBLISH_MIN_AGE_H` = 1 h old (`summarize.build` recent
+  series and `replay`). The workflow reads the repository variable `WX_PUBLISH_FORECAST_VALUES`
+  (default 0) instead of a hard-coded 0. **Not yet turned on:** the user sets the variable.
+- The CC BY citation and the real-time notice sit under every chart that draws WeatherNext
+  values (station chart, storm replays), from `meta.wn_value_attribution`.
+- Storm replays (PLAN_REPLAYS step 2, card of step 3): `find_events`, `select_events`, `replay`,
+  `build_replays` in `cloud/replay.py`; `events.json` + `events/<id>.json`. Real history gives
+  17 events (11 wind, 5 rain, 1 cold).
+- Tests: 197 pass (12 new replay/publishing tests); page checked locally with the real history,
+  desktop and 375 px (a too-wide event picker was fixed).
+
+Remaining: push (user's OK), then the user sets the repository variable. Steadiness on the page
+(PLAN_REPLAYS step 3 rest), the 15 Sep hand check (step 4: that day has no complete rain horizon,
+so it has no replay).

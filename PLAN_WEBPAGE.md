@@ -67,7 +67,8 @@ are saved. Setup and local decrypt instructions: `SETUP_CLOUD.md`.
 
 Yr/Frost: CC BY 4.0 with attribution (on the page). WeatherNext: terms read on
 26 Sep 2026, see DECISIONS.md "WeatherNext terms". The page publishes only error
-statistics, not WeatherNext forecast values (CI forces `WX_PUBLISH_FORECAST_VALUES=0`).
+statistics, and from 2 Oct 2026 (user's decision) past WeatherNext forecast values when the
+repository variable `WX_PUBLISH_FORECAST_VALUES` is 1 (DECISIONS.md).
 Current history files are encrypted too. Old plaintext commits/caches require a
 separate coordinated cleanup; a normal encryption commit cannot erase them.
 

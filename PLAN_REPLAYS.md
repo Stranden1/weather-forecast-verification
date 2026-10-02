@@ -97,7 +97,7 @@ observed values. Keep the most recent 30 events plus the top 5 per type of all t
 
 ## Steps and status
 
-- [ ] 0. **User decision:** read the WeatherNext real-time terms and decide
+- [x] 0. **User decision:** read the WeatherNext real-time terms and decide
        `WX_PUBLISH_FORECAST_VALUES`. Without it, replays show Yr and observed values only.
 - [x] 1. Steadiness: `replay.steadiness` + JSON + tests. Commit.
        *2026-09-25: `cloud/replay.py`, `site/data/steadiness.json` (not shown on the
@@ -107,8 +107,14 @@ observed values. Keep the most recent 30 events plus the top 5 per type of all t
        and 12→6 h). Temperature flip-flops per 100 forecasts: Yr 2.5 / WN 0.2. Revisions
        move toward the truth only ~50–57% of the time for both. The smoothness of the
        ensemble mean is the expected main cause, so the caveat matters.*
-- [ ] 2. Events + replays: `find_events`, `replay`, JSON, publish gate + tests. Commit.
-- [ ] 3. Page cards + demo data. Check light/dark/mobile with `?demo` and the real history. Commit.
+- [x] 2. Events + replays: `find_events`, `replay`, JSON, publish gate + tests. Commit.
+       *2026-10-02: WeatherNext included when published (target >= 1 h ago). Strong wind counts
+       land stations only (15 m/s is ordinary offshore). Cold snap: <= -5 °C only (the
+       "first sub-zero hour" trigger was left out). Wind/cold use the most extreme hour that met
+       the threshold and has the most horizons.*
+- [~] 3. Page cards + demo data. Check light/dark/mobile with `?demo` and the real history. Commit.
+       *2026-10-02: "Storm replays" card done, checked with the real history on desktop and at
+       375 px. The steadiness row on the page is still to do.*
 - [ ] 4. Check the 15 Sep western Norway case by hand against `history/` values.
 - [ ] 5. Update PLAN_WEBPAGE, PROJECT_STATUS, NEXT_STEPS and WORK_STATUS. Push only with the user's OK.
 

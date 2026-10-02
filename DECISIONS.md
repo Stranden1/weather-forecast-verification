@@ -333,10 +333,10 @@ transmission or supply to clearly identified and known third parties".
 - The page publishes WeatherNext **error statistics only** (non-retrievable findings), with the
   real-time 4(b) citation naming Google Earth Engine, the historic CC BY citation and the
   acknowledgement link (`ATTRIBUTION` in `cloud/config.py`, rendered with clickable links).
-- Raw WeatherNext forecast values stay off: `WX_PUBLISH_FORECAST_VALUES` remains unset/0.
+- ~~Raw WeatherNext forecast values stay off.~~ Superseded on 2 Oct 2026, see below.
 - Both working state and scored `history/` day files are encrypted with `WX_STATE_KEY`.
-  CI authenticates/decrypts in memory to build aggregate page data. Public workflow
-  exports force forecast values off; the repository's current day files expose ciphertext.
+  CI authenticates/decrypts in memory to build aggregate page data. Forecast values in
+  page exports follow the 2 Oct decision below; the repository's day files expose ciphertext.
 - Encryption at the current branch tip does not erase past plaintext Git objects.
   Previously published history/state copies may remain available via old commits or
   caches until a coordinated repository-history cleanup. Do not claim encryption alone
@@ -347,6 +347,28 @@ transmission or supply to clearly identified and known third parties".
 be published. But "relates to a time" is not defined (valid time vs issue time), and the terms
 do not say whether a copy obtained while it was real-time becomes CC BY once the time passes.
 Until Google confirms it (weathernext@google.com), treat publishing values as not settled.
+
+**Decision of 2 Oct 2026 (user): publish past WeatherNext forecast values under CC BY 4.0.**
+- Our reading: the terms say data that "relates to a time 1 hour ago or more is licensed under
+  the Creative Commons Attribution International License, Version 4.0 (CC BY 4.0)". A forecast
+  for a target time at least 1 hour in the past is therefore historic data, and may be
+  published with the required citation.
+- Open ambiguity, unchanged: "relates to a time" is not defined (target/valid time vs issue
+  time), and the terms don't say whether a copy fetched while it was real-time becomes CC BY
+  once that time has passed.
+- Per the user, weathernext@google.com was asked about this on 26 Sep 2026; no reply as of
+  2 Oct 2026. (The email is not in the repository; recorded as the user reported it.)
+- If Google asks, we remove the values at once: set `WX_PUBLISH_FORECAST_VALUES` to 0 (the next
+  run rebuilds the page without them) and record it here.
+- How it is limited: values are published only for target times at least
+  `PUBLISH_MIN_AGE_H` = 1 hour in the past (`cloud/summarize.py`, `cloud/replay.py`); the page
+  only uses scored, finished days anyway. Future and recent forecasts stay in the encrypted
+  `state` branch and never reach the page. `history/` day files stay encrypted for now.
+- Attribution: the CC BY citation and the real-time notice (with "accessed via Google Earth
+  Engine") are shown directly under every chart that draws WeatherNext values (station chart,
+  storm replays), as well as in the footer.
+- Switch: the workflow reads the repository variable `WX_PUBLISH_FORECAST_VALUES` (default
+  0). It is turned on by setting that variable to 1; the change is in effect from the next run.
 
 ## One-off fill of the first cloud days — 2026-09-26 (Claude, user's decision)
 
