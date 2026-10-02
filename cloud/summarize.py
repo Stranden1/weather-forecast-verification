@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .config import (ATTRIBUTION, HORIZONS, PRECIP_HORIZONS, PROVIDERS, PUBLISH_FORECAST_VALUES,
+                     PUBLISH_MIN_AGE_H, WN_VALUE_ATTRIBUTION,
                      SITE_DATA_DIR, VARIABLES, WET_THRESHOLD_MM, load_stations)
 from .heights import adjusted_t, flags, load_heights
 
@@ -274,16 +275,33 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     from .monthly import build_summary
     dump("summary.json", build_summary(scored, now))
 
+    # WeatherNext values are published only for targets at least PUBLISH_MIN_AGE_H ago (CC BY
+    # 4.0 historic data); scored days are always older, but the rule is enforced here anyway.
+    now_ts = pd.Timestamp.now(tz="UTC") if now is None else pd.Timestamp(now)
+    now_ts = now_ts.tz_localize("UTC") if now_ts.tzinfo is None else now_ts
+    cutoff = now_ts - pd.Timedelta(PUBLISH_MIN_AGE_H, unit="h")
+
+    from .replay import build_replays
+    (out_dir / "events").mkdir(exist_ok=True)
+    offshore = {sid for sid, h in heights.get("stations", {}).items() if h.get("offshore")}
+    index, replays = build_replays(scored, publish_values, now_ts, offshore)
+    dump("events.json", index)
+    for eid, r in replays.items():
+        (out_dir / "events" / f"{eid}.json").write_text(
+            json.dumps(r, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+
     # Recent hourly series at the 24 h horizon for the "predicted vs actual" chart.
     recent = scored[(scored.h == 24) & scored.target.astype(str).str[:10].isin(days[-7:])]
     for sid, g in recent.groupby("station"):
         g = g.sort_values("target")
+        old_enough = pd.to_datetime(g.target, utc=True) <= cutoff
         series = {"time": g.target.tolist()}
         for var in ("t", "w", "p"):
             series[f"obs_{var}"] = [_r(x, 2) if pd.notna(x) else None for x in g[f"obs_{var}"]]
             series[f"yr_{var}"] = [_r(x, 2) if pd.notna(x) else None for x in g[f"yr_{var}"]]
             if publish_values:
-                series[f"wn_{var}"] = [_r(x, 2) if pd.notna(x) else None for x in g[f"wn_{var}"]]
+                series[f"wn_{var}"] = [_r(x, 2) if pd.notna(x) and ok else None
+                                       for x, ok in zip(g[f"wn_{var}"], old_enough)]
         (out_dir / "recent" / f"{sid}.json").write_text(json.dumps(series, separators=(",", ":")),
                                                          encoding="utf-8")
 
@@ -295,6 +313,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "variables": VARIABLES, "providers": PROVIDERS,
         "publish_forecast_values": publish_values, "min_days_for_verdict": MIN_DAYS_FOR_VERDICT,
         "attribution": ATTRIBUTION,
+        "wn_value_attribution": WN_VALUE_ATTRIBUTION,  # shown next to every chart with WeatherNext values
         "stations": [{"id": s["station_id"], "name": s.get("name") or s.get("station_name"),
                       "lat": s["latitude"], "lon": s["longitude"], "elev": s.get("elevation_m"),
                       "county": s.get("county"),

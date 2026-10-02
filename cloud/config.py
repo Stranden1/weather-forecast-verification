@@ -89,18 +89,30 @@ PUBLISH_FORECAST_VALUES = os.getenv("WX_PUBLISH_FORECAST_VALUES", "0") == "1"
 # once the time had passed, so both required citations are shown: the real-time terms'
 # "findings" citation (section 4(b)) and the Earth Engine catalog's CC BY 4.0 citation for
 # historic data. The last line is the catalog's acknowledgement of upstream data.
-ATTRIBUTION = [
-    "Forecasts and observations from MET Norway (Yr, Frost), licensed CC BY 4.0.",
-    "WeatherNext 3 forecasts accessed via Google Earth Engine.",
+# Required WeatherNext notices, quoted exactly (DECISIONS.md, "WeatherNext terms"). They are
+# shown in the page footer and again next to every chart that shows WeatherNext values.
+WN_ACCESS_NOTE = "WeatherNext 3 forecasts accessed via Google Earth Engine."
+WN_REALTIME_NOTICE = (
     "© 2024-6 Google LLC, whose machine learning models were used to create the experimental "
     "data made available under the following licence terms "
     "https://storage.googleapis.com/weathernext-public/terms-of-use.pdf. This data is intended "
-    "for experimental modelling only and is not intended, validated, or approved for real world use.",
+    "for experimental modelling only and is not intended, validated, or approved for real world use.")
+WN_CCBY_CITATION = (
     "© 2026 DeepMind Technologies Limited's machine learning models used to create the "
     "experimental data made available at https://developers.google.com/earth-engine/datasets/"
     "catalog/projects_gcp-public-data-weathernext_assets_weathernext_3_0_0_0p05deg under "
     "CC BY 4.0 licence terms. This data is intended for experimental modelling only and is not "
-    "intended, validated, or approved for real world use.",
+    "intended, validated, or approved for real world use.")
+WN_VALUE_ATTRIBUTION = [WN_ACCESS_NOTE, WN_CCBY_CITATION, WN_REALTIME_NOTICE]
+# WeatherNext values are published only for target times at least this long ago: data for a
+# time 1 hour ago or more is CC BY 4.0; newer and future data falls under the real-time terms.
+PUBLISH_MIN_AGE_H = 1
+
+ATTRIBUTION = [
+    "Forecasts and observations from MET Norway (Yr, Frost), licensed CC BY 4.0.",
+    WN_ACCESS_NOTE,
+    WN_REALTIME_NOTICE,
+    WN_CCBY_CITATION,
     "WeatherNext 3 was generated using data and products of the European Centre for "
     "Medium-Range Weather Forecasts (ECMWF), as well as additional third-party providers: "
     "https://storage.googleapis.com/weathernext-public/weathernext-3-attributions-acknowledgements.pdf",

@@ -25,7 +25,8 @@ jobs:
       WX_STATE_DIR: state
       WX_STATE_KEY: ${{ secrets.WX_STATE_KEY }}
       GH_TOKEN: ${{ github.token }}
-      WX_PUBLISH_FORECAST_VALUES: '0'
+      # Off unless the repo variable is set to 1 (DECISIONS.md, "WeatherNext terms").
+      WX_PUBLISH_FORECAST_VALUES: ${{ vars.WX_PUBLISH_FORECAST_VALUES || '0' }}
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}

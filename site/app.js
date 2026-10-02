@@ -35,7 +35,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary"];
+    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events"];
     const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
@@ -225,11 +225,60 @@
     if (!rec) { el.querySelector(".chart").innerHTML = `<p class="empty">No recent data.</p>`; return; }
     const ds = [line("Measured", rec[`obs_${S.v}`], css("--obs"), { pointRadius: 0, borderWidth: 2 }),
                 line("Yr", rec[`yr_${S.v}`], css("--yr"), { pointRadius: 0 })];
-    if (rec[`wn_${S.v}`]) ds.push(line("WeatherNext", rec[`wn_${S.v}`], css("--wn"), { pointRadius: 0 }));
+    if (rec[`wn_${S.v}`]?.some(x => x != null)) {
+      ds.push(line("WeatherNext", rec[`wn_${S.v}`], css("--wn"), { pointRadius: 0 }));
+      el.querySelector(".chart").insertAdjacentHTML("afterend", wnNotice());
+    }
     const o = baseOptions(unit()); o.scales.y.beginAtZero = S.v !== "t";
     o.scales.x.ticks.maxTicksLimit = 7;
     chart("station-chart", { type: "line", options: o, data: {
       labels: rec.time.map(t => t.slice(5, 10) + " " + t.slice(11, 13) + "h"), datasets: ds } });
+  }
+
+  // Required WeatherNext notices, shown next to every chart that draws WeatherNext values.
+  function wnNotice() {
+    const link = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,)]/g, u => `<a href="${u}" rel="noopener">${u}</a>`);
+    return `<p class="attrib wn-notice">${(D.meta.wn_value_attribution || []).map(link).join("<br>")}</p>`;
+  }
+
+  // Storm replays: what each service said 7 days ... 6 hours before a notable event.
+  const EV_ICON = { rain: "Rain", wind: "Wind", cold: "Cold" };
+  async function renderReplays() {
+    const card = document.getElementById("replays");
+    const list = D.events || [];
+    card.hidden = !list.length;
+    if (!list.length) return;
+    const sel = document.getElementById("replay-pick");
+    const name = id => (D.meta.stations.find(s => s.id === id) || {}).name || id;
+    if (!S.replay || !list.some(e => e.id === S.replay)) S.replay = list[0].id;
+    sel.innerHTML = list.map(e => `<option value="${e.id}" ${e.id === S.replay ? "selected" : ""}>${e.day} · ${EV_ICON[e.type]} · ${esc(name(e.station).replace(/ \[SN\d+\]$/, ""))} ${fmt(e.value, 1)} ${e.unit}${e.n_stations > 1 ? ` (+${e.n_stations - 1})` : ""}</option>`).join("");
+    sel.onchange = () => { S.replay = sel.value; renderReplays(); };
+    let r = null;
+    try { r = await fetch(`${DATA}events/${S.replay}.json`).then(x => x.ok ? x.json() : null); } catch (e) {}
+    const body = document.getElementById("replay-body");
+    if (!r) { body.innerHTML = `<p class="empty">This replay could not be loaded.</p>`; return; }
+    const pts = r.points;  // farthest ahead first
+    const others = r.stations.slice(1).map(s => `${esc(name(s.station))} ${fmt(s.value, 1)}`).join(", ");
+    body.innerHTML = `<p style="margin:0 0 8px;font-size:15px"><b>${esc(r.label)} at ${esc(name(r.station))}, ${r.day}</b>:
+        measured ${fmt(r.observed, 1)} ${r.unit} (${esc(r.what)}).${others ? ` <span class="muted">Also: ${others} ${r.unit}.</span>` : ""}</p>
+      <div class="chart"><canvas id="replay-chart" aria-label="Forecasts before the event"></canvas></div>
+      ${r.wn_shown ? wnNotice() : `<p class="muted" style="font-size:12px">WeatherNext's values are not shown for this event.</p>`}
+      <p class="muted" style="font-size:13px">${r.type === "rain"
+        ? "Each point is the day's total as forecast that far ahead: the sum of the 24 hourly forecasts made that long before each hour. Rain is only scored up to 2 days ahead."
+        : "Each point is the forecast for the same hour, made that far ahead. The hour is the most extreme measured hour that has forecasts at the most horizons."}
+        Events are picked from the measurements only, never from who got it wrong.</p>`;
+    const labels = pts.map(p => H_LABEL[p.h] + " before");
+    const ds = [line("Yr", pts.map(p => p.yr), css("--yr")),
+                line("Measured", pts.map(() => r.observed), css("--obs"), { borderDash: [6, 4], pointRadius: 0 })];
+    if (r.wn_shown) {
+      ds.splice(1, 0, line("WeatherNext (average)", pts.map(p => p.wn), css("--wn")));
+      if (pts.some(p => p.wn50 != null))
+        ds.splice(2, 0, line("WeatherNext (median)", pts.map(p => p.wn50), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", backgroundColor: css("--surface") }));
+    }
+    const o = baseOptions(r.unit);
+    o.scales.y.beginAtZero = r.type !== "cold";
+    o.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: ${fmt(c.parsed.y, 1)} ${r.unit}`;
+    chart("replay-chart", { type: "line", options: o, data: { labels, datasets: ds } });
   }
 
   function renderPatterns() {
@@ -327,7 +376,7 @@
   }
 
   function render() {
-    renderTiles(); renderHorizon(); renderTrend(); renderMap(); renderPatterns();
+    renderTiles(); renderHorizon(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
   }
 
   load().then(() => {
