@@ -342,22 +342,23 @@ transmission or supply to clearly identified and known third parties".
   caches until a coordinated repository-history cleanup. Do not claim encryption alone
   removes those copies. No history rewrite or force-push of main is authorized by this task.
 
-**Are values older than one hour clearly publishable?** Not clearly. The preamble says data that
-"relates to a time 1 hour ago or more" is CC BY 4.0, which suggests forecasts for past times may
-be published. But "relates to a time" is not defined (valid time vs issue time), and the terms
-do not say whether a copy obtained while it was real-time becomes CC BY once the time passes.
-Until Google confirms it (weathernext@google.com), treat publishing values as not settled.
+**Are values older than one hour publishable?** Yes, answered by Google on 4 Oct 2026 (below):
+"relates to a time" means the forecast's **target** (valid) time, not its issue time.
 
 **Decision of 2 Oct 2026 (user): publish past WeatherNext forecast values under CC BY 4.0.**
 - Our reading: the terms say data that "relates to a time 1 hour ago or more is licensed under
   the Creative Commons Attribution International License, Version 4.0 (CC BY 4.0)". A forecast
   for a target time at least 1 hour in the past is therefore historic data, and may be
   published with the required citation.
-- Open ambiguity, unchanged: "relates to a time" is not defined (target/valid time vs issue
-  time), and the terms don't say whether a copy fetched while it was real-time becomes CC BY
-  once that time has passed.
-- Per the user, weathernext@google.com was asked about this on 26 Sep 2026; no reply as of
-  2 Oct 2026. (The email is not in the repository; recorded as the user reported it.)
+- **Google's answer (4 Oct 2026):** the user asked weathernext@google.com on 26 Sep 2026. Google's
+  WeatherNext team replied on 4 Oct 2026 that the 1-hour rule applies to the **target time**: a
+  forecast for a time at least 1 hour ago is historic data (CC BY 4.0), and a forecast for a future
+  time is real-time data, even if it was issued days ago. Our `PUBLISH_MIN_AGE_H` = 1 rule, applied
+  to target time, matches this. (The emails are not in the repository; recorded as the user
+  reported them.)
+- **Rule: the page must never show WeatherNext values for future target times**, nor for targets
+  less than 1 hour ago. Those are real-time data under the real-time terms, however old the run.
+  The cutoff is on target time, never on issue/fetch time; keep it that way in any new view.
 - If Google asks, we remove the values at once: set `WX_PUBLISH_FORECAST_VALUES` to 0 (the next
   run rebuilds the page without them) and record it here.
 - How it is limited: values are published only for target times at least

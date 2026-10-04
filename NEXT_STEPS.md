@@ -6,11 +6,12 @@ Updated 2026-10-04._
 ## Open items
 
 ### Needs the user
-1. **Turn on WeatherNext values** (user's decision of 2 Oct, DECISIONS.md "WeatherNext terms"):
+1. **Turn on WeatherNext values** (user's decision of 2 Oct, DECISIONS.md "WeatherNext terms";
+   Google confirmed on 4 Oct that the 1-hour rule is on target time, which is what the code does):
    `gh variable set WX_PUBLISH_FORECAST_VALUES --body 1 --repo Stranden1/weather-forecast-verification`.
-   Claude cannot set repository variables. Effective from the next run; set it to 0 to remove
-   the values again (e.g. if Google asks). Older plaintext Git commits/caches remain accessible;
-   no main-history rewrite has been performed.
+   Claude cannot set repository variables. Effective from the next run. Only targets at least 1 h
+   in the past are ever shown, never future ones. Set it to 0 to remove the values again.
+   Older plaintext Git commits/caches remain accessible; no main-history rewrite has been performed.
 2. **Windows task kept running (2 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
    rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
    ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.

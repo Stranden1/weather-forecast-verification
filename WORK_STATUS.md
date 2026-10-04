@@ -13,6 +13,9 @@ Done (not pushed; shown to the user first):
   every later step needs `steps.due.outputs.run == 'true'`.
 - `cloud/health.py`: `MIN_GAP_MIN` = 150 and `due(meta, now, manual)` from `last_success`;
   `RUN_EVERY_H` = 3 unchanged; `PREVIOUS_RUN_EVERY_H`, `RUN_EVERY_CHANGED_AT` and their test removed.
+- DECISIONS.md "WeatherNext terms": Google's 4 Oct reply (1-hour rule on target time) replaces
+  the open-ambiguity / no-reply wording; new rule: never show WeatherNext values for future target
+  times. NEXT_STEPS item 1 updated. Code already cuts off on target time (summarize, replay).
 - Tests: 2 new (gate rules; the `due` command writes `run=false/true` to `GITHUB_OUTPUT`).
 
 Remaining: push (user's OK). Then watch the gaps (NEXT_STEPS item 4). The two items from the
