@@ -420,6 +420,18 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   per period across the change (`cloud/health.py`); drop that transition code after 3 Oct.
 - The run log keeps 120 records (15 days at 8 a day).
 
+## Hourly trigger with a 150-minute gate — 2026-10-04 (Claude)
+
+- GitHub ran the 3-hourly cron only 8 times in 48 h (runs #33–#43, gaps 4.4–9.4 h). The cron is now
+  hourly (`23 * * * *`); a gate step right after state restore (`python -m cloud.run due`,
+  `health.due`) ends the job successfully, without collecting, publishing state or deploying, while
+  the last **successful** collect (`last_success`, as on the page) is under `MIN_GAP_MIN` = 150 min
+  old. Manual `workflow_dispatch` runs always collect. The `collect` concurrency group stays, so runs
+  never overlap.
+- The expected cadence stays `RUN_EVERY_H` = 3 (16 runs per 48 h on the health line); skipped runs
+  leave no run record. 150 min rather than 180 so a late run doesn't push the next one a whole hour.
+- The 6 → 3 h transition code (`PREVIOUS_RUN_EVERY_H`, `RUN_EVERY_CHANGED_AT`) is removed.
+
 ## Monthly summary and rain median headline — 2026-09-28 (Claude)
 
 - `site/data/summary.json` is built at export from decrypted history, one entry per UTC calendar

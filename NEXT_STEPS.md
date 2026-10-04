@@ -1,7 +1,7 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-10-02._
+Updated 2026-10-04._
 
 ## Open items
 
@@ -20,11 +20,12 @@ Updated 2026-10-02._
 ### Pipeline
 3. First reliability run and page health verified (36497119777). No new day was ready;
    check coverage metadata and new-day finalization when a future day is prepared.
-4. GitHub started the old 6-hourly schedule 3–5 h late (e.g. the 00:17 UTC slot ran at 05:18 on
-   27 Sep); the largest gap was 9 h 21 min (28 Sep). The schedule is now every 3 h (1 Oct) and the
-   page's health line warns when the last run is over 8 h old. Check the real gaps after a few
-   days; if delays keep tripping the warning, consider an external trigger.
-   After 3 Oct remove `PREVIOUS_RUN_EVERY_H` and `RUN_EVERY_CHANGED_AT` from `cloud/health.py`.
+4. GitHub ran schedules late or not at all: the 6-hourly one 3–5 h late, the 3-hourly one only
+   8 times in 48 h (runs #33–#43, gaps 4.4–9.4 h). Since 4 Oct (once pushed) the cron fires hourly
+   and a gate skips runs until the last successful collect is 150 min old (DECISIONS.md, "Hourly
+   trigger"). After a few days, check the gaps between collecting runs (the page expects 16 per
+   48 h) and how many hourly runs GitHub actually started; if gaps still exceed ~4 h, consider an
+   external trigger.
 
 ### Features
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once

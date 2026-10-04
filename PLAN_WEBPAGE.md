@@ -56,7 +56,8 @@ file, heading for ~100 GB/year. Almost none of it is needed for scoring.
 
 ### Cloud collection
 
-GitHub Actions, every 3 h (`.github/workflows/collect.yml`): collect → score →
+GitHub Actions, about every 3 h (`.github/workflows/collect.yml`; hourly trigger, a gate skips
+runs until the last success is 150 min old): collect → score →
 prepare → push history → verify origin → prune/push state → export → deploy Pages.
 Secrets: `MET_USER_AGENT`, `FROST_CLIENT_ID`, `EARTH_ENGINE_PROJECT`,
 `EE_SERVICE_ACCOUNT_KEY`, `WX_STATE_KEY`. Restore errors stop the job; only an absent

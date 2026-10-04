@@ -1,12 +1,15 @@
-# Collects Yr + WeatherNext + Frost every 3 hours, scores finished days,
-# and publishes the webpage. Working state lives on the `state` branch, which is
-# replaced (not appended) on every run, so the repository does not grow with it.
+# Collects Yr + WeatherNext + Frost about every 3 hours, scores finished days,
+# and publishes the webpage. GitHub starts scheduled runs late or drops them, so the
+# cron fires hourly and a gate step ends the run early (successfully, collecting and
+# deploying nothing) while the last successful collect is under 150 min old.
+# Working state lives on the `state` branch, which is replaced (not appended) on
+# every collecting run, so the repository does not grow with it.
 name: Collect, score and publish
 
 on:
   schedule:
-    - cron: "17 */3 * * *"   # 00:17, 03:17, ... 21:17 UTC
-  workflow_dispatch: {}
+    - cron: "23 * * * *"   # every hour at :23 UTC; most runs stop at the gate
+  workflow_dispatch: {}    # manual runs always collect
 
 permissions:
   contents: write
@@ -46,7 +49,12 @@ jobs:
       - name: Restore and validate working state (only a missing branch starts fresh)
         run: python -m cloud.persistence restore
 
+      - name: Gate (skip if the last successful collect is under 150 min old)
+        id: due
+        run: python -m cloud.run due ${{ github.event_name == 'workflow_dispatch' && '--manual' || '' }}
+
       - name: Collect, score, export
+        if: steps.due.outputs.run == 'true'
         env:
           MET_USER_AGENT: ${{ secrets.MET_USER_AGENT }}
           FROST_CLIENT_ID: ${{ secrets.FROST_CLIENT_ID }}
@@ -56,17 +64,23 @@ jobs:
         run: python -m cloud.run all
 
       - name: Push encrypted history, confirm origin, then prune and push leased state
+        if: steps.due.outputs.run == 'true'
         run: python -m cloud.persistence publish
 
       - name: Rebuild page from confirmed history and state
+        if: steps.due.outputs.run == 'true'
         run: python -m cloud.run export
 
       - uses: actions/configure-pages@v5
+        if: steps.due.outputs.run == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.due.outputs.run == 'true'
         with:
           path: site
       - id: deploy
+        if: steps.due.outputs.run == 'true'
         uses: actions/deploy-pages@v4
 
       - name: Report source failures after preserving data and publishing health
+        if: steps.due.outputs.run == 'true'
         run: python -m cloud.run check

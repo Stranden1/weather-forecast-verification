@@ -1,5 +1,6 @@
 """Naive baseline + skill, quantile (pinball) scoring, and the health status line."""
 import json
+import os
 import sqlite3
 import tempfile
 import unittest
@@ -234,20 +235,36 @@ class HealthTest(unittest.TestCase):
         self.assertFalse(h["last_run_failed"])
         self.assertEqual(h["sources"]["yr"]["status"], "ok")
 
-    def test_expected_runs_across_the_change_from_6_to_3_hours(self):
-        changed = health.RUN_EVERY_CHANGED_AT
-        long_ago = iso(changed - timedelta(days=9))
-        # 12 h after the change: 36 h of 6-hourly runs (6) + 12 h of 3-hourly runs (4).
-        now = changed + timedelta(hours=12)
-        self.assertEqual(health.expected_runs(health.parse(long_ago), now), 10)
-        runs = [run(h, now=now) for h in (47, 41, 35, 29, 23, 17, 11, 8, 5, 2)]
-        h = health.build({"first_fetch": long_ago, "runs": runs}, now)
-        self.assertEqual((h["runs_48h"], h["expected_48h"]), (10, 10))
-        # Two days on the window is entirely 3-hourly.
-        self.assertEqual(health.expected_runs(health.parse(long_ago), changed + timedelta(days=2)), 16)
-        # A start inside the window only counts time since the first run.
-        first = changed - timedelta(hours=6)
-        self.assertEqual(health.expected_runs(first, changed + timedelta(hours=3)), 3)
+    def test_due_skips_until_150_minutes_after_last_success(self):
+        meta = lambda *runs: {"first_fetch": runs[0]["fetched_at"], "runs": list(runs)}
+        self.assertTrue(health.due({"runs": []}, NOW)[0])           # nothing collected yet
+        self.assertFalse(health.due(meta(run(1)), NOW)[0])          # hourly cron, 1 h later
+        self.assertFalse(health.due(meta(run(2.49)), NOW)[0])
+        self.assertTrue(health.due(meta(run(2.5)), NOW)[0])          # exactly 150 min
+        self.assertTrue(health.due(meta(run(5)), NOW)[0])
+        # Only successful runs count: a failed run 1 h ago doesn't hold the next one back.
+        failed = run(1, yr=0, frost=0, yr_err=50)
+        self.assertTrue(health.due(meta(run(4), failed), NOW)[0])
+        self.assertFalse(health.due(meta(run(2), failed), NOW)[0])
+        # Manual runs always collect; a clock-skewed future success doesn't block forever.
+        self.assertTrue(health.due(meta(run(0.5)), NOW, manual=True)[0])
+        self.assertTrue(health.due(meta(run(-1)), NOW)[0])
+
+    def test_due_command_writes_github_output(self):
+        from cloud import run as cli
+        with tempfile.TemporaryDirectory() as tmp:
+            state, out = Path(tmp) / "state", Path(tmp) / "out.txt"
+            state.mkdir()
+            recent = {"fetched_at": iso(datetime.now(UTC) - timedelta(minutes=30)),
+                      "sources": run(0)["sources"]}
+            (state / "meta.json").write_text(json.dumps(
+                {"finalized_days": [], "first_fetch": recent["fetched_at"], "runs": [recent]}))
+            with mock.patch.object(cli, "State", lambda: State(state)), \
+                    mock.patch.object(cli, "_fernet"), \
+                    mock.patch.dict(os.environ, {"GITHUB_OUTPUT": str(out)}):
+                self.assertEqual(cli.main(["due"]), 0)
+                self.assertEqual(cli.main(["due", "--manual"]), 0)
+            self.assertEqual(out.read_text().splitlines(), ["run=false", "run=true"])
 
     def test_old_run_records_without_sources(self):
         old = {"fetched_at": iso(NOW), "yr_rows": 1400, "wn_rows": 0, "obs_rows": 3530,

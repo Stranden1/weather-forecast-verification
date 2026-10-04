@@ -4,6 +4,7 @@
     python -m cloud.run score      # prepare finished days; no pruning before remote confirmation
     python -m cloud.run export     # rebuild site/data/*.json
     python -m cloud.run all        # all three, in order
+    python -m cloud.run due [--manual]  # gate: run=true/false to $GITHUB_OUTPUT (health.due)
 
 Environment: MET_USER_AGENT, FROST_CLIENT_ID, EARTH_ENGINE_PROJECT,
 EE_SERVICE_ACCOUNT_KEY (JSON text), WEATHERNEXT_ENABLED (default 1),
@@ -74,8 +75,9 @@ def collect(state: State) -> list[str]:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("step", choices=["collect", "score", "export", "all", "check"])
+    ap.add_argument("step", choices=["collect", "score", "export", "all", "check", "due"])
     ap.add_argument("--strict", action="store_true", help="exit 1 if any source reported errors")
+    ap.add_argument("--manual", action="store_true", help="due: a manual run always collects")
     a = ap.parse_args(argv)
     _fernet(required=True)
     state = State()
@@ -85,6 +87,13 @@ def main(argv=None) -> int:
             return 1
         # CI runs this only AFTER saving successful sources and deploying health.
         return int(any(s.get("errors", 0) for s in runs[-1].get("sources", {}).values()))
+    if a.step == "due":
+        go, why = health.due(state.meta(), manual=a.manual)
+        print(("collect: " if go else "skip: ") + why)
+        if os.getenv("GITHUB_OUTPUT"):
+            with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                f.write(f"run={'true' if go else 'false'}\n")
+        return 0
     errors = []
     if a.step in ("collect", "all"):
         errors = collect(state)
