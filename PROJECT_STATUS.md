@@ -1,59 +1,60 @@
 # Project status
 
-_Updated 2026-09-28. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-06. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-WeatherApp compares Yr/MET and WeatherNext with Frost at 50 Norwegian stations.
-The cloud pipeline/public dashboard and local Windows collector run in parallel;
-ECMWF IFS/AIFS are also collected but not yet ranked on the page. The requested
-reliability and encrypted-history fixes were pushed as 3e6ec36 (about 20:24 UTC); first
-scheduled run verified successfully (28 Sep 23:16 UTC); older public plaintext Git copies still need
-coordinated cleanup before publication protection can be considered complete.
-A monthly summary paragraph and a rain view led by WeatherNext's median are live.
+WeatherApp compares Yr/MET and WeatherNext against Frost at 50 Norwegian stations.
+The local Windows collector and public cloud dashboard both work. Cloud collection
+timing remains unreliable, so keep the PC collector running until coverage matches.
+External timer dispatch support is implemented locally; push awaits the user's OK.
+The live page contains 29 scored days through 3 Oct (160,259 rows), monthly summaries,
+rain headlines led by WeatherNext's median, and past WeatherNext forecast values.
+ECMWF IFS/AIFS are collected but not yet ranked on the page.
 
 ## Current capabilities
 
-- Local: authoritative data/weather.db, full forecasts/observations, Streamlit
-  comparisons and six-hourly collection. This task did not modify that system.
-- Cloud: collects about every 3 h (hourly trigger + 150 min gate from 4 Oct; 6 h before 1 Oct), paired horizon snapshots, daily scoring,
-  encrypted immutable history, aggregate page JSON, trends, maps, uncertainty and baseline diagnostics.
-- Page top: a fixed-template paragraph per calendar month (this month "so far", earlier
-  months collapsed) from `summary.json`, naming a winner only where the bootstrap verdict does.
-  Rain views lead with WeatherNext's median; temperature and wind with its average.
-- Sampling method is recorded; height-adjusted WeatherNext remains a separate
-  labelled temperature comparison. Steadiness is exported but not displayed.
-- Project HQ provides a local read-only viewer of handoff documents.
+- Local: authoritative data/weather.db, full forecast/observation history,
+  Streamlit comparisons, and six-hourly collection on the active 50-station network.
+- Cloud: paired horizon snapshots, daily scoring, encrypted immutable history,
+  trends, maps, uncertainty, baseline diagnostics and storm replay exports/page card.
+- Collection aims for about every 3 h: hourly GitHub trigger with a 150 min gate.
+- Local workflow change: `trigger=timer` dispatches respect that gate;
+  `trigger=manual` (default) bypasses it. Setup is documented in SETUP_CLOUD.md.
+- Past WeatherNext values are enabled (WX_PUBLISH_FORECAST_VALUES=1); the code
+  restricts publication to target times at least 1 h old, with attribution.
+- Height-adjusted temperature remains a separate labelled comparison. Steadiness
+  is exported but not yet displayed. Project HQ is a local read-only document viewer.
 
-## Reliability changes verified in the first scheduled run
+## Reliability and verification
 
-- All 23 current history files are encrypted with WX_STATE_KEY. Exact original
-  compressed bytes and 126,109 rows are preserved. CI decrypts in memory; public
-  exports force forecast values off. Local decrypt is documented in SETUP_CLOUD.md.
-- Prepare a day at >=80% coverage of configured stations x24 UTC hours. Retry
-  incomplete days until day-end +72h, then record coverage and late-finalization.
-- Push history first, verify exact files/metadata in origin, then prune only the
-  confirmed days and publish encrypted state with a lease. Failures remain recoverable.
-- Only an absent state branch starts fresh; restore/decryption failures abort.
-  Source failures mark the run red after saving data and publishing health.
+- Encrypted state/history, fail-closed restore, history-first publication with origin
+  confirmation, and leased state updates are implemented and covered by tests.
+- Days require >=80% configured station-hour observation coverage, with retries
+  until day-end +72 h. Recent metadata verifies 94.9% for 2 Oct and 94.7% for 3 Oct;
+  neither day was late-finalized. This measures observations, not forecast coverage.
+- Last full check (5 Oct): 119 cloud + 79 local tests passed. Dependency warnings remain.
+- After the timer change (6 Oct), all 119 cloud tests pass, including gate boundary
+  and manual-bypass coverage. Live timer behavior awaits deployment.
+- Latest cloud collection checked: run 37231498979, manual, 4 Oct 22:17 Oslo time;
+  collection, persistence, Pages and final source check all passed. Published health
+  reports zero errors for Yr, WeatherNext, ECMWF and Frost, but only 9/16 expected
+  collections in its 48 h window. Last scheduled run checked started 4 Oct 20:38 Oslo.
+- Local collector finished successfully on 5 Oct at 00:14 Oslo; the last four
+  background collections were successful. Database size is about 5.75 GB (decimal).
+- Latest cloud CI passed the action upgrades (37236715635). A collecting/deploying
+  run using those upgrades, and a real scheduled gate skip, remain to be verified.
 
-## Verification and last checked live state
+## Findings and next actions
 
-177 local/cloud tests pass (154 before the monthly summary). Project HQ: 7 passed, 1 Windows symlink skip. Failure
-recovery was exercised with temporary Git remotes. All 58 generated page JSON
-files match pre-encryption exports except generation time; original scores unchanged.
+September's paired comparison spans 16 days: Yr leads raw temperature at 6 h;
+1-3 day temperature is too close to call. WeatherNext leads wind at 2 days and
+its rain median leads at 2 days. Height-adjusted WeatherNext leads temperature
+at 6 h-3 days, subject to the proxy-terrain/fixed-lapse-rate limitations.
+October has only three scored days, below the seven-day verdict threshold.
 
-Last checked live cloud run: 36497119777, 28 Sep 23:16 UTC, all steps and sources
-successful. Page health matches; 7 of 8 runs in 48 h after a 9 h 21 min gap.
-No new scored day was ready, so new coverage metadata was not exercised.
-Monthly summary is live. Verification heartbeat is paused.
-
-## Limits and next actions
-
-Compare cloud/local coverage before retiring the PC collector. Current-file encryption does not remove old plaintext commits/caches;
-coordinate that cleanup separately. Preserve a secure backup of WX_STATE_KEY,
-which now protects scored history as well as pending forecasts.
-
-Model findings remain preliminary, especially after the sampling change and for
-ECMWF. Height adjustment uses proxy terrain and a fixed lapse rate; AIFS hourly
-rain is interpolated. NEXT_STEPS.md holds open work; DECISIONS.md holds policies.
+Compare cloud/local forecast coverage before retiring the PC collector. After push
+approval, configure the external timer and verify gated skips and collection cadence.
+Continue replay/steadiness work, ECMWF display, and median rain consistency.
+Old plaintext commits/caches remain accessible; current encryption does not remove
+them. Keep a secure separate key backup. NEXT_STEPS.md holds open work.

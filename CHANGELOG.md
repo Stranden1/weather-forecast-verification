@@ -1,5 +1,74 @@
 # Changelog
 
+## External timer dispatch - 2026-10-06 (Codex)
+
+- Added `workflow_dispatch.inputs.trigger` (`manual` default, `timer` alternative).
+  The gate bypass requires both a dispatch event and `trigger=manual`; timer runs
+  respect the existing 150-minute interval. Hourly cron and concurrency are unchanged.
+- Added external timer setup to SETUP_CLOUD.md, including the POST request, 204
+  response and repo-scoped Actions: Read and write token permission; no real token.
+- Updated DECISIONS and handoff docs, preserving pre-existing health-review changes.
+- Validation: 119 cloud tests passed with the existing .venv. Existing warnings remain.
+- Five gate expression cases and unchanged cron/concurrency checked locally;
+  `git diff --check` passed.
+- Local commit only; push awaits the user's OK. No live dispatch or timer configured.
+
+## Project health review - 2026-10-05 (Codex)
+
+Done:
+- Checked clean Git state, latest GitHub runs/settings, public health/meta/monthly JSON,
+  recent scored-day metadata, read-only database summaries and local task state.
+- 119 cloud and 79 local tests pass using the existing .venv (198 total).
+- Cloud run 37231498979 passed all collection/persistence/Pages steps and reported no
+  source errors. Published data: 29 days through 3 Oct, 160,259 rows, 9/16 collections in 48 h.
+- WeatherNext past values are already enabled and published; removed that stale open item.
+- Coverage metadata verified for 2-3 Oct (~95%, not late-finalized); removed that stale item.
+- Local collector finished successfully at 00:14 Oslo on 5 Oct; 50 active stations.
+- Refreshed PROJECT_STATUS/NEXT_STEPS; archived the previous checkpoint in CHANGELOG.
+
+Remaining:
+- Verify a collecting/deploying run with the new actions and a real scheduled gate skip.
+- Recompare cloud/local forecast coverage before stopping the PC task; scheduling is still
+  the main operational concern. Evaluate the hourly trigger over several days.
+- Feature/housekeeping items remain in NEXT_STEPS; no application fixes made in this review.
+
+Only handoff documents changed. No authoritative database writes, collector/task changes,
+secret changes, workflow dispatch, commits or pushes were performed.
+
+## Project health review - 2026-10-05 (Codex)
+
+- Fresh validation: 119 cloud + 79 local tests passed. Clean checkout before review.
+- Cloud run 37231498979 passed all steps/sources; public health/meta checked on 5 Oct:
+  29 scored days through 3 Oct, 160,259 rows, 9/16 collections in the published 48 h window.
+- Confirmed WX_PUBLISH_FORECAST_VALUES=1 (set 4 Oct 20:13 UTC) and live publication;
+  removed the completed activation item from NEXT_STEPS.
+- Verified 2-3 Oct coverage metadata (94.9%/94.7%, neither late-finalized); removed
+  the completed first new-day verification item. Observation coverage is not forecast coverage.
+- Local database read-only check: 50 active stations; four latest background runs successful,
+  most recent finished 5 Oct 00:14 Oslo. Scheduled task remains enabled/Ready.
+- Refreshed handoff notes; no database, application, task, credentials or remote changes.
+
+## Workflow actions off Node.js 20 — 2026-10-04 (Claude)
+
+Done (pushed as 1eb4140; "Cloud pipeline tests" run 37236715635 green, 119 tests, the Node.js 20
+warning is gone):
+- `collect.yml` and `tests.yml`: checkout v4 → v7, setup-python v5 → v7, configure-pages v5 → v6,
+  upload-pages-artifact v3 → v5 (uses upload-artifact v7), deploy-pages v4 → v5; all node24.
+- Breaking changes checked against our use: upload-pages-artifact v4+ leaves out dotfiles (`site/`
+  has none); setup-python v7 dropped `pip-install` (unused; `cache`/`cache-dependency-path`
+  remain); checkout v6+ credential file and v7 fork-PR block don't apply (`persist-credentials:
+  false`, no `pull_request_target`/`workflow_run`).
+- Run #44 (12:21 UTC 4 Oct) failed only on ECMWF/Open-Meteo (read timeouts, 0 rows); Yr,
+  WeatherNext and Frost were fine.
+
+Remaining:
+- The new actions in `collect.yml` first run on the next collect run; check it deploys Pages.
+- Gate not yet seen in action: as of 21:36 UTC 4 Oct GitHub had started no scheduled run since
+  18:38 (none at 19:23, 20:23, 21:23; #46 at 20:17 was manual). Check that scheduled runs resume,
+  and that a skipped run leaves `state` and Pages untouched and adds no run record (NEXT_STEPS 4).
+- Still open: the user sets `WX_PUBLISH_FORECAST_VALUES`; replay steadiness on the page.
+- `ubuntu-latest` moves to Ubuntu 26 from 19 Oct (runner notice); watch the first run after that.
+
 ## Hourly trigger with a 150-minute gate — 2026-10-04 (Claude)
 
 Done (pushed 4 Oct as a6a78d7, 788be89; tests workflow green):

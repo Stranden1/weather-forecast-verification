@@ -48,7 +48,8 @@ the same project (noncommercial).
 
 ## 5. First run
 
-**Actions → Collect, score and publish → Run workflow.** It takes a few minutes.
+**Actions → Collect, score and publish → Run workflow.** Leave `trigger` at its
+default `manual` to bypass the 150-minute gate. It takes a few minutes.
 Open the log: the `collect` line shows how many Yr, WeatherNext and Frost rows
 were saved and lists any errors. The first scores appear about a day later.
 
@@ -67,6 +68,31 @@ database. Then commit and push the new files in `history/`.
 
 After validating cloud/local coverage and the deployed recovery fixes, stop the
 Windows collector only with the user's approval. Keep authoritative `data/weather.db`.
+
+## External timer (optional)
+
+After the updated `collect.yml` is on `main`, configure the external timer to send
+the following request (for example, hourly):
+
+```http
+POST https://api.github.com/repos/Stranden1/weather-forecast-verification/actions/workflows/collect.yml/dispatches
+Accept: application/vnd.github+json
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"ref":"main","inputs":{"trigger":"timer"}}
+```
+
+Expected response: **204 No Content** (dispatch accepted; check Actions for the run
+result). Use a **fine-grained personal access token**, restricted to
+`Stranden1/weather-forecast-verification` only, with repository permission
+**Actions: Read and write**. Store the real token only in the timer's secret store;
+never put it in documentation, source files or logs. `<token>` above is a placeholder.
+
+`trigger: timer` respects the same 150-minute gate as scheduled runs: a recent
+successful collection skips collection, state publication and Pages deployment.
+`trigger: manual` bypasses the gate and is the default. The hourly GitHub schedule
+(`23 * * * *`) and shared `collect` concurrency group remain enabled.
 
 ## Optional settings
 

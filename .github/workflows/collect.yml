@@ -9,7 +9,15 @@ name: Collect, score and publish
 on:
   schedule:
     - cron: "23 * * * *"   # every hour at :23 UTC; most runs stop at the gate
-  workflow_dispatch: {}    # manual runs always collect
+  workflow_dispatch:
+    inputs:
+      trigger:
+        description: "Manual bypasses the gate; timer respects the 150-minute interval"
+        type: choice
+        options:
+          - manual
+          - timer
+        default: manual
 
 permissions:
   contents: write
@@ -51,7 +59,7 @@ jobs:
 
       - name: Gate (skip if the last successful collect is under 150 min old)
         id: due
-        run: python -m cloud.run due ${{ github.event_name == 'workflow_dispatch' && '--manual' || '' }}
+        run: python -m cloud.run due ${{ github.event_name == 'workflow_dispatch' && inputs.trigger == 'manual' && '--manual' || '' }}
 
       - name: Collect, score, export
         if: steps.due.outputs.run == 'true'

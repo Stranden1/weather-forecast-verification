@@ -421,6 +421,19 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   per period across the change (`cloud/health.py`); drop that transition code after 3 Oct.
 - The run log keeps 120 records (15 days at 8 a day).
 
+## External timer dispatch respects the gate — 2026-10-06 (Codex)
+
+- `collect.yml` accepts the `workflow_dispatch` choice input `trigger`: `manual`
+  (default) or `timer`. Pass `--manual` only for a `workflow_dispatch` event with
+  `inputs.trigger == 'manual'`; timer dispatches use the existing 150-minute gate.
+- Keep the hourly GitHub schedule (`23 * * * *`) and `collect` concurrency group.
+  A skipped timer run has the same behavior as a skipped scheduled run.
+- External timers POST the dispatch body documented in `SETUP_CLOUD.md`. Use a
+  fine-grained token for this repository only, with Actions: Read and write;
+  real tokens belong only in the timer's secret store, never in repository files.
+- This refines the 4 Oct decision: dispatch alone no longer implies a gate bypass.
+  Deployment and live timer verification wait until the user approves a push.
+
 ## Hourly trigger with a 150-minute gate — 2026-10-04 (Claude)
 
 - GitHub ran the 3-hourly cron only 8 times in 48 h (runs #33–#43, gaps 4.4–9.4 h). The cron is now
