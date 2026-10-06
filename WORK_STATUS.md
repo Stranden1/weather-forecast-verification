@@ -2,28 +2,27 @@
 
 _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
 
-## Project health review - 2026-10-06 (Codex)
+## Timer diagnosis and activation - 2026-10-06 (Codex)
 
 Done:
-- Checked local task/logs, read-only database summaries, live cloud runs/state,
-  station configurations, scored-day coverage and the public dashboard.
-- Local collector completed at 12:14 Oslo; all sources OK, task Ready/result 0.
-- Cloud run 37438015907 confirms upgraded actions and Pages deployment work.
-  Live page: 31 days through 5 Oct, 174,911 rows; coverage 93.9-95.1% for 4-5 Oct.
-- Cloud cadence remains poor: 10/16 runs in 48 h, maximum recent gap 9 h 21 min.
-- Confirmed 45/50 cloud/local station overlap. Cloud observations for SN1120 and
-  SN20925 stop on 30 Sep; aggregate Frost status remains OK.
-- 79 local tests passed; 119 cloud tests passed earlier this session after timer edits.
-  Browser renders and rain filter works, with no captured console errors.
-- Database reads succeeded. SQLite quick_check hit its 45-second limit without a
-  completed result; full integrity is unverified.
-- Updated handoffs and archived the previous timer checkpoint.
+- Diagnosed missed GitHub starts rather than gate rejection: scheduled runs reached
+  the gate at 406 and 561 minutes after success and correctly collected.
+- User approved push/live verification and cron-job.org as the independent timer.
+- Preserved the health review, rebased local commits onto the two new scored-history
+  commits and pushed. Timer commit is now 0d97cf8; expanded setup docs are 1bbd7c4.
+- 119 cloud tests passed after rebase; CI 37453257669 passed.
+- Live timer dispatch 37453257515 succeeded, skipping at 135 minutes. Collection,
+  persistence and Pages were skipped; state SHA/public health timestamp unchanged.
+- Prepared a 30-minute external POST setup (:07/:37 UTC), with token scope,
+  failure notifications, troubleshooting and live verification in SETUP_CLOUD.md.
 
 Remaining:
-- User's OK to push is still required. Integrate remote scored-history commits first.
-- Deploy/configure and verify the timer, reconcile station networks, investigate
-  stale observations and add station-level health warnings; then recompare coverage.
-- Longer database integrity check if needed; other open work is in NEXT_STEPS.md.
+- cron-job.org is at its login page. User must sign in/create their account and
+  enter a repo-only Actions: Read and write token directly into the service.
+- Configure/enable the recurring job, verify its requests and a due collection.
+  No recurring external timer exists yet; do not claim scheduling is fixed.
+- Measure cadence/coverage for several days; keep the existing PC collector.
+- Other findings (station drift/staleness) remain in NEXT_STEPS.md.
 
-Only handoff documents changed and remain uncommitted. No database writes, history
-edits, configuration changes, task restarts, workflow dispatches, commits or pushes.
+No database writes, immutable-history edits, Windows task changes or real tokens
+in files/chat. Push permission was explicitly granted during this task.

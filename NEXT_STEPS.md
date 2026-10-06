@@ -20,18 +20,14 @@ Updated 2026-10-06._
    SN20925 (Wisting): latest cloud observations are 30 Sep 23:00 and 21:00 UTC respectively;
    SN1120 is also stale locally. Add per-station freshness/coverage warnings so overall
    Frost OK cannot hide missing stations. Do not silently remove them from scoring history.
-3. GitHub ran schedules late or not at all: the 6-hourly one 3–5 h late, the 3-hourly one only
-   8 times in 48 h (runs #33–#43, gaps 4.4–9.4 h). Since 4 Oct the cron fires hourly
-   and a gate skips runs until the last successful collect is 150 min old (DECISIONS.md, "Hourly
-   trigger"). After a few days, check the gaps between collecting runs (the page expects 16 per
-   48 h) and how many hourly runs GitHub actually started. External timer dispatch support is
-   implemented locally (6 Oct); **wait for the user's OK before pushing**. Integrate the two
-   newer remote scored-history commits first, preserving immutable day files. Then configure the
-   timer using SETUP_CLOUD.md, verify HTTP 204 and check a recent-success `trigger=timer` run
-   skips while one at least 150 min after success collects. Also verify the default manual
-   dispatch bypasses the gate. At the 6 Oct check, live health showed 10/16 with gaps up to
-   9 h 21 min; no scheduled gate skip was yet verified. Check a skip leaves state/Pages untouched
-   and adds no run record. Upgraded actions and deployment were verified in run 37438015907.
+3. **Finish cron-job.org activation.** User approved the service and push on 6 Oct;
+   timer support is deployed, CI passed and run 37453257515 verified a skip at 135 min
+   with state/Pages untouched. The remaining dependency is the user's service sign-in
+   and repository-scoped Actions: Read and write token, entered directly into the timer.
+   Configure one POST job for :07/:37 UTC as documented in SETUP_CLOUD.md; enable failure
+   and automatic-disable notifications. Verify recurring HTTP 204 responses, a collection
+   once >=150 min old, and an advancing public health timestamp. Then evaluate several
+   days of coverage. GitHub hourly fallback remains; prior gaps reached 9 h 21 min.
 4. **Old plaintext history:** coordinate cleanup of earlier public Git commits/caches if
    publication protection requires it; no main-history rewrite has been performed.
 

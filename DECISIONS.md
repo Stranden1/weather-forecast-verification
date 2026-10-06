@@ -421,6 +421,22 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   per period across the change (`cloud/health.py`); drop that transition code after 3 Oct.
 - The run log keeps 120 records (15 days at 8 a day).
 
+## Independent timer activation — 2026-10-06 (Codex)
+
+- User approved pushing the timer change and using cron-job.org after diagnosis:
+  hourly GitHub starts were missing, with gate logs showing success ages of 406
+  and 561 minutes. The gate itself correctly allowed those late runs.
+- Use an independent POST every 30 minutes (:07/:37 UTC), retaining the hourly
+  GitHub fallback, shared concurrency and 150-minute gate. Collection should be
+  roughly every 150-180 minutes when dispatches start promptly; no strict SLA.
+- The workflow change is deployed (rebased timer commit 0d97cf8; setup 1bbd7c4).
+  Run 37453257515 verified a timer skip at 135 minutes, without state or Pages
+  publication. CI 37453257669 passed. Recurring cron-job.org setup is still pending
+  the user's sign-in and repository-scoped token entry; never call it active yet.
+- HTTP 204 proves dispatch acceptance only. Verify subsequent gate decisions,
+  collection success and the public health timestamp separately. Enable timer
+  failure/disable notifications and renew its scoped token before expiration.
+
 ## External timer dispatch respects the gate — 2026-10-06 (Codex)
 
 - `collect.yml` accepts the `workflow_dispatch` choice input `trigger`: `manual`
