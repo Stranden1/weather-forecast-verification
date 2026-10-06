@@ -1,5 +1,36 @@
 # Changelog
 
+## External timer activated — 2026-10-06 (Codex)
+
+- User saved the repository-scoped token directly in cron-job.org. External test
+  returned HTTP 204 at 16:21 UTC; GitHub run 37495000121 succeeded and skipped at
+  65 minutes without --manual. Collection, persistence and Pages were skipped.
+- Enabled existing job 8590224 at :07/:37 UTC and verified the saved dashboard
+  showed one enabled job with an upcoming execution. GitHub hourly fallback remains.
+- Recorded token expiry (5 Nov 2026, 17:15 UTC), setup and handoffs without reading
+  or recording the credential. Prior 119 cloud/79 local tests and CI passed;
+  activation introduced no application code changes.
+- Recurring executions, the first external due collection and multi-day cadence
+  remain follow-up checks. Keep the PC collector until cloud coverage is proven.
+
+## Timer diagnosis and activation checkpoint — 2026-10-06 (Codex)
+
+Archived WORK_STATUS before activation:
+- Diagnosed missed GitHub starts rather than gate rejection: scheduled runs reached
+  the gate at 406 and 561 minutes after success and correctly collected.
+- User approved push/live verification and cron-job.org as the independent timer.
+- Preserved the health review, rebased local commits onto two new scored-history
+  commits and pushed. Timer commit 0d97cf8; expanded setup docs 1bbd7c4.
+- 119 cloud tests and CI 37453257669 passed. Timer run 37453257515 skipped at 135
+  minutes; downstream actions, state SHA and public health stayed unchanged.
+- Saved job 8590224 disabled, with :07/:37 UTC POST, timer JSON, request headers
+  and failure/recovery/disable notifications. Prepared repository-only token form,
+  Actions: Read and write, required read-only Metadata, expiry 5 Nov 2026.
+- At that checkpoint, user token generation/entry, testing and activation remained;
+  no external timer was active. Multi-day coverage and station findings remained open.
+- No database writes, immutable-history edits, Windows task changes or tokens in
+  files/chat. Push permission had been explicitly granted.
+
 ## Timer diagnosis and deployed dispatch gate — 2026-10-06 (Codex)
 
 - Confirmed missed GitHub starts: scheduled gate logs show 406/561-minute ages;

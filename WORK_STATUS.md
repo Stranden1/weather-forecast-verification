@@ -2,26 +2,27 @@
 
 _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
 
-## Timer diagnosis and activation - 2026-10-06 (Codex)
+## External timer enabled and tested - 2026-10-06 (Codex)
 
 Done:
-- Diagnosed missed GitHub starts rather than gate rejection: scheduled runs reached
-  the gate at 406 and 561 minutes after success and correctly collected.
-- User approved push/live verification and cron-job.org as the independent timer.
-- Preserved the health review, rebased local commits onto the two new scored-history
-  commits and pushed. Timer commit is now 0d97cf8; expanded setup docs are 1bbd7c4.
-- 119 cloud tests passed after rebase; CI 37453257669 passed.
-- Live timer dispatch 37453257515 succeeded, skipping at 135 minutes. Collection,
-  persistence and Pages were skipped; state SHA/public health timestamp unchanged.
-- Prepared a 30-minute external POST setup (:07/:37 UTC), with token scope,
-  failure notifications, troubleshooting and live verification in SETUP_CLOUD.md.
+- User entered and saved the repository-only Actions token directly in cron-job.org.
+  No token was read or put in chat/files. GitHub reports expiry 5 Nov 2026, 17:15 UTC.
+- External test returned HTTP 204 at 16:21 UTC and started run 37495000121.
+  Run succeeded; gate command omitted --manual and skipped at 65 minutes.
+  Collection, persistence, export and Pages steps all skipped correctly.
+- Enabled and saved existing job 8590224, "WeatherApp collection timer".
+  Dashboard confirms one enabled job and the next execution at 18:37 Oslo.
+  Requests run at :07/:37 UTC, with failure/recovery/disable notifications.
+- Existing GitHub schedule remains. Run 37485951770 at 15:15 UTC successfully
+  collected and deployed Pages before the external test.
+- Prior validation still applies: 119 cloud tests, 79 local tests and CI passed.
+  This activation changes service settings and docs only; no application code changed.
 
 Remaining:
-- cron-job.org is at its login page. User must sign in/create their account and
-  enter a repo-only Actions: Read and write token directly into the service.
-- Configure/enable the recurring job, verify its requests and a due collection.
-  No recurring external timer exists yet; do not claim scheduling is fixed.
+- Verify the first recurring request and a timer-triggered due collection with an
+  advancing public health timestamp; only the immediate external test is verified.
 - Measure cadence/coverage for several days; keep the existing PC collector.
+- Renew the scoped token before 5 Nov 2026 without putting it in chat/files.
 - Other findings (station drift/staleness) remain in NEXT_STEPS.md.
 
 No database writes, immutable-history edits, Windows task changes or real tokens

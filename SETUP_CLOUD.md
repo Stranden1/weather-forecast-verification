@@ -96,6 +96,12 @@ successful collection skips collection, state publication and Pages deployment.
 
 ### Recommended setup and verification
 
+Active setup (6 Oct 2026): job **8590224**, **WeatherApp collection timer**, is
+enabled with the schedule below. Reuse it; do not create a duplicate. Its external
+test returned 204 and GitHub run 37495000121 correctly skipped at 65 minutes.
+The current token expires **5 Nov 2026 at 17:15 UTC**; renew it before then.
+The first recurring execution and a due collection still need verification.
+
 GitHub's scheduled events can be delayed or dropped; changing the cron time alone
 does not guarantee collection. An independent service such as
 [cron-job.org](https://cron-job.org/en/) can send the POST while the PC is off.

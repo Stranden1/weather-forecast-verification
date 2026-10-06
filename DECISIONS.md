@@ -431,8 +431,10 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   roughly every 150-180 minutes when dispatches start promptly; no strict SLA.
 - The workflow change is deployed (rebased timer commit 0d97cf8; setup 1bbd7c4).
   Run 37453257515 verified a timer skip at 135 minutes, without state or Pages
-  publication. CI 37453257669 passed. Recurring cron-job.org setup is still pending
-  the user's sign-in and repository-scoped token entry; never call it active yet.
+  publication. CI 37453257669 passed. On 6 Oct, the user saved the scoped token
+  directly in cron-job.org; job 8590224 was enabled after an HTTP 204 external test.
+  Resulting run 37495000121 correctly skipped at 65 minutes. Recurring cadence
+  remains to be measured; renewal is needed before 5 Nov 2026 (17:15 UTC expiry).
 - HTTP 204 proves dispatch acceptance only. Verify subsequent gate decisions,
   collection success and the public health timestamp separately. Enable timer
   failure/disable notifications and renew its scoped token before expiration.

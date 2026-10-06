@@ -9,7 +9,7 @@ Updated 2026-10-06._
 1. **Windows task kept running (6 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
    rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
    ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
-   Recompare after the timer is live, using matched stations (networks currently overlap
+   Recompare after several days with the timer live, using matched stations (networks overlap
    at 45/50). Stop the task only after coverage matches and the user approves.
    Keep `data/weather.db`.
 
@@ -20,14 +20,13 @@ Updated 2026-10-06._
    SN20925 (Wisting): latest cloud observations are 30 Sep 23:00 and 21:00 UTC respectively;
    SN1120 is also stale locally. Add per-station freshness/coverage warnings so overall
    Frost OK cannot hide missing stations. Do not silently remove them from scoring history.
-3. **Finish cron-job.org activation.** User approved the service and push on 6 Oct;
-   timer support is deployed, CI passed and run 37453257515 verified a skip at 135 min
-   with state/Pages untouched. The remaining dependency is the user's service sign-in
-   and repository-scoped Actions: Read and write token, entered directly into the timer.
-   Configure one POST job for :07/:37 UTC as documented in SETUP_CLOUD.md; enable failure
-   and automatic-disable notifications. Verify recurring HTTP 204 responses, a collection
-   once >=150 min old, and an advancing public health timestamp. Then evaluate several
-   days of coverage. GitHub hourly fallback remains; prior gaps reached 9 h 21 min.
+3. **Measure the activated timer.** Job 8590224 is enabled with :07/:37 UTC POST
+   requests and failure/recovery/disable notifications. External test returned 204;
+   run 37495000121 succeeded and correctly skipped at 65 min. Verify recurring HTTP
+   204 responses, a timer-triggered collection once >=150 min old, and an advancing
+   public health timestamp. Then evaluate several days of coverage. GitHub hourly
+   fallback remains; prior gaps reached 9 h 21 min. Renew the repository-only token
+   before 5 Nov 2026 (expires 17:15 UTC); enter it directly in the timer, never chat/files.
 4. **Old plaintext history:** coordinate cleanup of earlier public Git commits/caches if
    publication protection requires it; no main-history rewrite has been performed.
 
