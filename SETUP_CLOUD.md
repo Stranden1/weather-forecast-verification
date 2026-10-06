@@ -71,8 +71,8 @@ Windows collector only with the user's approval. Keep authoritative `data/weathe
 
 ## External timer (optional)
 
-After the updated `collect.yml` is on `main`, configure the external timer to send
-the following request (for example, hourly):
+After the updated `collect.yml` is on `main`, configure an independent timer to send
+the following request every 30 minutes (for example, at :07 and :37 UTC):
 
 ```http
 POST https://api.github.com/repos/Stranden1/weather-forecast-verification/actions/workflows/collect.yml/dispatches
@@ -93,6 +93,45 @@ never put it in documentation, source files or logs. `<token>` above is a placeh
 successful collection skips collection, state publication and Pages deployment.
 `trigger: manual` bypasses the gate and is the default. The hourly GitHub schedule
 (`23 * * * *`) and shared `collect` concurrency group remain enabled.
+
+### Recommended setup and verification
+
+GitHub's scheduled events can be delayed or dropped; changing the cron time alone
+does not guarantee collection. An independent service such as
+[cron-job.org](https://cron-job.org/en/) can send the POST while the PC is off.
+
+1. Create one job named **WeatherApp collection timer** with the URL, POST method,
+   headers and JSON body above. Use UTC and minutes 7 and 37 of every hour, every day
+   (`7,37 * * * *`). Keep this separate from the unchanged GitHub hourly cron.
+2. Enter the repo-only GitHub token directly in the service's Authorization header
+   setting. Never paste it into chat or a tracked file. Record its expiration date
+   in your password manager so it can be renewed before dispatches stop.
+3. Enable notifications for failed requests and automatic job disabling, and verify
+   that the job is enabled. A timer test should return **204**, not an HTML page.
+4. Check the resulting GitHub Actions run. When the last successful collection is
+   under 150 minutes old, the Gate log must say `skip`, with collection, publication
+   and deployment steps skipped. Once due, those steps must run successfully.
+5. Check the public health timestamp advances after collection. A 204 only confirms
+   GitHub accepted the request; it does not confirm the workflow or collectors succeeded.
+
+To test the timer path with an already-authenticated GitHub CLI after deployment:
+
+```powershell
+gh workflow run collect.yml --repo Stranden1/weather-forecast-verification --ref main -f trigger=timer
+```
+
+Common failures: **401** means the token is invalid/expired; **403** requires checking
+repository access, Actions permission and rate-limit information; **404** requires
+checking the endpoint and token's repository access; **422** can mean the deployed
+workflow does not yet accept `trigger`, or the ref/input is invalid. Do not send
+`trigger=timer` until the updated workflow is on `main`.
+
+The 30-minute requests are wake-up attempts, not collections. With prompt starts,
+the gate allows collection roughly every 150-180 minutes; delayed GitHub execution
+can still extend that. Keep the PC collector until measured cloud coverage matches.
+
+References: [GitHub schedule limitations](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
+[cron-job.org request and notification settings](https://docs.cron-job.org/rest-api.html).
 
 ## Optional settings
 
