@@ -4,57 +4,50 @@ _Updated 2026-10-06. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-WeatherApp compares Yr/MET and WeatherNext against Frost at 50 Norwegian stations.
-The local Windows collector and public cloud dashboard both work. Cloud collection
-timing remains unreliable, so keep the PC collector running until coverage matches.
-External timer dispatch support is implemented locally; push awaits the user's OK.
-The live page contains 29 scored days through 3 Oct (160,259 rows), monthly summaries,
-rain headlines led by WeatherNext's median, and past WeatherNext forecast values.
-ECMWF IFS/AIFS are collected but not yet ranked on the page.
+The local collector and cloud dashboard work, but cloud cadence and station freshness
+need attention. Live health reports 10/16 expected collections in 48 h, with gaps up
+to 9 h 21 min. Keep the PC collector running. Timer support is committed locally as
+7ee874e; push still awaits the user's OK.
 
 ## Current capabilities
 
-- Local: authoritative data/weather.db, full forecast/observation history,
-  Streamlit comparisons, and six-hourly collection on the active 50-station network.
-- Cloud: paired horizon snapshots, daily scoring, encrypted immutable history,
-  trends, maps, uncertainty, baseline diagnostics and storm replay exports/page card.
-- Collection aims for about every 3 h: hourly GitHub trigger with a 150 min gate.
-- Local workflow change: `trigger=timer` dispatches respect that gate;
-  `trigger=manual` (default) bypasses it. Setup is documented in SETUP_CLOUD.md.
-- Past WeatherNext values are enabled (WX_PUBLISH_FORECAST_VALUES=1); the code
-  restricts publication to target times at least 1 h old, with attribution.
-- Height-adjusted temperature remains a separate labelled comparison. Steadiness
-  is exported but not yet displayed. Project HQ is a local read-only document viewer.
+- Local: authoritative data/weather.db, full forecasts/observations, Streamlit
+  comparisons and six-hourly collection at 50 active stations.
+- Cloud: paired snapshots, encrypted immutable history, daily scoring, trends,
+  maps, uncertainty, baseline diagnostics, monthly summaries and storm replays.
+- Live page: 31 scored days through 5 Oct, 174,911 rows. Past WeatherNext values
+  are enabled, restricted to targets at least 1 h old, with attribution.
+- Collection aims for every 3 h using an hourly cron and 150-minute gate. The local
+  timer change preserves that gate for trigger=timer; manual bypasses it.
+- ECMWF IFS/AIFS are collected but not ranked on the page; steadiness is exported
+  but not displayed. Height-adjusted temperature stays a separate comparison.
 
-## Reliability and verification
+## Latest verification
 
-- Encrypted state/history, fail-closed restore, history-first publication with origin
-  confirmation, and leased state updates are implemented and covered by tests.
-- Days require >=80% configured station-hour observation coverage, with retries
-  until day-end +72 h. Recent metadata verifies 94.9% for 2 Oct and 94.7% for 3 Oct;
-  neither day was late-finalized. This measures observations, not forecast coverage.
-- Last full check (5 Oct): 119 cloud + 79 local tests passed. Dependency warnings remain.
-- After the timer change (6 Oct), all 119 cloud tests pass, including gate boundary
-  and manual-bypass coverage. Live timer behavior awaits deployment.
-- Latest cloud collection checked: run 37231498979, manual, 4 Oct 22:17 Oslo time;
-  collection, persistence, Pages and final source check all passed. Published health
-  reports zero errors for Yr, WeatherNext, ECMWF and Frost, but only 9/16 expected
-  collections in its 48 h window. Last scheduled run checked started 4 Oct 20:38 Oslo.
-- Local collector finished successfully on 5 Oct at 00:14 Oslo; the last four
-  background collections were successful. Database size is about 5.75 GB (decimal).
-- Latest cloud CI passed the action upgrades (37236715635). A collecting/deploying
-  run using those upgrades, and a real scheduled gate skip, remain to be verified.
+- Local task: Ready, result 0, completed 6 Oct at 12:14 Oslo; next run 18:10.
+  All three sources report OK; recent forecast retrievals cover 50 stations.
+- Cloud run 37438015907 (manual, 6 Oct 10:43 Oslo) passed collection, persistence,
+  upgraded actions, Pages and final source check. All four sources report no errors.
+- Observation coverage for 4-5 Oct: 93.9% and 95.1%, neither late-finalized.
+- Browser: dashboard renders, rain filter works, no captured console errors.
+- Tests: 119 cloud tests passed earlier this session after the timer edit; 79 local
+  tests passed in this review. Existing dependency/resource warnings remain.
+- Database reads succeed; file is 6.21 GB, with 267 GB free on E:. Read-only SQLite
+  quick_check was interrupted at 45 seconds; full integrity remains unverified.
 
-## Findings and next actions
+## Open findings and next actions
 
-September's paired comparison spans 16 days: Yr leads raw temperature at 6 h;
-1-3 day temperature is too close to call. WeatherNext leads wind at 2 days and
-its rain median leads at 2 days. Height-adjusted WeatherNext leads temperature
-at 6 h-3 days, subject to the proxy-terrain/fixed-lapse-rate limitations.
-October has only three scored days, below the seven-day verdict threshold.
+- Cloud/local station networks overlap at 45/50. Local discovery refreshes weekly;
+  cloud config/stations.json is a fixed snapshot. Reconcile before comparing coverage.
+- Enningdalen (SN1120) has no observations after 30 Sep 23:00 UTC locally or in cloud;
+  Wisting (SN20925, cloud only) stops at 30 Sep 21:00 UTC. Aggregate Frost OK does not
+  reveal these station outages. Add station freshness/coverage warnings.
+- Remote main has two newer scored-history commits. Integrate them safely before
+  pushing local commits; preserve immutable history and never force-push.
+- After push approval, configure the timer, verify skips/collections and compare
+  cloud/local coverage on matched stations before retiring the PC task.
+- The 1-day headline has 19 paired days despite 31 total scored days; October has
+  five days, correctly below the seven-day monthly verdict threshold.
 
-Compare cloud/local forecast coverage before retiring the PC collector. After push
-approval, configure the external timer and verify gated skips and collection cadence.
-Continue replay/steadiness work, ECMWF display, and median rain consistency.
-Old plaintext commits/caches remain accessible; current encryption does not remove
-them. Keep a secure separate key backup. NEXT_STEPS.md holds open work.
+NEXT_STEPS.md holds open work. Earlier plaintext Git history remains a separate
+cleanup concern; keep secure backups of the database and encryption key.

@@ -1,27 +1,29 @@
 # Work status
 
-_The latest task's checkpoint only. When a new task finishes, move this entry to the top of
-CHANGELOG.md and replace it._
+_The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
 
-## External timer dispatch - 2026-10-06 (Codex)
+## Project health review - 2026-10-06 (Codex)
 
 Done:
-- Added the workflow_dispatch choice `trigger` (`manual` default, or `timer`).
-- Only dispatches with `trigger=manual` pass `--manual`; timer runs respect the
-  existing 150-minute gate. Hourly cron and collection concurrency are unchanged.
-- SETUP_CLOUD.md documents the timer POST, headers, JSON, expected 204 response
-  and repo-only fine-grained token with Actions: Read and write; placeholders only.
-- Recorded the decision and refreshed handoff docs, preserving the earlier pending
-  health-review edits and archiving the previous checkpoint in CHANGELOG.md.
-- All 119 cloud tests pass using the existing .venv, including gate boundary and
-  manual-bypass tests. Existing dependency/resource warnings remain.
-- Five gate expression cases and unchanged schedule/concurrency verified locally;
-  `git diff --check` passes.
+- Checked local task/logs, read-only database summaries, live cloud runs/state,
+  station configurations, scored-day coverage and the public dashboard.
+- Local collector completed at 12:14 Oslo; all sources OK, task Ready/result 0.
+- Cloud run 37438015907 confirms upgraded actions and Pages deployment work.
+  Live page: 31 days through 5 Oct, 174,911 rows; coverage 93.9-95.1% for 4-5 Oct.
+- Cloud cadence remains poor: 10/16 runs in 48 h, maximum recent gap 9 h 21 min.
+- Confirmed 45/50 cloud/local station overlap. Cloud observations for SN1120 and
+  SN20925 stop on 30 Sep; aggregate Frost status remains OK.
+- 79 local tests passed; 119 cloud tests passed earlier this session after timer edits.
+  Browser renders and rain filter works, with no captured console errors.
+- Database reads succeeded. SQLite quick_check hit its 45-second limit without a
+  completed result; full integrity is unverified.
+- Updated handoffs and archived the previous timer checkpoint.
 
 Remaining:
-- Await the user's OK to push, then configure the external timer and verify live
-  timer skips/collections and the default manual bypass (SETUP_CLOUD.md).
-- Existing deployment, coverage and feature follow-ups remain in NEXT_STEPS.md.
+- User's OK to push is still required. Integrate remote scored-history commits first.
+- Deploy/configure and verify the timer, reconcile station networks, investigate
+  stale observations and add station-level health warnings; then recompare coverage.
+- Longer database integrity check if needed; other open work is in NEXT_STEPS.md.
 
-Committed locally only; no push or live dispatch. No database, history
-day files, credentials, collector code or Windows scheduled-task changes.
+Only handoff documents changed and remain uncommitted. No database writes, history
+edits, configuration changes, task restarts, workflow dispatches, commits or pushes.

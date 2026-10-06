@@ -6,25 +6,32 @@ Updated 2026-10-06._
 ## Open items
 
 ### Needs the user
-1. **Windows task kept running (5 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
+1. **Windows task kept running (6 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
    rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
    ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
-   Re-run the comparison around 5 Oct for 2-4 Oct (first days with 3-hourly runs); stop the
-   task with `remove_background_task.bat` if the cloud then matches. Keep `data/weather.db`.
+   Recompare after the timer is live, using matched stations (networks currently overlap
+   at 45/50). Stop the task only after coverage matches and the user approves.
+   Keep `data/weather.db`.
 
 ### Pipeline
-2. **Verify the next collection uses the upgraded workflow actions and deploys Pages.**
-   CI passed (37236715635); the latest collecting run checked (37231498979) used the old actions.
+2. **Station freshness and network drift.** Cloud/local networks overlap at 45/50 stations.
+   Local weekly discovery changes the active database network; cloud uses a fixed snapshot.
+   Reconcile deliberately while preserving history. Investigate SN1120 (Enningdalen) and
+   SN20925 (Wisting): latest cloud observations are 30 Sep 23:00 and 21:00 UTC respectively;
+   SN1120 is also stale locally. Add per-station freshness/coverage warnings so overall
+   Frost OK cannot hide missing stations. Do not silently remove them from scoring history.
 3. GitHub ran schedules late or not at all: the 6-hourly one 3–5 h late, the 3-hourly one only
    8 times in 48 h (runs #33–#43, gaps 4.4–9.4 h). Since 4 Oct the cron fires hourly
    and a gate skips runs until the last successful collect is 150 min old (DECISIONS.md, "Hourly
    trigger"). After a few days, check the gaps between collecting runs (the page expects 16 per
    48 h) and how many hourly runs GitHub actually started. External timer dispatch support is
-   implemented locally (6 Oct); **wait for the user's OK before pushing**. Then configure the
+   implemented locally (6 Oct); **wait for the user's OK before pushing**. Integrate the two
+   newer remote scored-history commits first, preserving immutable day files. Then configure the
    timer using SETUP_CLOUD.md, verify HTTP 204 and check a recent-success `trigger=timer` run
    skips while one at least 150 min after success collects. Also verify the default manual
-   dispatch bypasses the gate. At the 5 Oct check, live health showed 9/16; no scheduled gate
-   skip was yet verified. Check a skip leaves state/Pages untouched and adds no run record.
+   dispatch bypasses the gate. At the 6 Oct check, live health showed 10/16 with gaps up to
+   9 h 21 min; no scheduled gate skip was yet verified. Check a skip leaves state/Pages untouched
+   and adds no run record. Upgraded actions and deployment were verified in run 37438015907.
 4. **Old plaintext history:** coordinate cleanup of earlier public Git commits/caches if
    publication protection requires it; no main-history rewrite has been performed.
 
@@ -46,6 +53,8 @@ Updated 2026-10-06._
    `second-run.json` (original availability metadata); the rest can be archived.
 10. Address dependency deprecation warnings before library/Python upgrades (NumPy timedeltas,
     pandas concatenation and boolean inversion in replay filtering).
+11. Correct stale publication wording in SETUP_CLOUD.md: it still says the workflow forces
+    forecast values off, although the repository variable enables past values.
 
 ## Standing reminders
 - Past WeatherNext values are live (`WX_PUBLISH_FORECAST_VALUES=1`, verified 5 Oct);
