@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-10-06. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-08. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -8,7 +8,15 @@ The local collector and cloud dashboard work, but cloud cadence and station fres
 need attention. Before timer activation, health reported 10/16 expected collections
 in 48 h, with gaps up to 9 h 21 min. Keep the PC collector running. cron-job.org job
 8590224 is now enabled at :07/:37 UTC. Its external test returned 204 and the resulting
-GitHub run correctly respected the 150-minute gate. Recurring cadence is not yet measured.
+GitHub run correctly respected the 150-minute gate. Since then (6 Oct 16:37 UTC) the
+cloud has collected every 2.5-3.0 h.
+
+**PC collector: not yet safe to retire (8 Oct check).** On 7 Oct, the only finished day
+since the timer, the cloud had 92-93% of the PC's scored station-hours on the 45 shared
+stations; all forecast gaps were runs GitHub skipped before the timer. On horizon slots
+the timer covered (6 h-1 day) it had 99.9%; the one miss was a late Frost observation.
+Longer horizons can't be judged until ~12 Oct (2 days) and ~18 Oct (10 days). Details in
+WORK_STATUS.md.
 
 ## Current capabilities
 
@@ -49,8 +57,8 @@ GitHub run correctly respected the 150-minute gate. Recurring cadence is not yet
   reveal these station outages. Add station freshness/coverage warnings.
 - Local commits were rebased over the two scored-history commits and pushed with
   user approval. History day files remain unchanged.
-- Verify recurring dispatches and a timer-triggered due collection, then compare
-  coverage before retiring the PC task. Renew the token before 5 Nov 2026.
+- Re-run the coverage comparison on ~12 Oct and ~18 Oct before retiring the PC task
+  (WORK_STATUS.md). Renew the token before 5 Nov 2026.
 - The 1-day headline has 19 paired days despite 31 total scored days; October has
   five days, correctly below the seven-day monthly verdict threshold.
 

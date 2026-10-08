@@ -1,7 +1,7 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-10-06._
+Updated 2026-10-08._
 
 ## Open items
 
@@ -9,8 +9,11 @@ Updated 2026-10-06._
 1. **Windows task kept running (6 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
    rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
    ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
-   Recompare after several days with the timer live, using matched stations (networks overlap
-   at 45/50). Stop the task only after coverage matches and the user approves.
+   8 Oct check (7 Oct, 45 shared stations): cloud 92-93% of the PC overall, 99.9% on horizon
+   slots the timer covered; all forecast gaps predate the timer (WORK_STATUS.md).
+   Re-run `work/coverage-compare/compare_cov.py` on ~12 Oct (9-11 Oct, horizons to 2 days) and
+   ~18 Oct (10 days). Stop the task only when timer-era coverage stays >=99% at every horizon
+   and the user approves.
    Keep `data/weather.db`.
 
 ### Pipeline
