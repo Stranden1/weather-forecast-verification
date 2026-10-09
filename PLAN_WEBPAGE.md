@@ -117,6 +117,13 @@ separate coordinated cleanup; a normal encryption commit cannot erase them.
 2. **Rain leads with WeatherNext's median** (solid line, headline value and verdict), the average
    dashed, in the tiles, horizon chart/table and "Catching rain".
 
+## Improvements — 2026-10-09
+
+1. **Horizon chart redesign.** The card leads with WeatherNext's error minus Yr's, with the 95%
+   range and verdict colours, and an "Error size" switch. Horizons with fewer than 7 days are
+   hidden from both charts; the naive guess ("same as yesterday") moved to the tiles and table.
+   See DECISIONS.md "Horizon chart: difference first".
+
 ## Existing local app
 
 Unchanged. `app.py`, the Windows task and `data/weather.db` keep working. Run

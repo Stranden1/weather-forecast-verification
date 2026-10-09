@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-10-08. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-09. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -16,7 +16,7 @@ since the timer, the cloud had 92-93% of the PC's scored station-hours on the 45
 stations; all forecast gaps were runs GitHub skipped before the timer. On horizon slots
 the timer covered (6 h-1 day) it had 99.9%; the one miss was a late Frost observation.
 Longer horizons can't be judged until ~12 Oct (2 days) and ~18 Oct (10 days). Details in
-WORK_STATUS.md.
+CHANGELOG.md (8 Oct entry).
 
 ## Current capabilities
 
@@ -28,6 +28,8 @@ WORK_STATUS.md.
   are enabled, restricted to targets at least 1 h old, with attribution.
 - Collection uses an external request every 30 min, the hourly GitHub fallback and
   a 150-minute gate. trigger=timer respects the gate; manual bypasses it.
+- The horizon card leads with a WeatherNext-minus-Yr difference chart (95% ranges, verdict colours,
+  horizons under 7 days hidden); an Error size view and the full table remain (9 Oct).
 - ECMWF IFS/AIFS are collected but not ranked on the page; steadiness is exported
   but not displayed. Height-adjusted temperature stays a separate comparison.
 
@@ -58,7 +60,7 @@ WORK_STATUS.md.
 - Local commits were rebased over the two scored-history commits and pushed with
   user approval. History day files remain unchanged.
 - Re-run the coverage comparison on ~12 Oct and ~18 Oct before retiring the PC task
-  (WORK_STATUS.md). Renew the token before 5 Nov 2026.
+  (CHANGELOG.md, 8 Oct). Renew the token before 5 Nov 2026.
 - The 1-day headline has 19 paired days despite 31 total scored days; October has
   five days, correctly below the seven-day monthly verdict threshold.
 

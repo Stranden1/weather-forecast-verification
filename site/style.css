@@ -105,6 +105,16 @@ h2 { font-size: 20px; margin: 0 0 4px; }
 select { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
   border-radius: 8px; padding: 5px 8px; min-height: 34px; }
 .chart { position: relative; height: 320px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--ink-2); margin: 0 0 8px; }
+.chart-legend:empty { display: none; }
+.chart-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend .shape { color: var(--ink-2); font-size: 15px; line-height: 1; }
+.chart-legend .shape.hollow { color: transparent; -webkit-text-stroke: 1.5px var(--ink-2); }
+.dot.neutral { background: var(--ink-3); }
+.mark { width: 11px; height: 11px; display: inline-block; flex: none; border: 2px solid var(--ink-2); background: var(--ink-2); }
+.mark.circle { border-radius: 50%; }
+.mark.hollow { background: transparent; }
+.chart-note { font-size: 13px; margin: 8px 0 0; }
 
 table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
 th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }

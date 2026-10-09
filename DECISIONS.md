@@ -514,3 +514,15 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
   health publication, rather than using `--strict` to skip those steps.
 - Validation uses temporary Git remotes and disposable state. This change is committed
   locally for review; deployment/push remains pending the user's instruction.
+
+## Horizon chart: difference first — 2026-10-09 (Claude)
+
+- The horizon card's default chart is WeatherNext error − Yr error per horizon, with the existing
+  95% day-block bootstrap range and verdict colours. No new statistics: it plots `diff`/`ci_*`/
+  `verdict` (and `diff_h`/`ci_h_*` for height-adjusted temperature, `diff_50`/`ci_50_*` for rain's
+  median) already in `leaderboard.json`. Average error sizes stay one click away and in the table.
+- Charts show only horizons with at least `min_days_for_verdict` days, and name the hidden ones;
+  the table keeps every horizon. This replaces drawing a 1-day point next to 3-week ones.
+- The naive baseline is not drawn in the charts; it stays as skill in the tiles and table and is
+  called "same as yesterday" (same definition as 2026-09-24). Temperature/wind charts drop the
+  WeatherNext median line (within ~0.01 of the average); it remains in the tiles and table.

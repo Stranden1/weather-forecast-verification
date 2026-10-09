@@ -13,15 +13,15 @@
     yr: ["Yr is ahead", "yr"], weathernext: ["WeatherNext is ahead", "wn"],
     too_close: ["Too close to call", ""], not_enough_data: ["Not enough days yet", ""],
   };
-  const S = { v: "t", period: "all", trendH: 24, mapH: 24, patH: 24, station: null };
+  const S = { v: "t", period: "all", hView: "diff", trendH: 24, mapH: 24, patH: 24, station: null };
   let D = {}, charts = {}, map, markers = [];
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmt = (x, d = 2) => x == null ? "–" : Number(x).toFixed(d);
-  // Skill 0.36 -> "36% better", -0.12 -> "12% worse" (than the naive guess).
+  // Skill 0.36 -> "36% better", -0.12 -> "12% worse" (than the naive "same as yesterday" guess).
   const skillPct = x => { if (x == null) return "–"; const p = Math.round(Math.abs(x) * 100);
     return p === 0 ? "same" : `${p}% ${x > 0 ? "better" : "worse"}`; };
-  const skillSentence = x => skillPct(x) === "same" ? "About the same as a naive guess" : `${skillPct(x)} than a naive guess`;
+  const skillSentence = x => skillPct(x) === "same" ? "About as good as “same as yesterday”" : `${skillPct(x)} than “same as yesterday”`;
   const unit = () => D.meta.variables[S.v].unit;
   // Rain leads with WeatherNext's median (its average spreads drizzle everywhere); the average is the dashed line.
   // Temperature and wind lead with the average. `wnPick` returns the headline and secondary numbers of a stats block.
@@ -93,7 +93,7 @@
     const ci = w.lo != null ? `95% range of the difference: ${fmt(w.lo)} to ${fmt(w.hi)} ${unit()}` :
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
     const skill = (p, x) => x == null ? "" :
-      `<div class="d">${skillSentence(x)} (naive error ${fmt(s.base.mae)} ${unit()})</div>`;
+      `<div class="d">${skillSentence(x)} (its error ${fmt(s.base.mae)} ${unit()})</div>`;
     // Temperature only: WeatherNext moved to each station's height (our adjustment, secondary).
     const adj = s.mae_wnh == null ? "" : `<div class="d">Height-adjusted (our estimate): ${fmt(s.mae_wnh)} ${unit()}</div>`;
     const [vh, clsh] = VERDICT[s.verdict_h] || VERDICT.not_enough_data;
@@ -114,37 +114,133 @@
         <div class="d">${ci}</div>${adjVerdict}</div>`;
   }
 
+  // Error by horizon. The default view plots WeatherNext's error minus Yr's with its 95% range,
+  // because on the error-size scale the gap is a few hundredths of a unit and can't be seen.
+  // Both charts leave out horizons with fewer than min_days_for_verdict days; the table keeps them.
+  // Each series returns [difference, range low, range high, verdict] for one stats block.
+  const horizonSeries = () => isRain()
+    ? [{ label: "WeatherNext's median", get: s => [s.diff_50, s.ci_50_lo, s.ci_50_hi, s.verdict_50], shape: "circle" },
+       { label: "WeatherNext's average", get: s => [s.diff, s.ci_lo, s.ci_hi, s.verdict], shape: "rect" }]
+    : [{ label: "As published", get: s => [s.diff, s.ci_lo, s.ci_hi, s.verdict], shape: "circle" },
+       ...(S.v === "t" ? [{ label: "Height-adjusted (our estimate)", get: s => [s.diff_h, s.ci_h_lo, s.ci_h_hi, s.verdict_h], shape: "triangle" }] : [])];
+  const verdictColor = v => css(v === "yr" ? "--yr" : v === "weathernext" ? "--wn" : "--ink-3");
+  // Legend marks for the series shapes; the second series is drawn hollow, as in the chart.
+  const shapeMark = (shape, hollow) => shape === "triangle"
+    ? `<span class="shape${hollow ? " hollow" : ""}">▲</span>`
+    : `<span class="mark ${shape}${hollow ? " hollow" : ""}"></span>`;
+
   function renderHorizon() {
     const b = D.leaderboard?.[S.v] || {};
-    const H = hs().filter(h => b[h]?.[S.period]?.n);
-    const g = k => H.map(h => b[h][S.period][k]);
-    const base = H.map(h => b[h][S.period].base?.mae ?? null);
-    const o = baseOptions(`Average error (${unit()})`);
+    const all = hs().filter(h => b[h]?.[S.period]?.n);
+    const H = all.filter(h => b[h][S.period].days >= D.meta.min_days_for_verdict);
+    const short = all.filter(h => !H.includes(h));
+    const wnErr = isRain() ? "the average error of WeatherNext's median" : "WeatherNext's average error";
+    document.getElementById("horizon-sub").textContent = S.hView === "diff"
+      ? `How much larger ${wnErr} was than Yr's, for forecasts made this far ahead. ` +
+        "Above the line Yr was closer; below it WeatherNext was. The bar is the 95% range: if it crosses the line, it's too close to call."
+      : "Average error (MAE) for forecasts made this far before the weather happened. Lower is better.";
+    const days = h => b[h][S.period].days;
+    document.getElementById("horizon-note").textContent = (short.length
+      ? `Not shown yet: ${short.map(h => `${H_LABEL[h]} (${days(h)} day${days(h) === 1 ? "" : "s"} of data)`).join(", ")}; ` +
+        `a horizon appears once it has ${D.meta.min_days_for_verdict} days. `
+      : "") + "Both forecasts come from the same moment, so each gets the same head start.";
+    if (S.hView === "diff") renderHorizonDiff(b, H); else renderHorizonError(b, H);
+    renderHorizonTable(b, all);
+  }
+
+  function renderHorizonDiff(b, H) {
+    const series = horizonSeries().filter(x => H.some(h => x.get(b[h][S.period])[1] != null));
+    const k = series.length, step = 0.24;
+    const datasets = series.map((x, j) => {
+      const data = H.map((h, i) => { const [y, lo, hi, v] = x.get(b[h][S.period]);
+        return y == null ? null : { x: i + (j - (k - 1) / 2) * step, y, lo, hi, v, h }; }).filter(Boolean);
+      const colors = data.map(p => verdictColor(p.v));
+      return { label: x.label, data, showLine: false, pointStyle: x.shape, pointRadius: 6, pointHoverRadius: 8,
+        borderWidth: 2, pointBorderColor: colors, pointBackgroundColor: j === 0 ? colors : css("--surface") };
+    });
+    document.getElementById("horizon-legend").innerHTML =
+      series.map((x, j) => `<span>${shapeMark(x.shape, j > 0)}${esc(x.label)}</span>`).join("") +
+      `<span><span class="dot yr"></span>Yr clearly closer</span><span><span class="dot wn"></span>WeatherNext clearly closer</span>` +
+      `<span><span class="dot neutral"></span>Too close to call</span>`;
+    const vals = datasets.flatMap(d => d.data.flatMap(p => [p.y, p.lo, p.hi])).filter(x => x != null).map(Math.abs);
+    // Symmetric around zero, on a round step, so the two halves read alike.
+    const raw = Math.max(0.05, ...vals) * 1.1;
+    const tick = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5].find(s => s >= raw / 3) || 10;
+    const m = Math.ceil(raw / tick) * tick;
+    const o = baseOptions(`WeatherNext error − Yr error (${unit()})`);
+    o.plugins.legend.display = false;
+    o.interaction = { mode: "nearest", axis: "x", intersect: false };
+    o.plugins.tooltip.callbacks = {
+      title: items => `${H_LABEL[items[0].raw.h]} ahead`,
+      label: c => { const p = c.raw, who = p.y < 0 ? "WeatherNext" : "Yr";
+        return [` ${c.dataset.label}: ${who} closer by ${fmt(Math.abs(p.y))} ${unit()}`,
+                ` 95% range ${fmt(p.lo)} to ${fmt(p.hi)} · ${(VERDICT[p.v] || VERDICT.not_enough_data)[0]}`]; },
+    };
+    o.scales.x = { type: "linear", min: -0.5, max: H.length - 0.5, grid: { display: false }, border: { color: css("--line") },
+      afterBuildTicks: sc => { sc.ticks = H.map((_, i) => ({ value: i })); },
+      ticks: { color: css("--ink-2"), autoSkip: false, callback: v => H_LABEL[H[v]] ?? "" } };
+    Object.assign(o.scales.y, { beginAtZero: false, min: -m, max: m });
+    o.scales.y.ticks = { ...o.scales.y.ticks, stepSize: tick, callback: v => fmt(v, tick < 0.1 ? 2 : 1) };
+    o.scales.y.grid = { color: c => c.tick.value === 0 ? css("--ink-3") : css("--grid"), lineWidth: c => c.tick.value === 0 ? 1.5 : 1 };
+    chart("horizon-chart", { type: "scatter", options: o, data: { datasets }, plugins: [diffBackdrop, whiskers] });
+  }
+
+  // Faint tints and labels for the two halves of the difference chart, drawn under the data.
+  const diffBackdrop = { id: "diffBackdrop", beforeDatasetsDraw(c) {
+    const { ctx, chartArea: a, scales: { y } } = c, z = y.getPixelForValue(0);
+    ctx.save();
+    ctx.fillStyle = css("--yr") + "12"; ctx.fillRect(a.left, a.top, a.width, z - a.top);
+    ctx.fillStyle = css("--wn") + "12"; ctx.fillRect(a.left, z, a.width, a.bottom - z);
+    ctx.font = "13px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+    const tag = (text, color, yy, base) => { ctx.textBaseline = base;
+      ctx.fillStyle = color; ctx.fillText("●", a.left + 8, yy);
+      ctx.fillStyle = css("--ink-2"); ctx.fillText(text, a.left + 24, yy); };
+    tag("Yr closer", css("--yr"), a.top + 8, "top");
+    tag("WeatherNext closer", css("--wn"), a.bottom - 8, "bottom");
+    ctx.restore();
+  } };
+  // 95% range bars for points that carry lo/hi.
+  const whiskers = { id: "whiskers", afterDatasetsDraw(c) {
+    const { ctx, scales: { x, y } } = c;
+    c.data.datasets.forEach((d, j) => { if (!c.isDatasetVisible(j)) return;
+      d.data.forEach(p => { if (p.lo == null || p.hi == null) return;
+        const px = x.getPixelForValue(p.x), lo = y.getPixelForValue(p.lo), hi = y.getPixelForValue(p.hi);
+        ctx.save(); ctx.strokeStyle = verdictColor(p.v); ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(px, lo); ctx.lineTo(px, hi);
+        ctx.moveTo(px - 5, lo); ctx.lineTo(px + 5, lo); ctx.moveTo(px - 5, hi); ctx.lineTo(px + 5, hi);
+        ctx.stroke(); ctx.restore(); }); });
+  } };
+
+  function renderHorizonError(b, H) {
     const rain = isRain();
+    const g = k => H.map(h => b[h][S.period][k] ?? null);
     const ds = [
       line("Yr", g("mae_yr"), css("--yr")),
-      line(`WeatherNext (${rain ? "median" : "average"})`, g(rain ? "mae_wn50" : "mae_wn"), css("--wn")),
-      line(`WeatherNext (${rain ? "average" : "median"})`, g(rain ? "mae_wn" : "mae_wn50"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", pointRadius: 4, backgroundColor: css("--surface") }),
+      line(rain ? "WeatherNext (median)" : "WeatherNext", g(rain ? "mae_wn50" : "mae_wn"), css("--wn")),
     ];
-    if (base.some(x => x != null))
-      ds.push(line("Naive guess (same as before)", base, css("--ink-3"), { borderDash: [2, 3], pointStyle: "rect", pointRadius: 3 }));
-    const adj = g("mae_wnh"), hasAdj = adj.some(x => x != null);
-    if (hasAdj)
-      ds.push(line("WeatherNext, height-adjusted (our estimate)", adj, css("--wn"), { borderDash: [1, 3], borderWidth: 2, pointStyle: "triangle", pointRadius: 4, backgroundColor: css("--surface") }));
-    chart("horizon-chart", { type: "line", options: o, data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
+    if (rain) ds.push(line("WeatherNext (average)", g("mae_wn"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", backgroundColor: css("--surface") }));
+    else if (g("mae_wnh").some(x => x != null))
+      ds.push(line("WeatherNext, height-adjusted (our estimate)", g("mae_wnh"), css("--wn"), { borderDash: [2, 3], pointStyle: "triangle", backgroundColor: css("--surface") }));
+    document.getElementById("horizon-legend").innerHTML = "";
+    chart("horizon-chart", { type: "line", options: baseOptions(`Average error (${unit()})`), data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
+  }
+
+  function renderHorizonTable(b, H) {
+    const rain = isRain(), hasAdj = H.some(h => b[h][S.period].mae_wnh != null);
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
       <tr><th>Ahead</th><th>Yr</th><th>WeatherNext${rain ? " (median)" : ""}</th><th>${rain ? "Average" : "Median"}</th>${hasAdj ? "<th>Height-adj.</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
-        <th>Naive guess</th><th>Yr vs naive</th><th>WeatherNext vs naive</th></tr>
+        <th>Same as yesterday</th><th>Yr vs it</th><th>WeatherNext vs it</th></tr>
       ${H.map(h => { const s = b[h][S.period]; const w = wnPick(s); const [vt, cls] = VERDICT[w.verdict] || VERDICT.not_enough_data;
         return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(w.main)}</td><td>${fmt(w.alt)}</td>
         ${hasAdj ? `<td>${fmt(s.mae_wnh)}</td>` : ""}
         <td>${fmt(w.diff)}</td><td>${w.lo == null ? "–" : fmt(w.lo) + " to " + fmt(w.hi)}</td>
         <td><span class="badge ${cls}">${vt}</span></td>
         <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(w.skill)}</td></tr>`; }).join("")}
-      </table></div><p class="muted" style="font-size:13px">Difference = WeatherNext${rain ? " (median)" : ""} error − Yr error, in ${unit()}. Negative means WeatherNext was closer.
-      ${hasAdj ? `Height-adj. = WeatherNext moved to each station's height at 6.5 °C per km (our adjustment, not Google's); the difference, range and verdict use the published values.` : ""}
-      Naive guess = the value measured at the same time of day on the latest day already known when the forecast was made.
-      "36% better" means the forecast's average error was 36% smaller than the naive guess's, counting only forecasts that have a naive value.</p>`;
+      </table></div><p class="muted" style="font-size:13px">Average errors in ${unit()}. Difference = WeatherNext${rain ? " (median)" : ""} error − Yr error. Negative means WeatherNext was closer.
+      ${hasAdj ? `Height-adj. = WeatherNext moved to each station's height at 6.5 °C per km (our adjustment, not Google's); the difference, range and verdict in this table use the published values.` : ""}
+      "Same as yesterday" = the value measured at the same time of day on the latest day already known when the forecast was made
+      (yesterday up to 1 day ahead, 2 days back for 2 days ahead, and so on).
+      "60% better" means the forecast's average error was 60% smaller than that guess's, counting only forecasts that have one.</p>`;
   }
 
   function rolling(arr, k = 7) {
@@ -397,6 +493,8 @@
         () => S.v, v => (S.v = v));
     seg(document.getElementById("period-seg"), [["all", "All time"], ["last30", "Last 30 days"]],
         () => S.period, v => (S.period = v));
+    seg(document.getElementById("horizon-view"), [["diff", "Difference"], ["mae", "Error size"]],
+        () => S.hView, v => (S.hView = v));
     S.station = S.station || (m.stations.find(s => s.id === "SN18700") || m.stations[0])?.id;
     render();
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
