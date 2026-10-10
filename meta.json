@@ -1,0 +1,3803 @@
+{
+ "finalized_days": [
+  "2026-09-05",
+  "2026-09-06",
+  "2026-09-07",
+  "2026-09-08",
+  "2026-09-09",
+  "2026-09-10",
+  "2026-09-11",
+  "2026-09-12",
+  "2026-09-13",
+  "2026-09-14",
+  "2026-09-15",
+  "2026-09-16",
+  "2026-09-17",
+  "2026-09-18",
+  "2026-09-19",
+  "2026-09-20",
+  "2026-09-21",
+  "2026-09-22",
+  "2026-09-23",
+  "2026-09-24",
+  "2026-09-25",
+  "2026-09-26",
+  "2026-09-27",
+  "2026-09-28",
+  "2026-09-29",
+  "2026-09-30",
+  "2026-10-01",
+  "2026-10-02",
+  "2026-10-03",
+  "2026-10-04",
+  "2026-10-05",
+  "2026-10-06",
+  "2026-10-07",
+  "2026-10-08",
+  "2026-10-09"
+ ],
+ "first_fetch": "2026-09-23T20:30:02Z",
+ "runs": [
+  {
+   "fetched_at": "2026-09-23T20:30:02Z",
+   "yr_rows": 0,
+   "wn_rows": 0,
+   "obs_rows": 3529,
+   "errors": [
+    "Yr SN10380: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN1120: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN120: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN12590: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN13760: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN18700: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20925: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20949: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN20961: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN25630: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN2970: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN33430: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN34130: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN41825: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN44610: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN50540: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN53101: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN57770: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN60980: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)",
+    "Yr SN63420: 'latin-1' codec can't encode character '\\ufeff' in position 0: ordinal not in range(256)"
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:33:46Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: Caller does not have required permission to use project weatherapp-508323. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=weatherapp-508323 and then retry. Propagation of the new permission may take a few minutes."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:42:00Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: Caller does not have required permission to use project weatherapp-508323. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=weatherapp-508323 and then retry. Propagation of the new permission may take a few minutes."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-23T20:49:08Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3530,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ]
+  },
+  {
+   "fetched_at": "2026-09-24T01:09:57Z",
+   "yr_rows": 1400,
+   "wn_rows": 0,
+   "obs_rows": 3521,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p05deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p05deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T04:51:30Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3521,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T11:46:31Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3515,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3515,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T17:12:04Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3514,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3514,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-24T21:31:40Z",
+   "yr_rows": 1350,
+   "wn_rows": 0,
+   "obs_rows": 3517,
+   "errors": [
+    "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access)."
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 0,
+     "errors": 1,
+     "error": "WeatherNext failed: ImageCollection.load: ImageCollection asset 'projects/gcp-public-data-weathernext/assets/weathernext_3_0_0_0p1deg' not found (does not exist or caller does not have access).",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3517,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T04:58:12Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3519,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3519,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T11:51:51Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3521,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T17:12:02Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3521,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-25T21:35:26Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3524,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3524,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T04:58:33Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3523,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3523,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T11:25:32Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3522,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3522,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T15:25:52Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3518,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3518,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T16:24:11Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3517,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3517,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-26T21:10:47Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "obs_rows": 3515,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3515,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-27T05:19:12Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 3521,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3521,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-27T12:02:53Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 3494,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3494,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-27T16:58:20Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 3515,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3515,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-27T21:21:22Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4700,
+   "obs_rows": 3510,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4700,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3510,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-28T05:24:34Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 3516,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3516,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-28T13:55:47Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 3526,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 3526,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-28T23:16:55Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5887,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5887,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-29T05:44:37Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5004,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5004,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-29T12:53:37Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 0,
+   "obs_rows": 5286,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+    "ECMWF (Open-Meteo) stations 26-50: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5286,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-29T22:15:56Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4600,
+   "obs_rows": 5837,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4600,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5837,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-30T05:33:11Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5020,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5020,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-30T12:35:31Z",
+   "yr_rows": 1361,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5369,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1361,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5369,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-09-30T22:16:48Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4600,
+   "obs_rows": 5846,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4600,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5846,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-01T05:54:43Z",
+   "yr_rows": 1328,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4921,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1328,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4921,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-01T13:15:29Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5278,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5278,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-01T22:41:41Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4600,
+   "obs_rows": 5726,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4600,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5726,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-02T05:37:20Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4909,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4909,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-02T12:35:11Z",
+   "yr_rows": 1359,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5243,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1359,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5243,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-02T19:57:15Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5574,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5574,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-03T00:30:22Z",
+   "yr_rows": 1351,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4638,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1351,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4638,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-03T09:09:37Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5043,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5043,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-03T14:19:16Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5304,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5304,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-03T18:41:33Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5494,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5494,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-03T23:46:44Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5729,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5729,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-04T05:52:30Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4841,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4841,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-04T12:21:58Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 0,
+   "obs_rows": 5173,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+    "ECMWF (Open-Meteo) stations 26-50: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5173,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-04T18:38:43Z",
+   "yr_rows": 1386,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5452,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1386,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5452,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-04T20:17:26Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5545,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5545,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-04T23:15:17Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5669,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5669,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-05T02:03:41Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4639,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4639,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-05T09:11:52Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4986,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4986,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-05T18:32:58Z",
+   "yr_rows": 1353,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5441,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1353,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5441,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T00:51:20Z",
+   "yr_rows": 1398,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4586,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1398,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4586,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T07:37:45Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4924,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4924,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T08:43:53Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4972,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4972,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T15:16:03Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5283,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5283,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T18:07:44Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5405,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5405,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T20:37:45Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5536,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5536,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-06T23:37:44Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5676,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5676,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T02:37:47Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4676,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4676,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T05:37:48Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4816,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4816,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T08:37:46Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 0,
+   "obs_rows": 4958,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: Expecting ',' delimiter: line 1 column 12309 (char 12308)",
+    "ECMWF (Open-Meteo) stations 26-50: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: Expecting ',' delimiter: line 1 column 12309 (char 12308)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4958,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T11:07:50Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5078,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5078,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T13:37:54Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5196,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5196,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T16:37:46Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5339,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5339,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T19:07:49Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5456,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5456,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-07T22:07:40Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4600,
+   "obs_rows": 5599,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4600,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5599,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T00:37:42Z",
+   "yr_rows": 1389,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4581,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1389,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4581,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T03:07:42Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4695,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4695,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T06:07:48Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4842,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4842,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T08:38:03Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4968,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4968,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T11:37:37Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5112,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5112,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T14:07:45Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5224,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5224,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T17:07:38Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5353,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5353,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T19:37:40Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5461,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5461,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-08T22:37:41Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4600,
+   "obs_rows": 5605,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4600,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5605,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T01:37:35Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4614,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4614,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T04:07:39Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4732,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4732,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T07:07:41Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4887,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4887,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T10:07:38Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5030,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5030,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T12:37:38Z",
+   "yr_rows": 1386,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5158,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1386,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5158,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T15:07:45Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5270,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5270,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T18:07:40Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5413,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5413,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T21:07:39Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4700,
+   "obs_rows": 5550,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4700,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5550,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-09T23:37:39Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5681,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5681,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T02:07:42Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4649,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4649,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T05:07:46Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4788,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4788,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T08:07:40Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4933,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4933,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T10:37:42Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5055,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5055,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T13:37:42Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5192,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5192,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-10T16:37:45Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5333,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5333,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  }
+ ],
+ "days": {
+  "2026-09-05": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "08d51685418a62763640ee44010792c3160d2dcbbe0be709b79f8322e5611b2c",
+   "status": "finalized"
+  },
+  "2026-09-06": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2f230a050f67c299931b94f556ab5cacb132408b9b3714fc461b05247de9880b",
+   "status": "finalized"
+  },
+  "2026-09-07": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "7e6a7d0d07b1f4a47a110190617ca2ec931e0c27e9f255547be15234e80c6511",
+   "status": "finalized"
+  },
+  "2026-09-08": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "b476cc5a631076391be6fb80817bb17544430628ded8658451c7bde775c799f3",
+   "status": "finalized"
+  },
+  "2026-09-09": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2469c1527b324be1c68c0e0cbbf0624b222fa87b6a9b6d38b6d6906b6d68a5c7",
+   "status": "finalized"
+  },
+  "2026-09-10": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "289112359c9b7dd0c094f53a686e3808c9d03d0a4c5135b6bc336da8ef3a61c5",
+   "status": "finalized"
+  },
+  "2026-09-11": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "28a99fa405a9e3ff9ab57aac8551b054ca79c6cbdb566233fe76e3d91f495ffd",
+   "status": "finalized"
+  },
+  "2026-09-12": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "06c096859a680e98e953f50cb064e4d560854178a26fd92799aa0e7a7efaa0c2",
+   "status": "finalized"
+  },
+  "2026-09-13": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "29ad86c9c1d2b60a3e999359e20972c261f364dca9268f6bf982188e5838c410",
+   "status": "finalized"
+  },
+  "2026-09-14": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "aa5fff075e2a1ff09d0ba98bf273eb69cce0d17be60463e21d3c065620671ddc",
+   "status": "finalized"
+  },
+  "2026-09-15": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "09a2a2acc48932fca5ce9cb84302e75222936605e41830a3a186b4f9ec48f621",
+   "status": "finalized"
+  },
+  "2026-09-16": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "63fae377dd61086ea78d3d37f4526a175fa0aa478c1b5e84cec5d9721a046674",
+   "status": "finalized"
+  },
+  "2026-09-17": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "d8c17d0661e4904a68259f08566dbd41c7dd581acaca7a182ff9cdded45b59f7",
+   "status": "finalized"
+  },
+  "2026-09-18": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "1181b424debe2ed35ac4370cbfea5660269874a229b432a7b294d2dc2acb5795",
+   "status": "finalized"
+  },
+  "2026-09-19": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "05967231bf46e638b3e9811a76f9caab5eae67e873a2dc09fe3413fa5a2f07bc",
+   "status": "finalized"
+  },
+  "2026-09-20": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "3724fb8f504fe88e57c339dcaac26828a78b5dad7b2a177546e6c8c204b66b04",
+   "status": "finalized"
+  },
+  "2026-09-21": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "6143ae515dd99191385b9b961d0bf62724e1e78e61fb387695992df1a7649939",
+   "status": "finalized"
+  },
+  "2026-09-22": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "45d156d4115eed085657ed77e5a3122442b84d36b5d7862f13b426942e2acd66",
+   "status": "finalized"
+  },
+  "2026-09-23": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "e184f379dcd1cad6cc36ec7f9a6cec92dbf5e122699114074e281823745862e0",
+   "status": "finalized"
+  },
+  "2026-09-24": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2785054a8447fb536d603b2fd695b20b10927527d50f148f4a2fd0db2c134a6a",
+   "status": "finalized"
+  },
+  "2026-09-25": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "dafccd4726229ea49165455db3127caa360e5287f565abac4d3216c2bfb3d185",
+   "status": "finalized"
+  },
+  "2026-09-26": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "43a1bfe25efe7c7d71b92aeef52b4aa93ac7eafed8632c011f222b26b424521c",
+   "status": "finalized"
+  },
+  "2026-09-27": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "614b64b0ffda4ef590fa477f68730324eec1a618aeb613860a614eca7e0906fa",
+   "status": "finalized"
+  },
+  "2026-09-28": {
+   "coverage": 0.9958333333333333,
+   "observed_station_hours": 1195,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-09-29T12:56:52.150452+00:00",
+   "sha256": "94aa9292cada90047f23bf02e7ba560030f0b0f10a241de1d7730f4c518d3702",
+   "status": "finalized"
+  },
+  "2026-09-29": {
+   "coverage": 0.9941666666666666,
+   "observed_station_hours": 1193,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-09-30T12:36:48.365251+00:00",
+   "sha256": "b2dc8d7744427507e5e79782bb1e914fd8d379c188e8dd02e1d9435c5bbd9fac",
+   "status": "finalized"
+  },
+  "2026-09-30": {
+   "coverage": 0.9775,
+   "observed_station_hours": 1173,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-01T13:16:43.883870+00:00",
+   "sha256": "52cc7e6224df1808d27f9c036f4b0240875da4851abcde485663714c99c29b51",
+   "status": "finalized"
+  },
+  "2026-10-01": {
+   "coverage": 0.9466666666666667,
+   "observed_station_hours": 1136,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-02T12:36:33.041510+00:00",
+   "sha256": "906b146c2fea22a3f7dd772faeb1bde747bb84a685a6ef068de71b72341a941d",
+   "status": "finalized"
+  },
+  "2026-10-02": {
+   "coverage": 0.9491666666666667,
+   "observed_station_hours": 1139,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-03T09:11:01.480267+00:00",
+   "sha256": "fe51c9e9e48fea7409b0196671299e5fa0a1b58080def26a5d82dfc9365abc94",
+   "status": "finalized"
+  },
+  "2026-10-03": {
+   "coverage": 0.9466666666666667,
+   "observed_station_hours": 1136,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-04T12:24:57.062866+00:00",
+   "sha256": "74908728798c56f67ad77848f9cd7949c13058086265ac60b51b07c8cd2f4708",
+   "status": "finalized"
+  },
+  "2026-10-04": {
+   "coverage": 0.9391666666666667,
+   "observed_station_hours": 1127,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-05T09:13:16.310643+00:00",
+   "sha256": "dda7e98793391e595bbddbdaf5ea24ae13457734659ca7a2be13b4045f54efaf",
+   "status": "finalized"
+  },
+  "2026-10-05": {
+   "coverage": 0.9508333333333333,
+   "observed_station_hours": 1141,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-06T07:39:04.729126+00:00",
+   "sha256": "e218d7a8fefc94b4529e0dc9636258cc3316677f0011e57a44660d2e8dd850b1",
+   "status": "finalized"
+  },
+  "2026-10-06": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-07T08:40:29.587491+00:00",
+   "sha256": "7ebb58d78790eb59d2abf341bc6e70aed725e8560977bc2d66800564935aae58",
+   "status": "finalized"
+  },
+  "2026-10-07": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-08T06:08:59.330426+00:00",
+   "sha256": "dd2769ab618490f6fe93fd6ad743e2745c064ef5c8abf6fa405583a6a4cce5d8",
+   "status": "finalized"
+  },
+  "2026-10-08": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-09T07:08:57.407043+00:00",
+   "sha256": "2e5eb1bda3a736006571919d7dd61ad63ee511397e8ebcab63ae0e6aa29aa497",
+   "status": "finalized"
+  },
+  "2026-10-09": {
+   "coverage": 0.9525,
+   "observed_station_hours": 1143,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-10T08:09:11.199342+00:00",
+   "sha256": "55266d512eb6aa966c068aec2adf92702f30b6c413da7d4278a534c6ad8daffb",
+   "status": "finalized"
+  }
+ }
+}
