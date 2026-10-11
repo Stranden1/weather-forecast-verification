@@ -170,6 +170,24 @@ class HeightTest(unittest.TestCase):
         self.assertEqual({x["id"] for x in meta["stations"]}, {"LAND", "SEA", "NOTE"})  # none dropped
         self.assertEqual({x["id"] for x in meta["stations"] if "flag" in x}, {"LAND", "NOTE"})
 
+    def test_meta_has_last_measurement_per_station(self):
+        import json
+        from cloud import summarize
+        from cloud.tests.test_pipeline import synthetic_scored
+        stations = [{"station_id": s, "name": s, "latitude": 60, "longitude": 10} for s in ("A", "B", "C")]
+        scored = synthetic_scored(days=4, stations=("A", "B"))
+        last = scored.target.max()
+        # B stops reporting after its first day; C never reports.
+        b_late = (scored.station == "B") & (scored.target.str[:10] > scored.target.min()[:10])
+        scored.loc[b_late, ["obs_t", "obs_w", "obs_p"]] = None
+        with tempfile.TemporaryDirectory() as tmp:
+            summarize.build(scored, Path(tmp), stations, heights={})
+            meta = json.loads((Path(tmp) / "meta.json").read_text(encoding="utf-8"))
+        got = {x["id"]: x["last_obs"] for x in meta["stations"]}
+        self.assertEqual(got["A"], last)
+        self.assertEqual(got["B"][:10], scored.target.min()[:10])
+        self.assertIsNone(got["C"])
+
     def test_meta_carries_required_weathernext_notices(self):
         import json
         from cloud import summarize

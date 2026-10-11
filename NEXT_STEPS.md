@@ -6,12 +6,11 @@ Updated 2026-10-11._
 ## Open items
 
 ### Pipeline
-1. **Station freshness and network drift.** Cloud/local networks overlap at 45/50 stations.
-   Local weekly discovery changes the active database network; cloud uses a fixed snapshot.
-   Reconcile deliberately while preserving history. Investigate SN1120 (Enningdalen) and
-   SN20925 (Wisting): latest cloud observations are 30 Sep 23:00 and 21:00 UTC respectively;
-   SN1120 is also stale locally. Add per-station freshness/coverage warnings so overall
-   Frost OK cannot hide missing stations. Do not silently remove them from scoring history.
+1. **Silent stations.** The page now warns about stations without measurements for 2 days
+   (11 Oct). SN20925 (Wisting) has none since 30 Sep 21:00 UTC: check Frost for it, and decide
+   whether to replace it in the fixed cloud network. SN1120 (Enningdalen) recovered by 10 Oct.
+   Do not silently remove stations from scoring history. (The local network is retired, so
+   cloud/local drift no longer applies.)
 2. **Measure the activated timer.** Job 8590224 is enabled with :07/:37 UTC POST
    requests and failure/recovery/disable notifications. External test returned 204;
    run 37495000121 succeeded and correctly skipped at 65 min. Verify recurring HTTP
@@ -28,13 +27,6 @@ Updated 2026-10-11._
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
 4. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (46.8 mm at Bergen) is
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
-- **Show the differences (agreed plan, 11 Oct; AgnosticBrain `plans/weatherapp-dashboard.md`).**
-  Steps 1 ("Both, averaged" tile) and 2 ("Which way do they miss?" card) are done and pushed 11 Oct;
-  step 3 ("Biggest differences" in the map panel) is done and pushed 11 Oct (8cf486c)
-  (WORK_STATUS.md, CHANGELOG.md). Remaining, with the agreed choices:
-  - Step 4 station freshness: `last_obs` per station in meta.json; warn in the health line and
-    grey-ring the map marker after 2 days without measurements (covers item 2's warning part).
-  - ECMWF on the page stays deferred (item above).
 5. **Rain median on the remaining rain views:** the map, "Over time" chart and "Patterns" table still
    use WeatherNext's average; the headline views now lead with the median (done 28 Sep).
 6. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether

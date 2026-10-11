@@ -345,6 +345,11 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         (out_dir / "recent" / f"{sid}.json").write_text(json.dumps(series, separators=(",", ":")),
                                                          encoding="utf-8")
 
+    # Latest hour with any measurement per station, so the page can flag stations that stopped reporting.
+    obs_cols = [c for c in ("obs_t", "obs_w", "obs_p") if c in scored]
+    measured = scored.dropna(subset=obs_cols, how="all") if obs_cols else scored.iloc[0:0]
+    last_obs = measured.groupby("station").target.max().astype(str).to_dict() if len(measured) else {}
+
     meta = {
         "generated_at": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
         "first_day": days[0] if days else None, "last_day": days[-1] if days else None,
@@ -356,7 +361,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "wn_value_attribution": WN_VALUE_ATTRIBUTION,  # shown next to every chart with WeatherNext values
         "stations": [{"id": s["station_id"], "name": s.get("name") or s.get("station_name"),
                       "lat": s["latitude"], "lon": s["longitude"], "elev": s.get("elevation_m"),
-                      "county": s.get("county"),
+                      "county": s.get("county"), "last_obs": last_obs.get(s["station_id"]),
                       **({"flag": station_flags[s["station_id"]]} if s["station_id"] in station_flags else {})}
                      for s in stations],
     }

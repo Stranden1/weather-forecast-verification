@@ -8,6 +8,7 @@
     no_access: "waiting for access", paused: "paused",
   };
   const STALE_H = 8; // runs are every 3 h; allow 5 h for GitHub's schedule delays (seen 3-5 h)
+  const NO_OBS_H = 48; // a station is "without measurements" after 2 days before the last scored day ends
   const H_LABEL = { 6: "6 h", 12: "12 h", 24: "1 day", 48: "2 days", 72: "3 days", 120: "5 days", 168: "7 days", 240: "10 days" };
   const VERDICT = {
     yr: ["Yr is ahead", "yr"], weathernext: ["WeatherNext is ahead", "wn"],
@@ -35,6 +36,15 @@
     : { main: s.mae_wn, alt: s.mae_wn50, bias: s.bias_wn, diff: s.diff, lo: s.ci_lo, hi: s.ci_hi, verdict: s.verdict,
         skill: s.base?.skill_wn, altVerdict: null, altWord: "median" };
   const hs = () => (S.v === "p" ? D.meta.precip_horizons : D.meta.horizons);
+  const dayMonth = iso => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Europe/Oslo" });
+  // Stations whose latest measurement is more than NO_OBS_H before the end of the last scored day.
+  // Stations that never reported (last_obs null) are left out: the map already shows them as "No data yet".
+  function silentStations() {
+    const m = D.meta; if (!m?.last_day) return new Map();
+    const end = Date.parse(m.last_day + "T24:00:00Z");
+    return new Map(m.stations.filter(s => s.last_obs && end - Date.parse(s.last_obs) > NO_OBS_H * 36e5)
+      .map(s => [s.id, s.last_obs]));
+  }
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
@@ -430,8 +440,9 @@
     // Colour strength relative to the largest station difference (min 0.1 unit).
     const scale = Math.max(0.1, ...Object.values(st).filter(r => r.yr != null && r.wn != null)
       .map(r => Math.abs(r.wn - r.yr)));
+    const silent = silentStations();
     for (const s of D.meta.stations) {
-      const r = st[s.id];
+      const r = st[s.id], quiet = silent.get(s.id);
       let color = neutral, tip = `${esc(s.name)}<br>No data yet`;
       if (r && r.yr != null && r.wn != null) {
         const d = r.wn - r.yr, t = Math.min(1, Math.abs(d) / scale);
@@ -439,6 +450,11 @@
         tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · WeatherNext ${fmt(r.wn)} ${unit()}<br>${r.n} forecasts` +
           (s.flag && S.v === "t" ? "<br>Height note: see station details" : "");
       }
+      if (quiet) tip += `<br>No measurements since ${dayMonth(quiet)}`;
+      // A grey ring around stations without recent measurements. The map tiles are light in both
+      // themes, so the ring uses a fixed dark grey rather than a theme colour.
+      if (quiet) markers.push(L.circleMarker([s.lat, s.lon], { radius: 13, weight: 3, color: "#5f5f5f", fill: false,
+        interactive: false }).addTo(map));
       const m = L.circleMarker([s.lat, s.lon], { radius: 8, weight: 2, color: css("--surface"), fillColor: color, fillOpacity: 1 })
         .bindTooltip(tip).on("click", () => { S.station = s.id; renderStation(); }).addTo(map);
       markers.push(m);
@@ -494,7 +510,8 @@
       <p class="muted" style="margin:0 0 8px;font-size:14px">${s.elev != null ? Math.round(s.elev) + " m above sea level · " : ""}${esc(s.county || "")}</p>
       <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>WeatherNext ${fmt(st?.wn)}</b> ${unit()}${
         st?.wnh != null && st.wnh !== st.wn ? ` · height-adjusted ${fmt(st.wnh)}` : ""}</p>
-      ${flagText}
+      ${flagText}${silentStations().has(s.id) ? `<p class="note" style="font-size:13px"><b>No measurements since ${dayMonth(s.last_obs)}.</b>
+        The station has stopped reporting to Frost, so it adds nothing new to the scores until it is back.</p>` : ""}
       <p class="muted" style="margin:0 0 4px;font-size:13px">Last 7 days: forecast made 1 day ahead vs what happened</p>
       <div class="chart"><canvas id="station-chart"></canvas></div>
       ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's forecast values are not shown, because its data terms don't clearly allow publishing them; its errors are included in every score.</p>`}`;
@@ -629,6 +646,14 @@
       const n = Math.min(h.runs_48h, h.expected_48h);
       if (h.expected_48h - h.runs_48h > 2) warn = true;
       parts.push(`${n} of ${h.expected_48h} runs in 48 h`);
+    }
+    const silent = [...silentStations()].map(([id, t]) => [D.meta.stations.find(s => s.id === id).name, t]);
+    if (silent.length) {
+      warn = true;
+      const names = silent.length <= 3 ? ` (${silent.map(([n]) => n).join(", ")})` : "";
+      parts.push(silent.length === 1
+        ? `1 station has no measurements since ${dayMonth(silent[0][1])}${names}`
+        : `${silent.length} stations have no measurements for over 2 days${names}`);
     }
     el.classList.toggle("warn", warn);
     el.innerHTML = (warn ? `<span class="warn-label">Check:</span> ` : "") + parts.map(esc).join(" · ");
