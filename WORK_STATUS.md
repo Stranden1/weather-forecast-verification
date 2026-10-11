@@ -24,5 +24,11 @@ showing the existing `steadiness.json` (PLAN_REPLAYS step 3). Site only (`site/a
   dark and light, all three variables: no page errors, no horizontal scroll. 119 cloud tests pass
   (none cover the JS).
 
-Next: PLAN_REPLAYS step 4 (15 Sep hand check) and the
+Step 4 hand check done the same day (see PLAN_REPLAYS.md). Next: the
 "Show the differences" ideas in NEXT_STEPS.
+
+**Replay hand check (PLAN_REPLAYS step 4), 2026-10-11:** the 15 Sep western Norway rain day is
+absent from the page by design (WeatherNext has 4 of 24 hours); measured totals in history are
+right. The published 16 Sep SN50540 replay matches hand sums from history exactly. Open idea, not
+agreed: show Yr-only rain points when WeatherNext is incomplete (15 Sep has full Yr totals at
+every horizon), or say on the page why big early days are missing.

@@ -38,7 +38,8 @@ Updated 2026-10-11._
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
   a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
-5. **Storm replay hand check:** PLAN_REPLAYS step 4 (15 Sep western Norway against `history/`).
+5. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (46.8 mm at Bergen) is
+   left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
 - **Show the differences (ideas from the 9 Oct analysis, 22 paired days, not yet agreed):**
   - "Better together": temperature errors correlate only ~0.6; the Yr+WeatherNext average beat
     both (1 day: 0.79 vs 0.89/0.90 °C; wind 1.31 vs 1.45/1.41 m/s), also after removing each bias.

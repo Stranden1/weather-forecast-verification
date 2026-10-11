@@ -116,7 +116,15 @@ observed values. Keep the most recent 30 events plus the top 5 per type of all t
        *2026-10-02: "Storm replays" card done, checked with the real history on desktop and at
        375 px. 2026-10-11: steadiness card done (own card under the horizon card), checked
        desktop/375 px, light/dark.*
-- [ ] 4. Check the 15 Sep western Norway case by hand against `history/` values.
+- [x] 4. Check the 15 Sep western Norway case by hand against `history/` values.
+       *2026-10-11: 15 Sep is correctly NOT published. Measured totals match the history (Bergen-Florida
+       SN50540 46.8 mm, SN41825 41.0, SN1120 30.0, SN53101 24.0, all 24 h), but WeatherNext has only
+       4 of 24 hours that day (its history starts late on 15 Sep), so no horizon has all 24 hours for
+       both services and `replay()` returns no points. Yr's day totals exist at every horizon
+       (SN50540: 23.5 / 27.5 / 21.8 / 27.8 mm at 2 d / 1 d / 12 h / 6 h). Checked the nearest
+       published rain replay instead, 16 Sep SN50540: hand sums from history (measured 22.4 mm;
+       6 h: Yr 12.0, WeatherNext average 12.7, median 10.8) equal the live events JSON exactly; the
+       2 d, 1 d and 12 h points are rightly missing (Yr 23/24 h at 2 d; WeatherNext 10 and 22 of 24).*
 - [ ] 5. Update PLAN_WEBPAGE, PROJECT_STATUS, NEXT_STEPS and WORK_STATUS. Push only with the user's OK.
 
 Later (not in this plan): rain replays beyond 2 days need the snapshot to keep
