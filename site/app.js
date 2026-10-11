@@ -99,6 +99,14 @@
     const [vh, clsh] = VERDICT[s.verdict_h] || VERDICT.not_enough_data;
     // A second verdict: the height-adjusted one for temperature, the average-based one for rain.
     const [va, clsa] = VERDICT[w.altVerdict] || VERDICT.not_enough_data;
+    // Temperature and wind: the two forecasts averaged (our blend, cloud/summarize.py `e_avg`).
+    const gain = s.avg_gain == null ? "" : `<div class="d">${s.avg_gain === 0 ? "Same as the better of the two"
+      : `${Math.round(Math.abs(s.avg_gain) * 100)}% ${s.avg_gain > 0 ? "better" : "worse"} than the better of the two`}</div>`;
+    const avgTile = s.mae_avg == null ? "" : `
+      <div class="tile"><p class="k"><span class="dot avg"></span>Both, averaged · 1 day ahead</p>
+        <div class="v">${fmt(s.mae_avg)} <small>${unit()} avg. error</small></div>${gain}
+        <div class="d">Our blend: the midpoint of the two forecasts, not a service you can open. Bias ${fmt(s.bias_avg)} ${unit()}</div></div>`;
+    el.classList.toggle("four", !!avgTile);
     const adjVerdict = isRain() ? `<div class="d">Using WeatherNext's average instead: <span class="badge ${clsa}">${va}</span></div>`
       : s.mae_wnh == null ? "" :
       `<div class="d">After a standard height adjustment: <span class="badge ${clsh}">${vh}</span></div>`;
@@ -108,7 +116,7 @@
         <div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr", s.base?.skill_yr)}</div>
       <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext${isRain() ? " (median)" : ""} · 1 day ahead</p>
         <div class="v">${fmt(w.main)} <small>${unit()} avg. error</small></div>
-        <div class="d">Bias ${fmt(w.bias)} ${unit()} · ${w.altWord} version ${fmt(w.alt)}</div>${skill("wn", w.skill)}${adj}</div>
+        <div class="d">Bias ${fmt(w.bias)} ${unit()} · ${w.altWord} version ${fmt(w.alt)}</div>${skill("wn", w.skill)}${adj}</div>${avgTile}
       <div class="tile"><p class="k">Verdict · ${s.days} days, ${s.n.toLocaleString()} forecasts</p>
         <div class="v" style="font-size:24px"><span class="badge ${cls}" style="font-size:15px">${vt}</span></div>
         <div class="d">${ci}</div>${adjVerdict}</div>`;
@@ -226,18 +234,19 @@
   }
 
   function renderHorizonTable(b, H) {
-    const rain = isRain(), hasAdj = H.some(h => b[h][S.period].mae_wnh != null);
+    const rain = isRain(), hasAdj = H.some(h => b[h][S.period].mae_wnh != null), hasAvg = H.some(h => b[h][S.period].mae_avg != null);
     document.getElementById("horizon-table").innerHTML = `<div class="table-scroll"><table>
-      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext${rain ? " (median)" : ""}</th><th>${rain ? "Average" : "Median"}</th>${hasAdj ? "<th>Height-adj.</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
+      <tr><th>Ahead</th><th>Yr</th><th>WeatherNext${rain ? " (median)" : ""}</th><th>${rain ? "Average" : "Median"}</th>${hasAdj ? "<th>Height-adj.</th>" : ""}${hasAvg ? "<th>Both, averaged</th>" : ""}<th>Difference</th><th>95% range</th><th>Verdict</th>
         <th>Same as yesterday</th><th>Yr vs it</th><th>WeatherNext vs it</th></tr>
       ${H.map(h => { const s = b[h][S.period]; const w = wnPick(s); const [vt, cls] = VERDICT[w.verdict] || VERDICT.not_enough_data;
         return `<tr><td>${H_LABEL[h]}</td><td>${fmt(s.mae_yr)}</td><td>${fmt(w.main)}</td><td>${fmt(w.alt)}</td>
-        ${hasAdj ? `<td>${fmt(s.mae_wnh)}</td>` : ""}
+        ${hasAdj ? `<td>${fmt(s.mae_wnh)}</td>` : ""}${hasAvg ? `<td>${fmt(s.mae_avg)}</td>` : ""}
         <td>${fmt(w.diff)}</td><td>${w.lo == null ? "–" : fmt(w.lo) + " to " + fmt(w.hi)}</td>
         <td><span class="badge ${cls}">${vt}</span></td>
         <td>${fmt(s.base?.mae)}</td><td>${skillPct(s.base?.skill_yr)}</td><td>${skillPct(w.skill)}</td></tr>`; }).join("")}
       </table></div><p class="muted" style="font-size:13px">Average errors in ${unit()}. Difference = WeatherNext${rain ? " (median)" : ""} error − Yr error. Negative means WeatherNext was closer.
       ${hasAdj ? `Height-adj. = WeatherNext moved to each station's height at 6.5 °C per km (our adjustment, not Google's); the difference, range and verdict in this table use the published values.` : ""}
+      ${hasAvg ? `Both, averaged = the midpoint of the Yr and WeatherNext forecasts (our blend, not a service).` : ""}
       "Same as yesterday" = the value measured at the same time of day on the latest day already known when the forecast was made
       (yesterday up to 1 day ahead, 2 days back for 2 days ahead, and so on).
       "60% better" means the forecast's average error was 60% smaller than that guess's, counting only forecasts that have one.</p>`;

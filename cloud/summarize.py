@@ -31,6 +31,8 @@ def paired(df: pd.DataFrame, var: str) -> pd.DataFrame:
         d["e_wn50"] = d[f"wn_{var}_p50"] - d[f"obs_{var}"]
     if f"wn_{var}_adj" in d:  # height-adjusted WeatherNext (temperature only; our adjustment)
         d["e_wnh"] = d[f"wn_{var}_adj"] - d[f"obs_{var}"]
+    if var in ("t", "w"):  # Yr and WeatherNext averaged; not rain, where it spreads drizzle further
+        d["e_avg"] = (d[f"yr_{var}"] + d[f"wn_{var}"]) / 2 - d[f"obs_{var}"]
     # Naive baseline; missing (NaN) on rows scored before it existed.
     d["e_base"] = (pd.to_numeric(d[f"base_{var}"], errors="coerce") - d[f"obs_{var}"]
                    if f"base_{var}" in d else np.nan)
@@ -91,11 +93,15 @@ def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True,
     out = {"n": int(len(d)), "days": int(d.day.nunique()) if len(d) else 0}
     if not len(d):
         return out
-    for p in ("yr", "wn", "wn50", "wnh"):
+    for p in ("yr", "wn", "wn50", "wnh", "avg"):
         if f"e_{p}" in d and d[f"e_{p}"].notna().any():
             out[f"mae_{p}"] = _r(d[f"e_{p}"].abs().mean())
             out[f"bias_{p}"] = _r(d[f"e_{p}"].mean())
     out["diff"] = _r(out["mae_wn"] - out["mae_yr"])
+    if "mae_avg" in out:  # share by which the average beats the better single service
+        best = min(d.e_yr.abs().mean(), d.e_wn.abs().mean())
+        if best > 0:
+            out["avg_gain"] = _r(1 - d.e_avg.abs().mean() / best)
     if "mae_wnh" in out:
         out["diff_h"] = _r(out["mae_wnh"] - out["mae_yr"])
     if with_ci:

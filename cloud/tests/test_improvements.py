@@ -159,6 +159,28 @@ class SkillTest(unittest.TestCase):
         self.assertIsNone(summarize.stats(d, with_ci=False)["base"]["skill_yr"])
 
 
+class AveragedForecastTest(unittest.TestCase):
+    def test_average_of_both_and_its_gain(self):
+        d = paired_rows([
+            dict(obs_t=0, yr_t=2, wn_t=-2),  # misses in opposite directions: average is exact
+            dict(obs_t=0, yr_t=1, wn_t=1),   # same miss: average misses as much
+        ])
+        s = summarize.stats(d, with_ci=False)
+        self.assertEqual(s["mae_avg"], 0.5)
+        self.assertEqual(s["bias_avg"], 0.5)
+        self.assertAlmostEqual(s["avg_gain"], 1 - 0.5 / 1.5, places=3)
+
+    def test_no_average_for_rain(self):
+        d = pd.DataFrame([dict(obs_p=0.0, yr_p=1.0, wn_p=0.0)])
+        d["target"] = "2026-10-01T12:00:00Z"
+        self.assertNotIn("mae_avg", summarize.stats(summarize.paired(d, "p"), with_ci=False))
+
+    def test_no_gain_when_both_are_exact(self):
+        s = summarize.stats(paired_rows([dict(obs_t=0, yr_t=0, wn_t=0)]), with_ci=False)
+        self.assertEqual(s["mae_avg"], 0.0)
+        self.assertNotIn("avg_gain", s)
+
+
 class QuantileTest(unittest.TestCase):
     def test_pinball_known_values(self):
         s = lambda *x: pd.Series(x, dtype=float)

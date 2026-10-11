@@ -40,14 +40,16 @@ Updated 2026-10-11._
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
 5. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (46.8 mm at Bergen) is
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
-- **Show the differences (ideas from the 9 Oct analysis, 22 paired days, not yet agreed):**
-  - "Better together": temperature errors correlate only ~0.6; the Yr+WeatherNext average beat
-    both (1 day: 0.79 vs 0.89/0.90 °C; wind 1.31 vs 1.45/1.41 m/s), also after removing each bias.
-  - "Which way do they miss?": bias by horizon, hour and conditions. Yr warm (+0.13..+0.33 °C,
-    most at night), WeatherNext cold (-0.3..-0.4, ~0 height-adjusted). Wind >=15 m/s: WeatherNext
-    -2.4 m/s, Yr -1.1.
-  - "Biggest differences" next to the map: WeatherNext wins offshore/northern coast, Yr in steep
-    valleys (Losistua, Sunndalsøra, Langfjordbotn: grid height).
+- **Show the differences (agreed plan, 11 Oct; AgnosticBrain `plans/weatherapp-dashboard.md`).**
+  Step 1 "Both, averaged" tile is done (WORK_STATUS.md). Remaining, with the agreed choices:
+  - Step 2 "Which way do they miss?": new card after steadiness; signed error in 4 blocks of 6 h
+    (Oslo time) with the existing horizon picker, from a new `bias.json`. Yr warm (+0.13..+0.33 °C,
+    most at night), WeatherNext cold (-0.3..-0.4, ~0 height-adjusted).
+  - Step 3 "Biggest differences" in the map panel when no station is selected: 3 stations per
+    service, at least 7 days of data, page only (stations.json as it is).
+  - Step 4 station freshness: `last_obs` per station in meta.json; warn in the health line and
+    grey-ring the map marker after 2 days without measurements (covers item 2's warning part).
+  - ECMWF on the page stays deferred (item above).
 6. **Rain median on the remaining rain views:** the map, "Over time" chart and "Patterns" table still
    use WeatherNext's average; the headline views now lead with the median (done 28 Sep).
 7. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
