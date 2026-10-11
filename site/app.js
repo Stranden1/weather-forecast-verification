@@ -351,8 +351,12 @@
     const o = baseOptions(`Average error with sign (${unit()})`);
     o.indexAxis = "y";
     o.interaction = { mode: "index", axis: "y", intersect: false };
-    const lim = Math.max(0.1, ...blocks.flatMap(b => [b.bias_yr, b[wnKey], adj ? b.bias_wnh : 0].map(x => Math.abs(x || 0)))) * 1.1;
+    // Symmetric around zero on a round step, as in the horizon difference chart; rain biases are hundredths of a mm.
+    const raw = Math.max(isRain() ? 0.01 : 0.05, ...blocks.flatMap(b => [b.bias_yr, b[wnKey], adj ? b.bias_wnh : 0].map(x => Math.abs(x || 0)))) * 1.1;
+    const tick = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5].find(s => s >= raw / 2) || 10;
+    const lim = Math.ceil(raw / tick) * tick;
     o.scales = { x: { ...o.scales.y, beginAtZero: false, min: -lim, max: lim,
+        ticks: { ...o.scales.y.ticks, stepSize: tick, callback: v => fmt(v, tick < 0.01 ? 3 : tick < 0.1 ? 2 : 1) },
         grid: { color: c => c.tick.value === 0 ? css("--ink-3") : css("--grid") } },
       y: { ...o.scales.x, ticks: { color: css("--ink-2"), autoSkip: false } } };
     o.plugins.tooltip.callbacks = {
