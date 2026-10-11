@@ -286,12 +286,12 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
                                      mae_wn=("e_wn", lambda s: s.abs().mean())).reset_index()
             trend[var][key] = [{"day": r.day, "n": int(r.n), "yr": _r(r.mae_yr), "wn": _r(r.mae_wn)}
                                for r in t.itertuples()]
-            agg = dict(n=("e_yr", "size"), yr=("e_yr", lambda s: s.abs().mean()),
+            agg = dict(n=("e_yr", "size"), days=("day", "nunique"), yr=("e_yr", lambda s: s.abs().mean()),
                        wn=("e_wn", lambda s: s.abs().mean()))
             if "e_wnh" in d:
                 agg["wnh"] = ("e_wnh", lambda s: s.abs().mean())
             st = d.groupby("station").agg(**agg).reset_index()
-            per_station[var][key] = {r.station: {"n": int(r.n), "yr": _r(r.yr), "wn": _r(r.wn),
+            per_station[var][key] = {r.station: {"n": int(r.n), "days": int(r.days), "yr": _r(r.yr), "wn": _r(r.wn),
                                                  **({"wnh": _r(r.wnh)} if "wnh" in agg else {})}
                                      for r in st.itertuples()}
             if var in ("t", "w"):

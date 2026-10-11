@@ -163,6 +163,7 @@ class HeightTest(unittest.TestCase):
         self.assertIn(s["verdict"], ("yr", "weathernext", "too_close"))  # primary verdict kept
         self.assertNotIn("mae_wnh", board["w"]["24"]["all"])
         self.assertEqual(per["t"]["24"]["SEA"]["wnh"], per["t"]["24"]["SEA"]["wn"])
+        self.assertEqual(per["t"]["24"]["SEA"]["days"], 8)  # page needs 7+ days for "biggest differences"
         self.assertEqual({x["id"] for x in meta["stations"]}, {"LAND", "SEA", "NOTE"})  # none dropped
         self.assertEqual({x["id"] for x in meta["stations"] if "flag" in x}, {"LAND", "NOTE"})
 

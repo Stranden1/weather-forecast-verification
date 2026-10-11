@@ -446,10 +446,39 @@
     renderStation();
   }
 
+  // With no station selected the panel lists where each service is clearly closer: stations with
+  // enough days whose average error is at least DIFF_MIN smaller, the biggest gaps first.
+  const DIFF_MIN = 0.10, DIFF_TOP = 3;
+  function renderDiffs(el) {
+    const st = D.stations?.[S.v]?.[S.mapH] || {}, minDays = D.meta.min_days_for_verdict || 7;
+    const rows = D.meta.stations.map(s => ({ s, r: st[s.id] }))
+      .filter(x => x.r && x.r.yr != null && x.r.wn != null && (x.r.days || 0) >= minDays)
+      .map(x => ({ ...x, gap: (x.r.wn - x.r.yr) / Math.max(x.r.yr, x.r.wn) }));
+    const pick = sign => rows.filter(x => sign * x.gap >= DIFF_MIN)
+      .sort((a, b) => sign * (b.gap - a.gap)).slice(0, DIFF_TOP);
+    const item = ({ s, r, gap }) => {
+      const adj = S.v === "t" && gap > 0 && r.wnh != null && r.wnh !== r.wn ? ` · height-adjusted ${fmt(r.wnh)}` : "";
+      return `<li><button class="diff-pick" data-id="${esc(s.id)}">${esc(s.name)}</button>
+        <span class="muted">${Math.round(Math.abs(gap) * 100)}% smaller error · Yr ${fmt(r.yr)} vs WeatherNext ${fmt(r.wn)}&nbsp;${unit()}${adj}</span></li>`;
+    };
+    const list = (sign, name, cls) => { const p = pick(sign);
+      return `<h4><span class="${cls}">${name}</span> is clearly closer at</h4>` + (p.length
+        ? `<ol class="diff-list">${p.map(item).join("")}</ol>`
+        : `<p class="muted diff-none">No station yet.</p>`); };
+    el.innerHTML = `<h3>Biggest differences</h3>
+      <p class="muted" style="margin:0 0 10px;font-size:13px">Forecasts made ${H_LABEL[S.mapH]} ahead. Stations with at least ${minDays} days
+        where one service's average error is at least ${Math.round(DIFF_MIN * 100)}% smaller.</p>
+      ${rows.length ? list(1, "Yr", "yr") + list(-1, "WeatherNext", "wn")
+        : `<p class="empty">No station has ${minDays} days of data at this horizon yet.</p>`}
+      <p class="muted" style="margin:12px 0 0;font-size:13px">Select a station on the map or in the list for details.</p>`;
+    el.onclick = e => { const b = e.target.closest(".diff-pick"); if (b) { S.station = b.dataset.id; renderStation(); } };
+  }
+
   async function renderStation() {
     const el = document.getElementById("station-panel");
     const s = D.meta.stations.find(x => x.id === S.station);
-    if (!s) return;
+    if (!s) { renderDiffs(el); return; }
+    el.onclick = e => { if (e.target.closest(".diff-back")) { S.station = null; renderStation(); } };
     const st = D.stations?.[S.v]?.[S.mapH]?.[s.id];
     let rec = null;
     try { rec = await fetch(`${DATA}recent/${s.id}.json`).then(r => r.ok ? r.json() : null); } catch (e) {}
@@ -460,7 +489,8 @@
          so it should read about ${fmt(Math.abs(f.expected), 1)} °C ${f.expected < 0 ? "colder" : "warmer"} from height alone.
          ${f.dz_old != null && f.dz_old !== f.dz ? `Before 26 Sep we read a slightly different grid point, ${higher(f.dz_old)} than the station.` : ""}` : ""}
       ${f.note ? `${esc(f.note)} In the data up to 26 Sep, height explained only part of WeatherNext's error here.` : ""}</p>`;
-    el.innerHTML = `<h3>${esc(s.name)}</h3>
+    el.innerHTML = `<button class="diff-back">← Biggest differences</button>
+      <h3>${esc(s.name)}</h3>
       <p class="muted" style="margin:0 0 8px;font-size:14px">${s.elev != null ? Math.round(s.elev) + " m above sea level · " : ""}${esc(s.county || "")}</p>
       <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>WeatherNext ${fmt(st?.wn)}</b> ${unit()}${
         st?.wnh != null && st.wnh !== st.wn ? ` · height-adjusted ${fmt(st.wnh)}` : ""}</p>
@@ -645,7 +675,6 @@
         () => S.period, v => (S.period = v));
     seg(document.getElementById("horizon-view"), [["diff", "Difference"], ["mae", "Error size"]],
         () => S.hView, v => (S.hView = v));
-    S.station = S.station || (m.stations.find(s => s.id === "SN18700") || m.stations[0])?.id;
     render();
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
   });
