@@ -8,7 +8,7 @@ See CHANGELOG.md.
 
 ## Station freshness warning — 2026-10-11 (Claude)
 
-**Done, committed locally, not pushed.** Step 4, the last step, of the dashboard plan
+**Done and pushed 2026-10-11 (5710d38).** Step 4, the last step, of the dashboard plan
 (AgnosticBrain `plans/weatherapp-dashboard.md`, now done).
 
 - Export (`cloud/summarize.py`): each station in `meta.json` gains `last_obs`, the latest scored
