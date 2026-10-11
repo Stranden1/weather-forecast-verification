@@ -6,20 +6,13 @@ Updated 2026-10-11._
 ## Open items
 
 ### Needs the user
-1. **Windows task kept running (checks 6, 8 and 11 Oct).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
-   rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
-   ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
-   8 Oct check (7 Oct, 45 shared stations): cloud 92-93% of the PC overall, 99.9% on horizon
-   slots the timer covered; all forecast gaps predate the timer (CHANGELOG.md, 8 Oct entry).
-   11 Oct check (9-10 Oct; results `work/coverage-compare/2026-10-09_10.json`, ignored): timer-era
-   coverage 100.0% at every horizon the timer has reached (6 h - 2 d both days, 3 d on 10 Oct),
-   Yr and WeatherNext. Overall Yr 100.0/98.3%, WeatherNext 98.4/95.2%; every gap is at 3-10 days
-   on forecasts fetched before the timer. The 5, 7 and 10 day horizons are not timer-era yet: first
-   fully timer-era target days are 12, 14 and 17 Oct. Final check ~18 Oct:
-   `python work/coverage-compare/compare_cov.py 2026-10-15 2026-10-16 2026-10-17`, with a fresh
-   `$TMP/obs.enc` from `git show origin/state:obs.csv.gz`. Stop the task only when timer-era
-   coverage stays >=99% at every horizon and the user approves.
-   Keep `data/weather.db`.
+1. **PC collector retired 11 Oct (user's decision).** Scheduled task "WeatherApp Background Collector"
+   deleted after the 11 Oct check (timer-era cloud coverage 100% at every horizon reached; each fetch
+   gets all horizons at once, so the 5-10 day horizons ride on the same timer fetches). The 7.7 GB
+   `data/weather.db` was compressed to `outputs/weather_db_2026-10-11.7z` (520 MB, SHA-256 of the db
+   inside; extraction verified identical); the user moves it to a spare drive. The cloud `history/`
+   is now the only live record. Optional: re-run `work/coverage-compare/compare_cov.py` is no longer
+   possible after 11 Oct (no new PC data).
 
 ### Pipeline
 2. **Station freshness and network drift.** Cloud/local networks overlap at 45/50 stations.
