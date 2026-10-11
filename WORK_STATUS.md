@@ -22,6 +22,6 @@ from 1 day (47 forecasts), and WeatherNext's average and median overlapped. Site
   and 375 px mobile: no page errors, no horizontal scroll. 119 cloud tests pass (none cover the JS).
 - Added `.claude/launch.json` (`site`: local static server on port 8765) for previews.
 
-Remaining: push when the user approves; then the steadiness card (NEXT_STEPS 5). The 9 Oct
+Pushed 2026-10-11 (21f7b2c). Next: the steadiness card (NEXT_STEPS 5). The 9 Oct
 analysis of model differences (in the conversation, not stored) suggested further cards:
 see NEXT_STEPS "Show the differences".
