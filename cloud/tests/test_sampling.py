@@ -1,5 +1,6 @@
 """WeatherNext sampling method: bilinear on the native grid, recorded per row."""
 import sqlite3
+from contextlib import closing
 import tempfile
 import unittest
 from datetime import date, datetime, timedelta, timezone
@@ -87,7 +88,9 @@ class MigrateTest(unittest.TestCase):
                                 (rid, iso(t), "air_temperature", "mean", float(rid), iso(got)))
                 con.execute("INSERT INTO observations VALUES (1,'SN1',?,11.0,3.5,0.0)", (iso(t),))
             con.commit(); con.close()
-            pending = migrate_sqlite.station_pending(sqlite3.connect(db), 1, "SN1")
+            # Close it before cleanup: Windows can't delete a database file that is still open.
+            with closing(sqlite3.connect(db)) as read:
+                pending = migrate_sqlite.station_pending(read, 1, "SN1")
             wn = pending[pending.provider == "wn"]
             self.assertEqual(set(wn.sampling), {WN_SAMPLING})   # newest run 3 is chosen
             self.assertEqual(set(wn.t), {3.0})

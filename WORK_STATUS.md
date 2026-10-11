@@ -24,9 +24,9 @@ See CHANGELOG.md.
   like the map colours (NEXT_STEPS item 5 covers the median on those views).
 - Live history, 1 day temperature: Yr closer at Losistua, E6 Langfjordbotn, E6 Mjøsbrua;
   WeatherNext at Norne, Johan Castberg, Aasta Hansteen (offshore). Wind: Yr at Valdresflye (65%).
-- 127 of 128 cloud tests pass. `MigrateTest.test_runs_marked_by_retrieval_time` errors with a
-  Windows file lock on a temp SQLite file during cleanup, also without these changes (flaky; it
-  passed earlier the same day). Checked in the browser with data rebuilt from history: all three
+- 128 cloud tests pass. (`MigrateTest.test_runs_marked_by_retrieval_time` used to error on
+  Windows: it left a read connection open, so the temp `w.db` was locked at cleanup. Fixed the same
+  day by closing it; 5 runs in a row pass.) Checked in the browser with data rebuilt from history: all three
   variables, 1/3/10 day horizons (10 days: "no station has 7 days"), click-through and back,
   375 px light, dark; no horizontal scroll, no console errors.
 
