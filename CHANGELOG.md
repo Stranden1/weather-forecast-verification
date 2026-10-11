@@ -2,7 +2,7 @@
 
 ## Averaged forecast tile — 2026-10-11 (Claude)
 
-**Done, committed (a6e6e31), not pushed.** Step 1 of the dashboard plan (AgnosticBrain
+**Done and pushed 2026-10-11 (a6e6e31).** Step 1 of the dashboard plan (AgnosticBrain
 `plans/weatherapp-dashboard.md`; HTML version in local `work/plans/better-dashboard.packed.html`).
 All five plan decisions were kept as suggested.
 

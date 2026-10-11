@@ -4,8 +4,9 @@ _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it
 
 ## "Which way do they miss?" card — 2026-10-11 (Claude)
 
-**Done, committed, not pushed.** Step 2 of the dashboard plan (AgnosticBrain
-`plans/weatherapp-dashboard.md`). Step 1 (a6e6e31) is not pushed either.
+**Done and pushed 2026-10-11 (a69cdf3; step 1 a6e6e31 with it).** Step 2 of the dashboard plan
+(AgnosticBrain `plans/weatherapp-dashboard.md`). CI run 38138056010 passed. The live page shows
+both after the next scheduled publish run.
 
 - Export (`cloud/summarize.py`): new `bias_by_hour()` beside `conditions()` writes `bias.json`:
   per variable and horizon, 4 blocks of 6 h in Oslo local time (summer/winter time handled) with

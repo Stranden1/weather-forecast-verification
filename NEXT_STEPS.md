@@ -41,7 +41,7 @@ Updated 2026-10-11._
 5. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (46.8 mm at Bergen) is
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
 - **Show the differences (agreed plan, 11 Oct; AgnosticBrain `plans/weatherapp-dashboard.md`).**
-  Steps 1 ("Both, averaged" tile) and 2 ("Which way do they miss?" card) are done, not pushed
+  Steps 1 ("Both, averaged" tile) and 2 ("Which way do they miss?" card) are done and pushed 11 Oct
   (WORK_STATUS.md, CHANGELOG.md). Remaining, with the agreed choices:
   - Step 3 "Biggest differences" in the map panel when no station is selected: 3 stations per
     service, at least 7 days of data, page only (stations.json as it is).
