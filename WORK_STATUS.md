@@ -2,23 +2,24 @@
 
 _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
 
-## Averaged forecast tile — 2026-10-11 (Claude)
+## "Which way do they miss?" card — 2026-10-11 (Claude)
 
-**Done, committed, not pushed.** Step 1 of the dashboard plan (AgnosticBrain
-`plans/weatherapp-dashboard.md`; HTML version in local `work/plans/better-dashboard.packed.html`).
-All five plan decisions were kept as suggested.
+**Done, committed, not pushed.** Step 2 of the dashboard plan (AgnosticBrain
+`plans/weatherapp-dashboard.md`). Step 1 (a6e6e31) is not pushed either.
 
-- Export (`cloud/summarize.py`): `paired()` adds `e_avg` = midpoint of Yr and WeatherNext minus the
-  observation, temperature and wind only (not rain). `stats()` adds `mae_avg`, `bias_avg` and
-  `avg_gain` (1 - avg MAE / the better single MAE) to every stats block, so leaderboard.json and
-  patterns.json gain them. Verdicts, ranges and scoring are unchanged.
-- Page: a fourth tile "Both, averaged" (with "N% better than the better of the two" and a note that
-  it is our blend, not a service) and a "Both, averaged" column in the horizon table. Tiles go
-  4 across, 2x2 below 1000 px, 1 column below 760 px. Rain keeps three tiles.
-- Live history (24 days at 1 day): temperature 0.80 vs Yr 0.90 / WeatherNext 0.91 °C (11% better);
-  wind 1.33 vs 1.46 / 1.43 m/s (7%).
-- 122 cloud tests pass (3 new in `test_improvements.py`). Checked in the browser against data
-  rebuilt from history into ignored `site/data/`: desktop, 900 px and 375 px, all three variables,
-  no console errors, no horizontal scroll.
+- Export (`cloud/summarize.py`): new `bias_by_hour()` beside `conditions()` writes `bias.json`:
+  per variable and horizon, 4 blocks of 6 h in Oslo local time (summer/winter time handled) with
+  n, days, bias_yr, bias_wn, bias_wn50 and, for temperature, bias_wnh. All days; no period split.
+- Page: new card "Which way do they miss?" after the steadiness card, with its own horizon picker.
+  Horizontal bars from a zero line (right = too warm/strong/wet). Temperature adds an outlined
+  height-adjusted WeatherNext bar; rain uses WeatherNext's median, as the tiles do. A lead line
+  gives the all-hours bias from leaderboard.json; table view; note for blocks under 7 days.
+- `renderBias()` returns early if its section is missing, so a cached old index.html with the
+  new app.js still renders (seen once in testing, before the guard).
+- Live history, temperature 1 day: Yr +0.18 °C (+0.23 at night, +0.10 by day), WeatherNext
+  -0.29 °C, height-adjusted about 0. At 7 days Yr leans +0.55 °C.
+- 125 cloud tests pass (3 new: Oslo blocks incl. winter time; build writes bias.json). Checked in
+  the browser with data rebuilt from history: desktop and 375 px, dark and light, all three
+  variables, horizon picker; no horizontal scroll, no errors after the guard.
 
-Next: plan step 2, the "Which way do they miss?" bias card (`bias.json`).
+Next: plan step 3, "Biggest differences" in the map panel (page only).

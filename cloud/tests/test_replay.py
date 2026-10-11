@@ -111,6 +111,39 @@ class SteadinessTest(unittest.TestCase):
         self.assertEqual(data["t"]["steps"][0]["yr"]["rev"], 2.0)
         self.assertEqual(data["w"]["steps"], [])
 
+    def test_build_writes_bias_json(self):
+        scored = frame([row("2026-10-01T12:00:00Z", 24, 13, 14, 12)])
+        with tempfile.TemporaryDirectory() as tmp:
+            summarize.build(scored, Path(tmp), stations=STATIONS)
+            data = json.loads((Path(tmp) / "bias.json").read_text(encoding="utf-8"))
+        self.assertEqual(set(data), {"t", "w", "p"})
+        day = next(b for b in data["t"]["24"] if b["label"].startswith("Day"))
+        self.assertEqual((day["n"], day["bias_yr"], day["bias_wn"]), (1, 1.0, -1.0))
+        self.assertEqual(data["w"], {})
+
+
+class BiasByHourTest(unittest.TestCase):
+    def blocks(self, rows):
+        d = summarize.paired(frame(rows), "t")
+        return {b["label"].split()[0]: b for b in summarize.bias_by_hour(d)}
+
+    def test_blocks_use_oslo_time(self):
+        b = self.blocks([
+            row("2026-10-01T23:00:00Z", 24, 0, 1, -2),  # 01 Oslo (UTC+2): night
+            row("2026-10-01T03:00:00Z", 24, 0, 3, -1),  # 05 Oslo: night
+            row("2026-10-01T05:00:00Z", 24, 0, -1, 0),  # 07 Oslo: morning
+        ])
+        self.assertEqual(list(b), ["Night", "Morning", "Day", "Evening"])
+        self.assertEqual((b["Night"]["n"], b["Night"]["bias_yr"], b["Night"]["bias_wn"]), (2, 2.0, -1.5))
+        self.assertEqual(b["Morning"]["bias_yr"], -1.0)
+        self.assertEqual(b["Day"]["n"], 0)
+        self.assertNotIn("bias_yr", b["Day"])
+
+    def test_winter_time_shifts_the_block(self):
+        b = self.blocks([row("2026-12-01T05:00:00Z", 24, 0, 1, 1)])  # 06 Oslo (UTC+1): morning
+        self.assertEqual(b["Morning"]["n"], 1)
+        self.assertEqual(b["Night"]["n"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

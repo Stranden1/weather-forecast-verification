@@ -214,6 +214,20 @@ def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
     return out
 
 
+HOUR_BLOCKS = (("Night (00–06)", 0), ("Morning (06–12)", 6), ("Day (12–18)", 12), ("Evening (18–24)", 18))
+
+
+def bias_by_hour(d: pd.DataFrame) -> list[dict]:
+    """Which way do they miss: signed error (bias) in 4 blocks of 6 h, Oslo local time."""
+    hour = pd.to_datetime(d.target, utc=True).dt.tz_convert("Europe/Oslo").dt.hour
+    out = []
+    for label, lo in HOUR_BLOCKS:
+        s = stats(d[(hour >= lo) & (hour < lo + 6)], with_ci=False, with_base=False)
+        out.append({"label": label, **{k: s[k] for k in
+                    ("n", "days", "bias_yr", "bias_wn", "bias_wn50", "bias_wnh") if k in s}})
+    return out
+
+
 def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
           publish_values: bool = PUBLISH_FORECAST_VALUES, heights: dict | None = None,
           now: pd.Timestamp | None = None) -> dict:
@@ -239,10 +253,10 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     days = sorted(scored.target.astype(str).str[:10].unique())
     last30 = days[-30:]
 
-    board, trend, per_station, calib, patterns, rain = {}, {}, {}, {}, {}, {}
+    board, trend, per_station, calib, patterns, rain, bias = {}, {}, {}, {}, {}, {}, {}
     for var in VARIABLES:
         hs = PRECIP_HORIZONS if var == "p" else HORIZONS
-        board[var], trend[var], per_station[var], calib[var], patterns[var] = {}, {}, {}, {}, {}
+        board[var], trend[var], per_station[var], calib[var], patterns[var], bias[var] = {}, {}, {}, {}, {}, {}
         for h in hs:
             d = paired(scored[scored.h == h], var) if len(scored) else pd.DataFrame()
             if d.empty:
@@ -265,6 +279,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
             if var in ("t", "w"):
                 calib[var][key] = coverage(scored[scored.h == h], var, h)
             patterns[var][key] = conditions(d, var, elevation)
+            bias[var][key] = bias_by_hour(d)
             if var == "p":
                 rain[key] = events(d)
 
@@ -274,6 +289,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     dump("calibration.json", calib)
     dump("patterns.json", patterns)
     dump("rain.json", rain)
+    dump("bias.json", bias)
 
     from .replay import steadiness
     dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})

@@ -61,6 +61,18 @@
     <details class="table-view"><summary>Show as table</summary><div id="steady-table"></div></details>
   </section>
 
+  <section class="card" id="bias" hidden>
+    <div class="card-head">
+      <div><h2>Which way do they miss?</h2>
+        <p class="sub" id="bias-sub"></p></div>
+      <label class="pick">Forecast made <select id="bias-h"></select> ahead</label>
+    </div>
+    <p class="bias-lead" id="bias-lead"></p>
+    <div class="chart bias-chart"><canvas id="bias-chart" aria-label="Average signed error by time of day"></canvas></div>
+    <p class="muted chart-note" id="bias-note"></p>
+    <details class="table-view"><summary>Show as table</summary><div id="bias-table"></div></details>
+  </section>
+
   <section class="card">
     <div class="card-head">
       <div><h2>Over time</h2>

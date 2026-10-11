@@ -13,7 +13,7 @@
     yr: ["Yr is ahead", "yr"], weathernext: ["WeatherNext is ahead", "wn"],
     too_close: ["Too close to call", ""], not_enough_data: ["Not enough days yet", ""],
   };
-  const S = { v: "t", period: "all", hView: "diff", trendH: 24, mapH: 24, patH: 24, station: null };
+  const S = { v: "t", period: "all", hView: "diff", trendH: 24, mapH: 24, patH: 24, biasH: 24, station: null };
   let D = {}, charts = {}, map, markers = [];
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -35,7 +35,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events", "steadiness"];
+    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events", "steadiness", "bias"];
     const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
@@ -324,6 +324,65 @@
       day-by-day test as the accuracy verdicts. "Moved closer" counts changes of at least ${fmt(minRev, 1)} ${unit()}.</p>`;
   }
 
+  // Which way do they miss: signed error (bias) in 4 blocks of 6 h, Oslo time (cloud/summarize.py
+  // bias_by_hour). All days so far; the period switch doesn't apply. Rain uses WeatherNext's median.
+  const MISS = { t: ["too warm", "too cold"], w: ["too strong", "too weak"], p: ["too wet", "too dry"] };
+  const missText = x => x == null ? "–" : Math.abs(x) < 0.005 ? "about right"
+    : `${fmt(Math.abs(x))} ${unit()} ${MISS[S.v][x > 0 ? 0 : 1]}`;
+  function renderBias() {
+    const card = document.getElementById("bias");
+    if (!card) return; // a cached index.html from before this card; the rest of the page must still render
+    const byH = D.bias?.[S.v] || {};
+    card.hidden = !Object.keys(byH).length;
+    if (card.hidden) return;
+    hSelect("bias-h", "biasH");
+    const blocks = (byH[S.biasH] || []).filter(b => b.n);
+    const wnKey = isRain() ? "bias_wn50" : "bias_wn", wnName = isRain() ? "WeatherNext (median)" : "WeatherNext";
+    const adj = S.v === "t" && blocks.some(b => b.bias_wnh != null);
+    document.getElementById("bias-sub").textContent = "Average error with its sign, by local time of day (Oslo). " +
+      `Right of the line the forecast was ${MISS[S.v][0]}; left of it, ${MISS[S.v][1]}. A big error in either direction ` +
+      "still counts here, so this shows a lean, not accuracy.";
+    const s = D.leaderboard?.[S.v]?.[S.biasH]?.all;
+    document.getElementById("bias-lead").innerHTML = s?.n ? `${H_LABEL[S.biasH]} ahead, over all hours:
+      <span class="dot yr"></span> Yr <b>${missText(s.bias_yr)}</b> ·
+      <span class="dot wn"></span> ${wnName} <b>${missText(wnPick(s).bias)}</b>` +
+      (adj && s.bias_wnh != null ? ` · height-adjusted <b>${missText(s.bias_wnh)}</b>` : "") : "";
+
+    const o = baseOptions(`Average error with sign (${unit()})`);
+    o.indexAxis = "y";
+    o.interaction = { mode: "index", axis: "y", intersect: false };
+    const lim = Math.max(0.1, ...blocks.flatMap(b => [b.bias_yr, b[wnKey], adj ? b.bias_wnh : 0].map(x => Math.abs(x || 0)))) * 1.1;
+    o.scales = { x: { ...o.scales.y, beginAtZero: false, min: -lim, max: lim,
+        grid: { color: c => c.tick.value === 0 ? css("--ink-3") : css("--grid") } },
+      y: { ...o.scales.x, ticks: { color: css("--ink-2"), autoSkip: false } } };
+    o.plugins.tooltip.callbacks = {
+      title: items => `${blocks[items[0].dataIndex].label}, ${H_LABEL[S.biasH]} ahead`,
+      label: c => ` ${c.dataset.label}: ${missText(c.parsed.x)}`,
+      afterBody: items => { const b = blocks[items[0].dataIndex];
+        return [` ${b.n.toLocaleString()} forecasts over ${b.days} day${b.days === 1 ? "" : "s"}`]; },
+    };
+    const bar = (label, key, color, extra = {}) => ({ label, data: blocks.map(b => b[key]), backgroundColor: color,
+      borderColor: color, borderRadius: 3, barPercentage: 0.85, categoryPercentage: 0.75, ...extra });
+    chart("bias-chart", { type: "bar", options: o, data: { labels: blocks.map(b => b.label), datasets: [
+      bar("Yr", "bias_yr", css("--yr")), bar(wnName, wnKey, css("--wn")),
+      ...(adj ? [bar("WeatherNext height-adjusted (our estimate)", "bias_wnh", "transparent",
+        { borderColor: css("--wn"), borderWidth: 2 })] : [])] } });
+
+    const few = blocks.filter(b => b.days < D.meta.min_days_for_verdict);
+    document.getElementById("bias-note").textContent = (few.length
+      ? `Fewer than ${D.meta.min_days_for_verdict} days so far for: ${few.map(b => b.label).join(", ")}; read these with care. ` : "") +
+      (adj ? "WeatherNext's temperature is for the average height of its grid area, often higher than the station, " +
+        "so part of its cold lean is height; the outlined bar shows it after our standard height adjustment. " : "") +
+      (isRain() ? "Rain uses WeatherNext's median, as the tiles do. " : "") + "Uses all days so far.";
+
+    document.getElementById("bias-table").innerHTML = `<div class="table-scroll"><table>
+      <tr><th>Time of day</th><th>Yr</th><th>${wnName}</th>${adj ? "<th>Height-adj.</th>" : ""}<th>Forecasts</th><th>Days</th></tr>
+      ${blocks.map(b => `<tr><td>${esc(b.label)}</td><td>${fmt(b.bias_yr)}</td><td>${fmt(b[wnKey])}</td>
+        ${adj ? `<td>${fmt(b.bias_wnh)}</td>` : ""}<td>${b.n.toLocaleString()}</td><td>${b.days}</td></tr>`).join("")}
+      </table></div><p class="muted" style="font-size:13px">Average of forecast − measurement in ${unit()}.
+      Positive means the forecast was ${MISS[S.v][0]}, negative ${MISS[S.v][1]}.</p>`;
+  }
+
   function rolling(arr, k = 7) {
     return arr.map((_, i) => { const w = arr.slice(Math.max(0, i - k + 1), i + 1).filter(x => x != null);
       return w.length >= Math.min(k, 3) ? w.reduce((a, b) => a + b, 0) / w.length : null; });
@@ -553,7 +612,7 @@
   }
 
   function render() {
-    renderTiles(); renderHorizon(); renderSteadiness(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
+    renderTiles(); renderHorizon(); renderSteadiness(); renderBias(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
   }
 
   load().then(() => {

@@ -118,6 +118,8 @@ select { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg
 .mark.hollow { background: transparent; }
 .chart-note { font-size: 13px; margin: 8px 0 0; }
 .steady-chart { height: 360px; }
+.bias-chart { height: 300px; }
+.bias-lead { font-size: 15px; margin: 0 0 12px; }
 .steady-flip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 15px; margin: 0 0 12px; }
 .steady-flip > span { display: inline-flex; align-items: center; gap: 6px; }
 .steady-flip .muted { font-size: 13px; flex-basis: 100%; }
