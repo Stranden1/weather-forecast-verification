@@ -4,7 +4,7 @@ _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it
 
 ## Steadiness card — 2026-10-11 (Claude)
 
-**Done locally, not pushed.** New card "How steady are the forecasts?" under the horizon card,
+**Done and pushed 2026-10-11 (85bf9d6).** New card "How steady are the forecasts?" under the horizon card,
 showing the existing `steadiness.json` (PLAN_REPLAYS step 3). Site only (`site/app.js`,
 `index.html`, `style.css`); no scoring, export, data or workflow changes.
 
@@ -24,5 +24,5 @@ showing the existing `steadiness.json` (PLAN_REPLAYS step 3). Site only (`site/a
   dark and light, all three variables: no page errors, no horizontal scroll. 119 cloud tests pass
   (none cover the JS).
 
-Remaining: push when the user approves. Then PLAN_REPLAYS step 4 (15 Sep hand check) and the
+Next: PLAN_REPLAYS step 4 (15 Sep hand check) and the
 "Show the differences" ideas in NEXT_STEPS.
