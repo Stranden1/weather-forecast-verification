@@ -551,7 +551,7 @@
     const sel = document.getElementById("replay-pick");
     const name = id => (D.meta.stations.find(s => s.id === id) || {}).name || id;
     if (!S.replay || !list.some(e => e.id === S.replay)) S.replay = list[0].id;
-    sel.innerHTML = list.map(e => `<option value="${e.id}" ${e.id === S.replay ? "selected" : ""}>${e.day} · ${EV_ICON[e.type]} · ${esc(name(e.station).replace(/ \[SN\d+\]$/, ""))} ${fmt(e.value, 1)} ${e.unit}${e.n_stations > 1 ? ` (+${e.n_stations - 1})` : ""}</option>`).join("");
+    sel.innerHTML = list.map(e => `<option value="${e.id}" ${e.id === S.replay ? "selected" : ""}>${e.day} · ${EV_ICON[e.type]} · ${esc(name(e.station))} ${fmt(e.value, 1)} ${e.unit}${e.n_stations > 1 ? ` (+${e.n_stations - 1})` : ""}</option>`).join("");
     sel.onchange = () => { S.replay = sel.value; renderReplays(); };
     let r = null;
     try { r = await fetch(`${DATA}events/${S.replay}.json`).then(x => x.ok ? x.json() : null); } catch (e) {}
