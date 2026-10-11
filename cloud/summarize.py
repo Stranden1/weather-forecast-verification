@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -14,6 +15,30 @@ from .heights import adjusted_t, flags, load_heights
 
 MIN_DAYS_FOR_VERDICT = 7
 BOOTSTRAP = 2000
+
+
+_TAG = re.compile(r"\s*\[SN\d+\]\s*$")
+_ROAD = re.compile(r"(?:E|FV)\d+")
+_KEEP_CAPS = {"II", "III", "FPSO", "A", "B"}
+_SMALL = {"I", "OG"}
+
+
+def display_name(raw):
+    """Friendly station/county name: drop a trailing [SNnnnn] tag; title-case ALL-CAPS names."""
+    if not raw:
+        return raw
+    name = _TAG.sub("", raw).strip()
+    if name != name.upper():
+        return name
+    out = []
+    for i, tok in enumerate(name.split(" ")):
+        if _ROAD.fullmatch(tok) or tok in _KEEP_CAPS:
+            out.append(tok)
+        elif i and tok in _SMALL:
+            out.append(tok.lower())
+        else:
+            out.append(tok.title())
+    return " ".join(out)
 
 
 def _r(x, n=3):
@@ -359,9 +384,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "publish_forecast_values": publish_values, "min_days_for_verdict": MIN_DAYS_FOR_VERDICT,
         "attribution": ATTRIBUTION,
         "wn_value_attribution": WN_VALUE_ATTRIBUTION,  # shown next to every chart with WeatherNext values
-        "stations": [{"id": s["station_id"], "name": s.get("name") or s.get("station_name"),
+        "stations": [{"id": s["station_id"], "name": display_name(s.get("name") or s.get("station_name")),
                       "lat": s["latitude"], "lon": s["longitude"], "elev": s.get("elevation_m"),
-                      "county": s.get("county"), "last_obs": last_obs.get(s["station_id"]),
+                      "county": display_name(s.get("county")), "last_obs": last_obs.get(s["station_id"]),
                       **({"flag": station_flags[s["station_id"]]} if s["station_id"] in station_flags else {})}
                      for s in stations],
     }

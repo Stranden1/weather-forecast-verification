@@ -1,5 +1,39 @@
 # Changelog
 
+## Consistent station names — 2026-10-12 (Claude)
+
+`display_name()` in `cloud/summarize.py` tidies station names and counties in `meta.json`
+(ID tag removed, ALL-CAPS to Norwegian title case). Test added; 130 tests pass.
+
+## Station freshness warning — 2026-10-11 (Claude)
+
+**Done and pushed 2026-10-11 (5710d38).** Step 4, the last step, of the dashboard plan
+(AgnosticBrain `plans/weatherapp-dashboard.md`, now done).
+
+- Export (`cloud/summarize.py`): each station in `meta.json` gains `last_obs`, the latest scored
+  hour with any measurement (temperature, wind or rain), or null if it never reported. Test added.
+- Page (`site/app.js` `silentStations()`): a station is "without measurements" when `last_obs` is
+  more than 48 h (`NO_OBS_H`, decision 4) before the end of `meta.last_day`. Stations that never
+  reported are left out (the map already says "No data yet").
+  - Health line: "1 station has no measurements since 30 Sept (WISTING [SN20925])", which turns the
+    line into a warning. Several stations: "N stations have no measurements for over 2 days",
+    names listed up to 3.
+  - Map: a grey ring around the marker (separate outer circle, fixed #5f5f5f because the OSM tiles
+    are light in both themes; a dashed border on the dot was tried first and was hard to see).
+    Tooltip and station details say since when. The map's legend line mentions the ring.
+- Live history now: only Wisting (SN20925, Barents Sea) is silent, last measurement 30 Sep 21:00 UTC.
+  Enningdalen (SN1120) has recovered (10 Oct 23:00).
+- Map default view (follow-up, same day): the map now fits all stations instead of a fixed
+  centre/zoom, so Wisting (73.5° N) shows without zooming out. Quarter zoom steps (`zoomSnap`
+  0.25); bottom padding = attribution bar height + 12 px (it wraps to two lines on a phone).
+  Leaflet adds the tile layer only once the map has a view, and a fit before that came out a
+  quarter step too tight, so the map gets a rough `setView` first, then `fitBounds`. Checked at
+  375, 768 and 1400 px: all 50 stations inside the map and clear of the attribution bar.
+- 129 cloud tests pass. Checked in the browser with data rebuilt from history: health line,
+  ring, tooltip, station details; no console errors.
+
+Next: plan finished. NEXT_STEPS item 5 (rain median on the remaining views) or ECMWF on the page.
+
 ## "Biggest differences" in the map panel — 2026-10-11 (Claude)
 
 **Done and pushed 2026-10-11 (8cf486c).** Step 3 of the dashboard plan (AgnosticBrain

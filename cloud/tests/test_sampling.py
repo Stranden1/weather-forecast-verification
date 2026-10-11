@@ -131,6 +131,27 @@ HEIGHTS = {"stations": {
 }}
 
 
+class DisplayNameTest(unittest.TestCase):
+    def test_display_name(self):
+        from cloud.summarize import display_name
+        cases = {
+            "LOSISTUA [SN84210]": "Losistua",
+            "E6 MJØSBRUA [SN12590]": "E6 Mjøsbrua",
+            "FV17 VÅG [SN76245]": "FV17 Våg",
+            "SUNNDALSØRA III [SN63420]": "Sunndalsøra III",
+            "BØ I VESTERÅLEN III [SN86740]": "Bø i Vesterålen III",
+            "GOLIAT FPSO [SN76956]": "Goliat FPSO",
+            "STATFJORD A [SN76922]": "Statfjord A",
+            "SNÅSA - KJEVLIA [SN70850]": "Snåsa - Kjevlia",
+            "VARDØ RADIO [SN98550]": "Vardø Radio",
+            "Oslo": "Oslo",
+            "MØRE OG ROMSDAL": "Møre og Romsdal",
+        }
+        for raw, want in cases.items():
+            self.assertEqual(display_name(raw), want)
+        self.assertIsNone(display_name(None))
+
+
 class HeightTest(unittest.TestCase):
     def test_adjustment_per_sampling_method(self):
         from cloud.heights import adjusted_t
