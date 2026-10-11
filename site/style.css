@@ -115,6 +115,10 @@ select { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg
 .mark.circle { border-radius: 50%; }
 .mark.hollow { background: transparent; }
 .chart-note { font-size: 13px; margin: 8px 0 0; }
+.steady-chart { height: 360px; }
+.steady-flip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 15px; margin: 0 0 12px; }
+.steady-flip > span { display: inline-flex; align-items: center; gap: 6px; }
+.steady-flip .muted { font-size: 13px; flex-basis: 100%; }
 
 table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
 th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }

@@ -51,6 +51,16 @@
     <details class="table-view"><summary>Show as table</summary><div id="horizon-table"></div></details>
   </section>
 
+  <section class="card" id="steady" hidden>
+    <h2>How steady are the forecasts?</h2>
+    <p class="sub">Take one hour at one station. How much did each service's forecast for it change between
+      being made, say, 2 days ahead and 1 day ahead? Smaller changes mean a steadier forecast.</p>
+    <p class="steady-flip" id="steady-flip"></p>
+    <div class="chart steady-chart"><canvas id="steady-chart" aria-label="How much forecasts changed between horizons"></canvas></div>
+    <p class="muted chart-note" id="steady-note"></p>
+    <details class="table-view"><summary>Show as table</summary><div id="steady-table"></div></details>
+  </section>
+
   <section class="card">
     <div class="card-head">
       <div><h2>Over time</h2>

@@ -35,7 +35,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events"];
+    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events", "steadiness"];
     const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
@@ -241,6 +241,78 @@
       "Same as yesterday" = the value measured at the same time of day on the latest day already known when the forecast was made
       (yesterday up to 1 day ahead, 2 days back for 2 days ahead, and so on).
       "60% better" means the forecast's average error was 60% smaller than that guess's, counting only forecasts that have one.</p>`;
+  }
+
+  // Steadiness: how much each service's forecast for the same station and hour changed from one
+  // horizon to the next (cloud/replay.py). All days so far; the period switch doesn't apply.
+  const STEADY = {
+    yr: ["Yr steadier", "yr"], weathernext: ["WeatherNext steadier", "wn"],
+    too_close: ["Too close to call", ""], not_enough_data: ["Not enough days yet", ""],
+  };
+  const H_SHORT = h => H_LABEL[h].replace(/ days?$/, " d");
+  const stepLabel = s => `${H_SHORT(s.from)} → ${H_SHORT(s.to)}`;
+  const stepText = s => `${H_LABEL[s.from]} → ${H_LABEL[s.to]}`;
+  const pct = x => x == null ? "–" : Math.round(x * 100) + "%";
+  const range = xs => { const v = xs.filter(x => x != null); if (!v.length) return "–";
+    const [a, b] = [Math.min(...v), Math.max(...v)].map(pct); return a === b ? a : `${a.slice(0, -1)}–${b}`; };
+
+  function renderSteadiness() {
+    const card = document.getElementById("steady");
+    const st = D.steadiness?.[S.v];
+    const all = (st?.steps || []).filter(s => s.n);
+    card.hidden = !all.length;
+    if (!all.length) return;
+    const minDays = D.meta.min_days_for_verdict;
+    const steps = all.filter(s => s.days >= minDays);
+    const short = all.filter(s => s.days < minDays);
+    const wnName = isRain() ? "WeatherNext (average)" : "WeatherNext";
+    const f = st.flip || {};
+    document.getElementById("steady-flip").innerHTML = f.n ? `
+      <span><b>Flip-flops per 100 forecasts:</b></span>
+      <span><span class="dot yr"></span>Yr <b>${fmt(f.yr, 1)}</b></span>
+      <span><span class="dot wn"></span>${wnName} <b>${fmt(f.wn, 1)}</b></span>
+      <span class="muted">A flip-flop is a forecast that moved at least ${fmt(f.size, 1)} ${unit()} one way and then at least
+        ${fmt(f.size, 1)} ${unit()} back over three horizons in a row (${f.n.toLocaleString()} forecasts checked).</span>` : "";
+
+    const o = baseOptions(`Average change (${unit()})`);
+    o.indexAxis = "y";
+    o.interaction = { mode: "index", axis: "y", intersect: false };
+    o.scales = { x: o.scales.y, y: { ...o.scales.x, ticks: { color: css("--ink-2"), autoSkip: false,
+      callback: (_, i) => [stepLabel(steps[i]), (STEADY[steps[i].steadier] || STEADY.not_enough_data)[0]] } } };
+    o.plugins.tooltip.callbacks = {
+      title: items => `${stepText(steps[items[0].dataIndex])} ahead`,
+      label: c => ` ${c.dataset.label}: changed ${fmt(c.parsed.x)} ${unit()} on average`,
+      afterBody: items => { const s = steps[items[0].dataIndex];
+        return s.ci_lo == null ? [] : [` Difference ${fmt(s.diff)} ${unit()}, 95% range ${fmt(s.ci_lo)} to ${fmt(s.ci_hi)}`,
+          ` ${(STEADY[s.steadier] || STEADY.not_enough_data)[0]}`]; },
+    };
+    const bar = (label, p, color) => ({ label, data: steps.map(s => s[p].rev), backgroundColor: color,
+      borderRadius: 3, barPercentage: 0.8, categoryPercentage: 0.7 });
+    chart("steady-chart", { type: "bar", options: o, data: { labels: steps.map(stepLabel),
+      datasets: [bar("Yr", "yr", css("--yr")), bar(wnName, "wn", css("--wn"))] } });
+
+    const minRev = { t: 0.2, w: 0.5, p: 0.1 }[S.v];
+    document.getElementById("steady-note").textContent =
+      (short.length ? `Not shown yet: ${short.map(s => `${stepText(s)} (${s.days} day${s.days === 1 ? "" : "s"} of data)`).join(", ")}; ` +
+        `a step appears once it has ${minDays} days. ` : "") +
+      `Changes of at least ${fmt(minRev, 1)} ${unit()} moved the forecast closer to what was measured ` +
+      `${range(steps.map(s => s.yr.toward))} of the time for Yr and ${range(steps.map(s => s.wn.toward))} for WeatherNext ` +
+      `(50% would be a coin toss). Steady is not the same as accurate: ` +
+      `WeatherNext's forecast here is the average of many possible outcomes, which moves less by nature, ` +
+      `and Yr's first days are corrected with fresh station measurements, so it changes more close to the event. ` +
+      `Only hours where both services issued a new forecast at both horizons count. Uses all days so far.`;
+
+    document.getElementById("steady-table").innerHTML = `<div class="table-scroll"><table>
+      <tr><th>Change from → to</th><th>Yr</th><th>${wnName}</th><th>Difference</th><th>95% range</th><th>Verdict</th>
+        <th>Yr moved closer</th><th>WeatherNext moved closer</th><th>Forecasts</th><th>Days</th></tr>
+      ${all.map(s => { const [vt, cls] = STEADY[s.steadier] || STEADY.not_enough_data;
+        return `<tr><td>${stepText(s)}</td><td>${fmt(s.yr.rev)}</td><td>${fmt(s.wn.rev)}</td>
+        <td>${fmt(s.diff)}</td><td>${s.ci_lo == null ? "–" : fmt(s.ci_lo) + " to " + fmt(s.ci_hi)}</td>
+        <td><span class="badge ${cls}">${vt}</span></td><td>${pct(s.yr.toward)}</td><td>${pct(s.wn.toward)}</td>
+        <td>${s.n.toLocaleString()}</td><td>${s.days}</td></tr>`; }).join("")}
+      </table></div><p class="muted" style="font-size:13px">Average size of the change in ${unit()}, in either direction.
+      Difference = WeatherNext − Yr; negative means WeatherNext changed less. The 95% range and verdict use the same
+      day-by-day test as the accuracy verdicts. "Moved closer" counts changes of at least ${fmt(minRev, 1)} ${unit()}.</p>`;
   }
 
   function rolling(arr, k = 7) {
@@ -472,7 +544,7 @@
   }
 
   function render() {
-    renderTiles(); renderHorizon(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
+    renderTiles(); renderHorizon(); renderSteadiness(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
   }
 
   load().then(() => {

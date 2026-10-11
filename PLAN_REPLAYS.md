@@ -112,9 +112,10 @@ observed values. Keep the most recent 30 events plus the top 5 per type of all t
        land stations only (15 m/s is ordinary offshore). Cold snap: <= -5 °C only (the
        "first sub-zero hour" trigger was left out). Wind/cold use the most extreme hour that met
        the threshold and has the most horizons.*
-- [~] 3. Page cards + demo data. Check light/dark/mobile with `?demo` and the real history. Commit.
+- [x] 3. Page cards + demo data. Check light/dark/mobile with `?demo` and the real history. Commit.
        *2026-10-02: "Storm replays" card done, checked with the real history on desktop and at
-       375 px. The steadiness row on the page is still to do.*
+       375 px. 2026-10-11: steadiness card done (own card under the horizon card), checked
+       desktop/375 px, light/dark.*
 - [ ] 4. Check the 15 Sep western Norway case by hand against `history/` values.
 - [ ] 5. Update PLAN_WEBPAGE, PROJECT_STATUS, NEXT_STEPS and WORK_STATUS. Push only with the user's OK.
 

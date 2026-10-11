@@ -1,7 +1,7 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-10-09._
+Updated 2026-10-11._
 
 ## Open items
 
@@ -38,9 +38,7 @@ Updated 2026-10-09._
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
   a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
-5. **Steadiness card (next, user's choice 9 Oct):** `steadiness.json` is exported but not shown.
-   9 Oct data: WeatherNext revises 0.20-0.35 °C between runs vs Yr 0.33-0.70, all clear verdicts;
-   Yr's biggest jump is 3 days -> 2 days. Remaining replay hand checks/review: `PLAN_REPLAYS.md`.
+5. **Storm replay hand check:** PLAN_REPLAYS step 4 (15 Sep western Norway against `history/`).
 - **Show the differences (ideas from the 9 Oct analysis, 22 paired days, not yet agreed):**
   - "Better together": temperature errors correlate only ~0.6; the Yr+WeatherNext average beat
     both (1 day: 0.79 vs 0.89/0.90 °C; wind 1.31 vs 1.45/1.41 m/s), also after removing each bias.
