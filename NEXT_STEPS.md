@@ -30,7 +30,7 @@ Updated 2026-10-11._
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
 - **Show the differences (agreed plan, 11 Oct; AgnosticBrain `plans/weatherapp-dashboard.md`).**
   Steps 1 ("Both, averaged" tile) and 2 ("Which way do they miss?" card) are done and pushed 11 Oct;
-  step 3 ("Biggest differences" in the map panel) is done 11 Oct, committed but not pushed
+  step 3 ("Biggest differences" in the map panel) is done and pushed 11 Oct (8cf486c)
   (WORK_STATUS.md, CHANGELOG.md). Remaining, with the agreed choices:
   - Step 4 station freshness: `last_obs` per station in meta.json; warn in the health line and
     grey-ring the map marker after 2 days without measurements (covers item 2's warning part).

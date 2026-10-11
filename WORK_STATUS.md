@@ -8,7 +8,7 @@ See CHANGELOG.md.
 
 ## "Biggest differences" in the map panel — 2026-10-11 (Claude)
 
-**Done, committed locally, not pushed.** Step 3 of the dashboard plan (AgnosticBrain
+**Done and pushed 2026-10-11 (8cf486c).** Step 3 of the dashboard plan (AgnosticBrain
 `plans/weatherapp-dashboard.md`).
 
 - Page (`site/app.js` `renderDiffs()`): with no station selected, the map panel lists up to 3
