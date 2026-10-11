@@ -24,3 +24,9 @@ both after the next scheduled publish run.
   variables, horizon picker; no horizontal scroll, no errors after the guard.
 
 Next: plan step 3, "Biggest differences" in the map panel (page only).
+
+**"Both, averaged" tile range, 2026-10-11:** `stats()` now adds `avg_gain_lo/hi` and `verdict_avg`
+(better / worse / too_close / not_enough_data) from a day-block bootstrap of 1 - MAE(avg)/MAE(better
+single service), the better service fixed on the full sample (`bootstrap_gain`). The tile shows the
+95% range and a badge. Now: temperature 1 day +11% (+9 to +13%), wind +7% (+5 to +9%), both clear;
+at 7 days too close to call. 128 cloud tests pass.

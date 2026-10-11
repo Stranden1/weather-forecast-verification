@@ -175,6 +175,29 @@ class AveragedForecastTest(unittest.TestCase):
         d["target"] = "2026-10-01T12:00:00Z"
         self.assertNotIn("mae_avg", summarize.stats(summarize.paired(d, "p"), with_ci=False))
 
+    def days(self, per_day, n=8):
+        d = pd.DataFrame([r for i in range(n) for r in per_day])
+        d["target"] = [f"2026-10-{i + 1:02d}T12:00:00Z" for i in range(n) for _ in per_day]
+        return summarize.paired(d, "t")
+
+    def test_gain_range_clear_when_misses_cancel_every_day(self):
+        s = summarize.stats(self.days([dict(obs_t=0, yr_t=2, wn_t=-2), dict(obs_t=0, yr_t=1, wn_t=1)]))
+        self.assertEqual((s["avg_gain_lo"], s["avg_gain_hi"], s["verdict_avg"]), (s["avg_gain"], s["avg_gain"], "better"))
+
+    def test_gain_too_close_when_days_disagree(self):
+        rows = [dict(obs_t=0, yr_t=1, wn_t=-1)] * 4 + [dict(obs_t=0, yr_t=1, wn_t=3)] * 4
+        d = summarize.paired(pd.DataFrame(rows).assign(
+            target=[f"2026-10-{i + 1:02d}T12:00:00Z" for i in range(8)]), "t")
+        s = summarize.stats(d)
+        self.assertLess(s["avg_gain_lo"], 0)
+        self.assertGreater(s["avg_gain_hi"], 0)
+        self.assertEqual(s["verdict_avg"], "too_close")
+
+    def test_gain_range_needs_enough_days(self):
+        s = summarize.stats(self.days([dict(obs_t=0, yr_t=2, wn_t=-2)], n=3))
+        self.assertIsNone(s["avg_gain_lo"])
+        self.assertEqual(s["verdict_avg"], "not_enough_data")
+
     def test_no_gain_when_both_are_exact(self):
         s = summarize.stats(paired_rows([dict(obs_t=0, yr_t=0, wn_t=0)]), with_ci=False)
         self.assertEqual(s["mae_avg"], 0.0)

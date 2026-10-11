@@ -77,6 +77,19 @@ def bootstrap_diff(d: pd.DataFrame, seed: int = 1) -> tuple[float | None, float 
     return float(np.percentile(diff, 2.5)), float(np.percentile(diff, 97.5))
 
 
+def bootstrap_gain(d: pd.DataFrame, best: str, seed: int = 1) -> tuple[float | None, float | None]:
+    """95% interval for 1 - MAE(average of both) / MAE(`best` service), resampling whole days."""
+    per_day = d.groupby("day").agg(a_avg=("e_avg", lambda s: s.abs().sum()),
+                                  a_best=(f"e_{best}", lambda s: s.abs().sum()))
+    k = len(per_day)
+    if k < MIN_DAYS_FOR_VERDICT:
+        return None, None
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, k, size=(BOOTSTRAP, k))
+    gain = 1 - per_day.a_avg.to_numpy()[idx].sum(1) / per_day.a_best.to_numpy()[idx].sum(1)
+    return float(np.percentile(gain, 2.5)), float(np.percentile(gain, 97.5))
+
+
 def verdict(lo, hi) -> str:
     if lo is None:
         return "not_enough_data"
@@ -99,9 +112,14 @@ def stats(d: pd.DataFrame, with_ci: bool = True, with_base: bool = True,
             out[f"bias_{p}"] = _r(d[f"e_{p}"].mean())
     out["diff"] = _r(out["mae_wn"] - out["mae_yr"])
     if "mae_avg" in out:  # share by which the average beats the better single service
-        best = min(d.e_yr.abs().mean(), d.e_wn.abs().mean())
-        if best > 0:
-            out["avg_gain"] = _r(1 - d.e_avg.abs().mean() / best)
+        best = "yr" if d.e_yr.abs().mean() <= d.e_wn.abs().mean() else "wn"
+        if d[f"e_{best}"].abs().mean() > 0:
+            out["avg_gain"] = _r(1 - d.e_avg.abs().mean() / d[f"e_{best}"].abs().mean())
+            if with_ci:  # better/worse than the better single service, with the same day-block test
+                lo, hi = bootstrap_gain(d, best)
+                out.update(avg_gain_lo=_r(lo), avg_gain_hi=_r(hi),
+                           verdict_avg="not_enough_data" if lo is None
+                           else "better" if lo > 0 else "worse" if hi < 0 else "too_close")
     if "mae_wnh" in out:
         out["diff_h"] = _r(out["mae_wnh"] - out["mae_yr"])
     if with_ci:

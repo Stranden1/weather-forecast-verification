@@ -23,6 +23,9 @@
     return p === 0 ? "same" : `${p}% ${x > 0 ? "better" : "worse"}`; };
   const skillSentence = x => skillPct(x) === "same" ? "About as good as “same as yesterday”" : `${skillPct(x)} than “same as yesterday”`;
   const unit = () => D.meta.variables[S.v].unit;
+  // "Both, averaged" against the better single service (gain = share of its error removed).
+  const AVG_VERDICT = { better: "Clearly better", worse: "Clearly worse", too_close: "Too close to call", not_enough_data: "Not enough days yet" };
+  const signedPct = x => { const p = Math.round(x * 100); return p === 0 ? "0%" : `${p > 0 ? "+" : "−"}${Math.abs(p)}%`; };
   // Rain leads with WeatherNext's median (its average spreads drizzle everywhere); the average is the dashed line.
   // Temperature and wind lead with the average. `wnPick` returns the headline and secondary numbers of a stats block.
   const isRain = () => S.v === "p";
@@ -101,7 +104,10 @@
     const [va, clsa] = VERDICT[w.altVerdict] || VERDICT.not_enough_data;
     // Temperature and wind: the two forecasts averaged (our blend, cloud/summarize.py `e_avg`).
     const gain = s.avg_gain == null ? "" : `<div class="d">${s.avg_gain === 0 ? "Same as the better of the two"
-      : `${Math.round(Math.abs(s.avg_gain) * 100)}% ${s.avg_gain > 0 ? "better" : "worse"} than the better of the two`}</div>`;
+      : `${Math.round(Math.abs(s.avg_gain) * 100)}% ${s.avg_gain > 0 ? "better" : "worse"} than the better of the two`}</div>` +
+      (s.verdict_avg == null ? "" : `<div class="d">${s.avg_gain_lo == null ? `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`
+        : `95% range: ${signedPct(s.avg_gain_lo)} to ${signedPct(s.avg_gain_hi)}`}
+        <span class="badge">${AVG_VERDICT[s.verdict_avg] || AVG_VERDICT.not_enough_data}</span></div>`);
     const avgTile = s.mae_avg == null ? "" : `
       <div class="tile"><p class="k"><span class="dot avg"></span>Both, averaged · 1 day ahead</p>
         <div class="v">${fmt(s.mae_avg)} <small>${unit()} avg. error</small></div>${gain}
