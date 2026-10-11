@@ -6,15 +6,19 @@ Updated 2026-10-11._
 ## Open items
 
 ### Needs the user
-1. **Windows task kept running (6 Oct check).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
+1. **Windows task kept running (checks 6, 8 and 11 Oct).** For 26 Sep - 1 Oct the cloud missed 7% (26 Sep)
    rising to 26-28% (29 Sep - 1 Oct) of the 6 h - 2 day station-hours the PC scored, because GitHub
    ran the 6-hourly slots late or not at all. Values agree where both have the same forecast.
    8 Oct check (7 Oct, 45 shared stations): cloud 92-93% of the PC overall, 99.9% on horizon
    slots the timer covered; all forecast gaps predate the timer (CHANGELOG.md, 8 Oct entry).
-   Re-run `work/coverage-compare/compare_cov.py` on ~12 Oct (9-11 Oct, horizons to 2 days) and
-   ~18 Oct (10 days): `python work/coverage-compare/compare_cov.py 2026-10-09 2026-10-10 2026-10-11`,
-   with a fresh `$TMP/obs.enc` from `git show origin/state:obs.csv.gz`. Stop the task only when timer-era coverage stays >=99% at every horizon
-   and the user approves.
+   11 Oct check (9-10 Oct; results `work/coverage-compare/2026-10-09_10.json`, ignored): timer-era
+   coverage 100.0% at every horizon the timer has reached (6 h - 2 d both days, 3 d on 10 Oct),
+   Yr and WeatherNext. Overall Yr 100.0/98.3%, WeatherNext 98.4/95.2%; every gap is at 3-10 days
+   on forecasts fetched before the timer. The 5, 7 and 10 day horizons are not timer-era yet: first
+   fully timer-era target days are 12, 14 and 17 Oct. Final check ~18 Oct:
+   `python work/coverage-compare/compare_cov.py 2026-10-15 2026-10-16 2026-10-17`, with a fresh
+   `$TMP/obs.enc` from `git show origin/state:obs.csv.gz`. Stop the task only when timer-era
+   coverage stays >=99% at every horizon and the user approves.
    Keep `data/weather.db`.
 
 ### Pipeline
