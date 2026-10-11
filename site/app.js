@@ -431,9 +431,16 @@
     hSelect("map-h", "mapH");
     const st = D.stations?.[S.v]?.[S.mapH] || {};
     if (!map) {
-      map = L.map("map", { scrollWheelZoom: false }).setView([64.5, 13], 4);
+      // Leaflet only adds the tile layer (and its attribution text) once the map has a view, and a
+      // fit made before that comes out a quarter step too tight, so start from a rough view.
+      map = L.map("map", { scrollWheelZoom: false, zoomSnap: 0.25 }).setView([64.5, 13], 4);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         { maxZoom: 10, attribution: "© OpenStreetMap contributors" }).addTo(map);
+      // Then fit every station (offshore Wisting at 73.5° N included), so a narrow window doesn't cut
+      // off the far north. Quarter zoom steps fit tighter. The bottom padding is the attribution
+      // bar's height (two lines on a phone), so no station sits under it.
+      map.fitBounds(D.meta.stations.map(s => [s.lat, s.lon]), { paddingTopLeft: [16, 16],
+        paddingBottomRight: [16, map.attributionControl.getContainer().offsetHeight + 12], animate: false });
     }
     markers.forEach(m => m.remove()); markers = [];
     const neutral = css("--neutral"), yr = css("--yr"), wn = css("--wn");

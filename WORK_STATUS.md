@@ -24,8 +24,12 @@ See CHANGELOG.md.
     Tooltip and station details say since when. The map's legend line mentions the ring.
 - Live history now: only Wisting (SN20925, Barents Sea) is silent, last measurement 30 Sep 21:00 UTC.
   Enningdalen (SN1120) has recovered (10 Oct 23:00).
-- Wisting sits just outside the map's default view in a narrow window (73.5° N); zooming out
-  shows it. Not changed here.
+- Map default view (follow-up, same day): the map now fits all stations instead of a fixed
+  centre/zoom, so Wisting (73.5° N) shows without zooming out. Quarter zoom steps (`zoomSnap`
+  0.25); bottom padding = attribution bar height + 12 px (it wraps to two lines on a phone).
+  Leaflet adds the tile layer only once the map has a view, and a fit before that came out a
+  quarter step too tight, so the map gets a rough `setView` first, then `fitBounds`. Checked at
+  375, 768 and 1400 px: all 50 stations inside the map and clear of the attribution bar.
 - 129 cloud tests pass. Checked in the browser with data rebuilt from history: health line,
   ring, tooltip, station details; no console errors.
 
