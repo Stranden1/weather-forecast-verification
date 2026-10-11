@@ -7,6 +7,11 @@
 - `data/weather.db` (7.7 GB, WAL empty) compressed to `outputs/weather_db_2026-10-11.7z`
   (520 MB; extraction verified identical by SHA-256). The user copied it to a spare drive; then
   `weather.db`, `-wal` and `-shm` were deleted. The cloud `history/` is now the live record.
+- Correction, later the same day: the 7z was then also deleted (with `rm`, bypassing the Recycle
+  Bin) on the mistaken understanding that a copy existed; there was none. A search of all drives
+  found no copy. E: is an NVMe SSD (TRIM), so recovery was judged unlikely and skipped. Lost: the
+  raw local forecasts/observations. Kept: every scored day in `history/`. Docs now say `history/`
+  is the only record.
 - CLAUDE.md, AGENTS.md, PROJECT_STATUS.md and NEXT_STEPS.md updated to match.
 
 ## Averaged forecast tile — 2026-10-11 (Claude)

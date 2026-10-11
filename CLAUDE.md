@@ -10,9 +10,9 @@ Before starting, read `AGENTS.md`, `WORK_STATUS.md`, `PROJECT_STATUS.md`,
   overwrite uncommitted work you did not make.
 - Update the handoff .md files at the end of each substantial task, as
   `AGENTS.md` describes. Read `CHANGELOG.md` only when you need past details.
-- The cloud `history/` is the live record. `data/weather.db` was archived on
-  2026-10-11 (`outputs/weather_db_2026-10-11.7z`, copy on the user's spare drive)
-  and deleted from the PC; extract the archive only if a task needs the old local data.
+- The cloud `history/` is the only record. The local `data/weather.db` and its
+  archive were deleted on 2026-10-11 and are lost; there is no local database.
+  Never delete or rewrite `history/` day files, and keep `WX_STATE_KEY` safe.
 - Commit in validated steps. Do not push unless asked.
 
 ## Model routing

@@ -61,5 +61,5 @@ Updated 2026-10-11._
   running process keeps old code in memory.
 - If Yr collection becomes Delayed or Stale, check promptly: missed Yr history cannot be recovered.
 - Revalidate wind height/unit metadata when changing the station network or collectors.
-- Keep the `weather_db_2026-10-11.7z` archive and credentials backed up; GitHub holds neither.
+- Keep `WX_STATE_KEY` and other credentials backed up outside GitHub; without the key `history/` is unreadable.
 - Setting GitHub secrets from PowerShell 5.1 by piping adds a BOM; use `gh secret set --body`.

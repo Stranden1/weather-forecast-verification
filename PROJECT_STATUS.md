@@ -20,9 +20,9 @@ CHANGELOG.md (8 Oct entry).
 
 ## Current capabilities
 
-- Local: retired 2026-10-11. data/weather.db (to 11 Oct) archived as
-  outputs/weather_db_2026-10-11.7z (copy on the user's spare drive) and deleted.
-  The cloud history/ is the live record.
+- Local: retired 2026-10-11. data/weather.db and its archive were deleted that
+  day and are lost (raw local forecasts/observations). The cloud history/ is the
+  only record; scored days from the local era were migrated into it earlier.
 - Cloud: paired snapshots, encrypted immutable history, daily scoring, trends,
   maps, uncertainty, baseline diagnostics, monthly summaries and storm replays.
 - Live page: 31 scored days through 5 Oct, 174,911 rows. Past WeatherNext values
