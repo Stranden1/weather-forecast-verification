@@ -2,6 +2,10 @@
 
 _The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
 
+**Data note, 2026-10-11:** `data/weather.db` is archived (`outputs/weather_db_2026-10-11.7z`,
+copy on the user's spare drive) and deleted from the PC. The cloud `history/` is the live record.
+See CHANGELOG.md.
+
 ## "Which way do they miss?" card — 2026-10-11 (Claude)
 
 **Done and pushed 2026-10-11 (a69cdf3; step 1 a6e6e31 with it).** Step 2 of the dashboard plan

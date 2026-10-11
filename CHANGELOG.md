@@ -1,5 +1,14 @@
 # Changelog
 
+## PC collector retired; weather.db archived and deleted — 2026-10-11 (Claude)
+
+- Scheduled task "WeatherApp Background Collector" deleted (user's decision after the 11 Oct
+  coverage check: timer-era cloud coverage 100% at every horizon reached).
+- `data/weather.db` (7.7 GB, WAL empty) compressed to `outputs/weather_db_2026-10-11.7z`
+  (520 MB; extraction verified identical by SHA-256). The user copied it to a spare drive; then
+  `weather.db`, `-wal` and `-shm` were deleted. The cloud `history/` is now the live record.
+- CLAUDE.md, AGENTS.md, PROJECT_STATUS.md and NEXT_STEPS.md updated to match.
+
 ## Averaged forecast tile — 2026-10-11 (Claude)
 
 **Done and pushed 2026-10-11 (a6e6e31).** Step 1 of the dashboard plan (AgnosticBrain

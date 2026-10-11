@@ -10,8 +10,9 @@ Before starting, read `AGENTS.md`, `WORK_STATUS.md`, `PROJECT_STATUS.md`,
   overwrite uncommitted work you did not make.
 - Update the handoff .md files at the end of each substantial task, as
   `AGENTS.md` describes. Read `CHANGELOG.md` only when you need past details.
-- `data/weather.db` is authoritative. Open it read-only unless the task
-  explicitly requires writes.
+- The cloud `history/` is the live record. `data/weather.db` was archived on
+  2026-10-11 (`outputs/weather_db_2026-10-11.7z`, copy on the user's spare drive)
+  and deleted from the PC; extract the archive only if a task needs the old local data.
 - Commit in validated steps. Do not push unless asked.
 
 ## Model routing

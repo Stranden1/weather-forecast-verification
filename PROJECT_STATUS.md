@@ -20,8 +20,9 @@ CHANGELOG.md (8 Oct entry).
 
 ## Current capabilities
 
-- Local: authoritative data/weather.db, full forecasts/observations, Streamlit
-  comparisons and six-hourly collection at 50 active stations.
+- Local: retired 2026-10-11. data/weather.db (to 11 Oct) archived as
+  outputs/weather_db_2026-10-11.7z (copy on the user's spare drive) and deleted.
+  The cloud history/ is the live record.
 - Cloud: paired snapshots, encrypted immutable history, daily scoring, trends,
   maps, uncertainty, baseline diagnostics, monthly summaries and storm replays.
 - Live page: 31 scored days through 5 Oct, 174,911 rows. Past WeatherNext values
