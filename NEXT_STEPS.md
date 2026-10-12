@@ -6,11 +6,11 @@ Updated 2026-10-11._
 ## Open items
 
 ### Pipeline
-1. **Silent stations.** The page now warns about stations without measurements for 2 days
-   (11 Oct). SN20925 (Wisting) has none since 30 Sep 21:00 UTC: check Frost for it, and decide
-   whether to replace it in the fixed cloud network. SN1120 (Enningdalen) recovered by 10 Oct.
-   Do not silently remove stations from scoring history. (The local network is retired, so
-   cloud/local drift no longer applies.)
+1. **Silent stations.** Wisting (SN20925) was retired from the network on 12 Oct (`"active": 0`;
+   Frost no longer has the source). Revsbotn - Danielsvika (SN94190) has had no measurements
+   since 9 Oct: check Frost for it (`availableTimeSeries`) and, if it is gone too, retire it the
+   same way. Do not remove stations from `history/` or scoring history. SN1120 (Enningdalen)
+   recovered by 10 Oct.
 2. **Measure the activated timer.** Job 8590224 is enabled with :07/:37 UTC POST
    requests and failure/recovery/disable notifications. External test returned 204;
    run 37495000121 succeeded and correctly skipped at 65 min. Verify recurring HTTP

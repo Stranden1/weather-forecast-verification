@@ -56,8 +56,9 @@ CHANGELOG.md (8 Oct entry).
 - Cloud/local station networks overlap at 45/50. Local discovery refreshes weekly;
   cloud config/stations.json is a fixed snapshot. Reconcile before comparing coverage.
 - Enningdalen (SN1120) has no observations after 30 Sep 23:00 UTC locally or in cloud;
-  Wisting (SN20925, cloud only) stops at 30 Sep 21:00 UTC. Aggregate Frost OK does not
-  reveal these station outages. Add station freshness/coverage warnings.
+  Wisting (SN20925, cloud only) stopped at 30 Sep 21:00 UTC and is gone from Frost; it was
+  retired on 12 Oct (`active: 0`, 49 active stations, its scored history is kept). The page now
+  warns about stations silent for 2 days; Revsbotn (SN94190) is the next one to check.
 - Local commits were rebased over the two scored-history commits and pushed with
   user approval. History day files remain unchanged.
 - Re-run the coverage comparison on ~12 Oct and ~18 Oct before retiring the PC task

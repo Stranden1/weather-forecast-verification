@@ -526,3 +526,11 @@ Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
 - The naive baseline is not drawn in the charts; it stays as skill in the tiles and table and is
   called "same as yesterday" (same definition as 2026-09-24). Temperature/wind charts drop the
   WeatherNext median line (within ~0.01 of the average); it remains in the tiles and table.
+
+## Retiring a station — 2026-10-12
+
+Retire a station that Frost no longer has by setting `"active": 0` in `config/stations.json`
+(`load_stations()` skips it). Never delete its entry or touch `history/`: its past scored rows
+stay in the leaderboard and `stations.json`; only collection, the map and `meta.json` drop it.
+SN20925 (Wisting) is the first.
+
