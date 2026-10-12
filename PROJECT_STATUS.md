@@ -10,7 +10,7 @@ Collection has run every 2.5–3.0 hours since the external timer began on 6 Oct
 
 ## Current work
 
-Local branch `codex/scorecard-corrections` starts from Wisting's retirement commit. Checkpoint 1 corrects daily rain boundaries and replay labels/publication timing; 132 cloud tests pass. Further rain/date-scope consistency, mobile clarity and practical event views are in progress. No new collection or deployment is authorized by this checkpoint.
+Local branch `codex/scorecard-corrections` starts from Wisting's retirement commit. Checkpoints 1–2 correct daily rain boundaries and replay labels/publication timing, rain median views and calendar period scopes; 140 cloud tests pass. Mobile clarity and practical event views are in progress. No new collection or deployment is authorized by this checkpoint.
 
 ## Operations and retained capabilities
 

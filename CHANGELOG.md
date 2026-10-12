@@ -1,5 +1,14 @@
 # Changelog
 
+## Scorecard corrections: periods and rain checkpoint — 2026-10-12 (Codex)
+
+- Added `views.json`: period-scoped map, trends, Patterns, bias, rain detection, matched uncertainty and steadiness. Legacy exports remain compatible.
+- Rain views use the median on common available hours, never silently substitute the mean; recent series include gated hourly medians.
+- Last 30 days means the final scored UTC target date plus the preceding 29 calendar days. Trends include missing calendar dates, stop lines at gaps, and offer a data table.
+- Station differences are labelled descriptive; station/replay requests cannot overwrite newer filter selections. Station outage text identifies finalized-history scope.
+- Validated 140 cloud tests; real-history rebuild 224,292 rows (new views 224,720 bytes); browser checks pass for rain, dates, gaps and selection changes, with no JS errors or mobile overflow.
+- Local checkpoint only. Next: compact first answer, keyboard/data accessibility and practical event comparisons.
+
 ## Scorecard corrections: rain checkpoint — 2026-10-12 (Codex)
 
 - Corrected UTC rain-day selection to interval ends 01:00 through next midnight; raw history untouched.

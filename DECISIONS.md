@@ -540,3 +540,10 @@ SN20925 (Wisting) is the first.
 - Preserve the existing UTC calendar-day convention. Rain intervals ending 01:00 through the following midnight form a day; an end at 00:00 belongs to the previous day. Temperature/wind retain instant-date grouping.
 - Correct exported daily aggregates and event selection only; never rewrite immutable scored history.
 - A summed hourly-median forecast is labelled as a sum, not the median of an ensemble daily total. The final rain interval must be at least one hour old before publishing WeatherNext values.
+
+## Page metric and period scope — 2026-10-12 (Codex)
+
+- Statistical views use one calendar period: all scored target dates, or the final scored UTC target date and preceding 29 days. Missing dates do not extend that window. Health, monthly summaries and the explicitly labelled latest-seven-day station chart retain their own scopes.
+- Rain's primary point-error views use WeatherNext's median, on hours where observation, Yr, WeatherNext mean and median exist. Never fall back silently to the mean. Mean alternatives remain explicitly labelled in rain detection, monthly text and replays.
+- Trends place each calendar day on the axis, preserve gaps, and calculate averages within seven calendar days with at least three available days. Inside-range rates and range scores/widths use one common provider cohort.
+- Per-station lists/maps describe observed differences; a percentage threshold alone is not an uncertainty test and does not justify a station winner verdict.

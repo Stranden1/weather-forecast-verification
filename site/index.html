@@ -76,16 +76,17 @@
   <section class="card">
     <div class="card-head">
       <div><h2>Over time</h2>
-        <p class="sub">Daily average error, with a 7-day rolling line. Patterns appear as weeks and seasons pass.</p></div>
+        <p class="sub">Daily average error, with a 7-calendar-day average when at least 3 days have data. Gaps stay visible.</p></div>
       <label class="pick">Forecast made <select id="trend-h"></select> ahead</label>
     </div>
     <div class="chart"><canvas id="trend-chart" aria-label="Daily error over time"></canvas></div>
+    <details class="table-view"><summary>Show daily values as a table</summary><div id="trend-table"></div></details>
   </section>
 
   <section class="card">
     <div class="card-head">
-      <div><h2>Who wins where</h2>
-        <p class="sub">Blue: Yr has the smaller error at that station. Orange: WeatherNext does. Grey: about equal. A grey ring: no measurements for over 2 days. Select a station for details.</p></div>
+      <div><h2>Where the errors differ</h2>
+        <p class="sub">Blue: Yr has lower observed error. Orange: WeatherNext does. These are descriptive differences, not station verdicts. A grey ring marks missing measurements in scored history. Select a station for details.</p></div>
       <label class="pick">Forecast made <select id="map-h"></select> ahead</label>
     </div>
     <div class="map-grid">

@@ -23,8 +23,6 @@ Updated 2026-10-12._
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
 4. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (56.3 mm at Bergen, corrected UTC day) is
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
-5. **Rain median on the remaining rain views:** the map, "Over time" chart and "Patterns" table still
-   use WeatherNext's average; the headline views now lead with the median (done 28 Sep).
 6. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
    the height adjustment over-warms cold valley stations (Røros, Dividalen, Grønliheia).
 

@@ -294,7 +294,11 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     if "wn_t" in scored and heights.get("stations"):
         scored["wn_t_adj"] = adjusted_t(scored, heights)
     days = sorted(scored.target.astype(str).str[:10].unique())
-    last30 = days[-30:]
+    end_day = days[-1] if days else None
+    start30 = (pd.Timestamp(end_day) - pd.Timedelta(days=29)).strftime("%Y-%m-%d") if end_day else None
+    periods = {"all": {"start": days[0] if days else None, "end": end_day},
+               "last30": {"start": start30, "end": end_day}}
+    last30 = [day for day in days if day >= start30] if start30 else []
 
     board, trend, per_station, calib, patterns, rain, bias = {}, {}, {}, {}, {}, {}, {}
     for var in VARIABLES:
@@ -302,6 +306,8 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         board[var], trend[var], per_station[var], calib[var], patterns[var], bias[var] = {}, {}, {}, {}, {}, {}
         for h in hs:
             d = paired(scored[scored.h == h], var) if len(scored) else pd.DataFrame()
+            if var == "p" and not d.empty and "e_wn50" in d:
+                d = d[d.e_wn50.notna()]  # one shared cohort for the median headline and its mean alternative
             if d.empty:
                 continue
             key = str(h)
@@ -334,6 +340,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     dump("rain.json", rain)
     dump("bias.json", bias)
 
+    from .views import build_views
+    dump("views.json", build_views(scored, periods, elevation) if days else {})
+
     from .replay import steadiness
     dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})
 
@@ -356,7 +365,8 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
             json.dumps(r, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     # Recent hourly series at the 24 h horizon for the "predicted vs actual" chart.
-    recent = scored[(scored.h == 24) & scored.target.astype(str).str[:10].isin(days[-7:])]
+    start7 = (pd.Timestamp(end_day) - pd.Timedelta(days=6)).strftime("%Y-%m-%d") if end_day else ""
+    recent = scored[(scored.h == 24) & (scored.target.astype(str).str[:10] >= start7)]
     for sid, g in recent.groupby("station"):
         g = g.sort_values("target")
         old_enough = pd.to_datetime(g.target, utc=True) <= cutoff
@@ -367,6 +377,9 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
             if publish_values:
                 series[f"wn_{var}"] = [_r(x, 2) if pd.notna(x) and ok else None
                                        for x, ok in zip(g[f"wn_{var}"], old_enough)]
+        if publish_values:
+            series["wn_p_p50"] = [_r(x, 2) if pd.notna(x) and ok else None
+                                   for x, ok in zip(g.get("wn_p_p50", pd.Series(np.nan, index=g.index)), old_enough)]
         (out_dir / "recent" / f"{sid}.json").write_text(json.dumps(series, separators=(",", ":")),
                                                          encoding="utf-8")
 
@@ -379,6 +392,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "generated_at": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
         "first_day": days[0] if days else None, "last_day": days[-1] if days else None,
         "days": len(days), "rows": int(len(scored)),
+        "periods": periods, "view_metrics": {"t": "mean", "w": "mean", "p": "median"},
         "horizons": HORIZONS, "precip_horizons": PRECIP_HORIZONS,
         "variables": VARIABLES, "providers": PROVIDERS,
         "publish_forecast_values": publish_values, "min_days_for_verdict": MIN_DAYS_FOR_VERDICT,

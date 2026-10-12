@@ -15,7 +15,7 @@
     too_close: ["Too close to call", ""], not_enough_data: ["Not enough days yet", ""],
   };
   const S = { v: "t", period: "all", hView: "diff", trendH: 24, mapH: 24, patH: 24, biasH: 24, station: null };
-  let D = {}, charts = {}, map, markers = [];
+  let D = {}, charts = {}, map, markers = [], stationRequest = 0, replayRequest = 0;
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmt = (x, d = 2) => x == null ? "–" : Number(x).toFixed(d);
@@ -30,6 +30,10 @@
   // Rain leads with WeatherNext's median (its average spreads drizzle everywhere); the average is the dashed line.
   // Temperature and wind lead with the average. `wnPick` returns the headline and secondary numbers of a stats block.
   const isRain = () => S.v === "p";
+  const wnName = () => isRain() ? "WeatherNext (median)" : "WeatherNext";
+  const selected = name => D.views?.[S.period]?.[name] || {};
+  const dates = () => D.meta.periods?.[S.period] || { start: D.meta.first_day, end: D.meta.last_day };
+  const periodText = () => dates().start ? `${dates().start} to ${dates().end} (UTC target dates)` : "No dates yet";
   const wnPick = s => isRain()
     ? { main: s.mae_wn50, alt: s.mae_wn, bias: s.bias_wn50, diff: s.diff_50, lo: s.ci_50_lo, hi: s.ci_50_hi, verdict: s.verdict_50,
         skill: s.base?.skill_wn50, altVerdict: s.verdict, altWord: "average" }
@@ -48,7 +52,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   async function load() {
-    const names = ["meta", "leaderboard", "trend", "stations", "calibration", "patterns", "rain", "health", "summary", "events", "steadiness", "bias"];
+    const names = ["meta", "leaderboard", "health", "summary", "events", "views"];
     const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
     names.forEach((n, i) => (D[n] = got[i]));
   }
@@ -88,7 +92,7 @@
   }
   function line(label, data, color, extra = {}) {
     return { label, data, borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: 4,
-             pointHoverRadius: 6, spanGaps: true, tension: 0.2, ...extra };
+             pointHoverRadius: 6, spanGaps: false, tension: 0.2, ...extra };
   }
   function chart(id, config) {
     if (charts[id]) charts[id].destroy();
@@ -283,14 +287,14 @@
 
   function renderSteadiness() {
     const card = document.getElementById("steady");
-    const st = D.steadiness?.[S.v];
+    const st = selected("steadiness")?.[S.v];
     const all = (st?.steps || []).filter(s => s.n);
     card.hidden = !all.length;
     if (!all.length) return;
     const minDays = D.meta.min_days_for_verdict;
     const steps = all.filter(s => s.days >= minDays);
     const short = all.filter(s => s.days < minDays);
-    const wnName = isRain() ? "WeatherNext (average)" : "WeatherNext";
+    const wnName = isRain() ? "WeatherNext (median)" : "WeatherNext";
     const f = st.flip || {};
     document.getElementById("steady-flip").innerHTML = f.n ? `
       <span><b>Flip-flops per 100 forecasts:</b></span>
@@ -323,9 +327,9 @@
       `Changes of at least ${fmt(minRev, 1)} ${unit()} moved the forecast closer to what was measured ` +
       `${range(steps.map(s => s.yr.toward))} of the time for Yr and ${range(steps.map(s => s.wn.toward))} for WeatherNext ` +
       `(50% would be a coin toss). Steady is not the same as accurate: ` +
-      `WeatherNext's forecast here is the average of many possible outcomes, which moves less by nature, ` +
+      `WeatherNext's forecast here is the ${isRain() ? "median" : "average"} of many possible outcomes, ` +
       `and Yr's first days are corrected with fresh station measurements, so it changes more close to the event. ` +
-      `Only hours where both services issued a new forecast at both horizons count. Uses all days so far.`;
+      `Only hours where both services issued a new forecast at both horizons count. ${periodText()}.`;
 
     document.getElementById("steady-table").innerHTML = `<div class="table-scroll"><table>
       <tr><th>Change from → to</th><th>Yr</th><th>${wnName}</th><th>Difference</th><th>95% range</th><th>Verdict</th>
@@ -348,7 +352,7 @@
   function renderBias() {
     const card = document.getElementById("bias");
     if (!card) return; // a cached index.html from before this card; the rest of the page must still render
-    const byH = D.bias?.[S.v] || {};
+    const byH = selected("bias")?.[S.v] || {};
     card.hidden = !Object.keys(byH).length;
     if (card.hidden) return;
     hSelect("bias-h", "biasH");
@@ -358,7 +362,7 @@
     document.getElementById("bias-sub").textContent = "Average error with its sign, by local time of day (Oslo). " +
       `Right of the line the forecast was ${MISS[S.v][0]}; left of it, ${MISS[S.v][1]}. A big error in either direction ` +
       "still counts here, so this shows a lean, not accuracy.";
-    const s = D.leaderboard?.[S.v]?.[S.biasH]?.all;
+    const s = D.leaderboard?.[S.v]?.[S.biasH]?.[S.period];
     document.getElementById("bias-lead").innerHTML = s?.n ? `${H_LABEL[S.biasH]} ahead, over all hours:
       <span class="dot yr"></span> Yr <b>${missText(s.bias_yr)}</b> ·
       <span class="dot wn"></span> ${wnName} <b>${missText(wnPick(s).bias)}</b>` +
@@ -393,7 +397,7 @@
       ? `Fewer than ${D.meta.min_days_for_verdict} days so far for: ${few.map(b => b.label).join(", ")}; read these with care. ` : "") +
       (adj ? "WeatherNext's temperature is for the average height of its grid area, often higher than the station, " +
         "so part of its cold lean is height; the outlined bar shows it after our standard height adjustment. " : "") +
-      (isRain() ? "Rain uses WeatherNext's median, as the tiles do. " : "") + "Uses all days so far.";
+      (isRain() ? "Rain uses WeatherNext's median, as the tiles do. " : "") + periodText() + ".";
 
     document.getElementById("bias-table").innerHTML = `<div class="table-scroll"><table>
       <tr><th>Time of day</th><th>Yr</th><th>${wnName}</th>${adj ? "<th>Height-adj.</th>" : ""}<th>Forecasts</th><th>Days</th></tr>
@@ -404,22 +408,32 @@
   }
 
   function rolling(arr, k = 7) {
-    return arr.map((_, i) => { const w = arr.slice(Math.max(0, i - k + 1), i + 1).filter(x => x != null);
+    return arr.map((v, i) => { if (v == null) return null;
+      const w = arr.slice(Math.max(0, i - k + 1), i + 1).filter(x => x != null);
       return w.length >= Math.min(k, 3) ? w.reduce((a, b) => a + b, 0) / w.length : null; });
   }
   function renderTrend() {
     hSelect("trend-h", "trendH");
-    let t = D.trend?.[S.v]?.[S.trendH] || [];
-    if (S.period === "last30") t = t.slice(-30);
+    const rows = selected("trend")?.[S.v]?.[S.trendH] || [];
+    const byDay = new Map(rows.map(r => [r.day, r])), t = [];
+    if (dates().start && dates().end) for (let ts = Date.parse(dates().start); ts <= Date.parse(dates().end); ts += 864e5) {
+      const day = new Date(ts).toISOString().slice(0, 10);
+      t.push(byDay.get(day) || { day, n: 0, yr: null, wn: null });
+    }
     const yr = t.map(r => r.yr), wn = t.map(r => r.wn);
     const faint = c => c + "55";
     chart("trend-chart", { type: "line", options: baseOptions(`Average error (${unit()})`), data: {
       labels: t.map(r => r.day.slice(5)), datasets: [
         line("Yr, 7-day", rolling(yr), css("--yr"), { pointRadius: 0 }),
-        line("WeatherNext, 7-day", rolling(wn), css("--wn"), { pointRadius: 0 }),
+        line(`${wnName()}, 7-day`, rolling(wn), css("--wn"), { pointRadius: 0 }),
         line("Yr, daily", yr, faint(css("--yr")), { borderWidth: 0, pointRadius: 3, showLine: false }),
-        line("WeatherNext, daily", wn, faint(css("--wn")), { borderWidth: 0, pointRadius: 3, showLine: false }),
+        line(`${wnName()}, daily`, wn, faint(css("--wn")), { borderWidth: 0, pointRadius: 3, showLine: false }),
       ] } });
+    const table = document.getElementById("trend-table");
+    if (table) table.innerHTML = `<div class="table-scroll"><table>
+      <tr><th>UTC date</th><th>Paired hours</th><th>Yr error</th><th>${wnName()} error</th></tr>
+      ${t.map(r => `<tr><td>${r.day}</td><td>${r.n}</td><td>${fmt(r.yr)}</td><td>${fmt(r.wn)}</td></tr>`).join("")}
+      </table></div>`;
   }
 
   function mix(a, b, t) { // hex blend for the diverging scale
@@ -429,7 +443,7 @@
   }
   function renderMap() {
     hSelect("map-h", "mapH");
-    const st = D.stations?.[S.v]?.[S.mapH] || {};
+    const st = selected("stations")?.[S.v]?.[S.mapH] || {};
     if (!map) {
       // Leaflet only adds the tile layer (and its attribution text) once the map has a view, and a
       // fit made before that comes out a quarter step too tight, so start from a rough view.
@@ -454,7 +468,7 @@
       if (r && r.yr != null && r.wn != null) {
         const d = r.wn - r.yr, t = Math.min(1, Math.abs(d) / scale);
         color = d > 0 ? mix(neutral, yr, t) : mix(neutral, wn, t);
-        tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · WeatherNext ${fmt(r.wn)} ${unit()}<br>${r.n} forecasts` +
+        tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · ${wnName()} ${fmt(r.wn)} ${unit()}<br>${r.n} paired hours · ${r.days} days` +
           (s.flag && S.v === "t" ? "<br>Height note: see station details" : "");
       }
       if (quiet) tip += `<br>No measurements since ${dayMonth(quiet)}`;
@@ -473,7 +487,7 @@
   // enough days whose average error is at least DIFF_MIN smaller, the biggest gaps first.
   const DIFF_MIN = 0.10, DIFF_TOP = 3;
   function renderDiffs(el) {
-    const st = D.stations?.[S.v]?.[S.mapH] || {}, minDays = D.meta.min_days_for_verdict || 7;
+    const st = selected("stations")?.[S.v]?.[S.mapH] || {}, minDays = D.meta.min_days_for_verdict || 7;
     const rows = D.meta.stations.map(s => ({ s, r: st[s.id] }))
       .filter(x => x.r && x.r.yr != null && x.r.wn != null && (x.r.days || 0) >= minDays)
       .map(x => ({ ...x, gap: (x.r.wn - x.r.yr) / Math.max(x.r.yr, x.r.wn) }));
@@ -482,29 +496,31 @@
     const item = ({ s, r, gap }) => {
       const adj = S.v === "t" && gap > 0 && r.wnh != null && r.wnh !== r.wn ? ` · height-adjusted ${fmt(r.wnh)}` : "";
       return `<li><button class="diff-pick" data-id="${esc(s.id)}">${esc(s.name)}</button>
-        <span class="muted">${Math.round(Math.abs(gap) * 100)}% smaller error · Yr ${fmt(r.yr)} vs WeatherNext ${fmt(r.wn)}&nbsp;${unit()}${adj}</span></li>`;
+        <span class="muted">${Math.round(Math.abs(gap) * 100)}% smaller error · Yr ${fmt(r.yr)} vs ${wnName()} ${fmt(r.wn)}&nbsp;${unit()}${adj}</span></li>`;
     };
     const list = (sign, name, cls) => { const p = pick(sign);
-      return `<h4><span class="${cls}">${name}</span> is clearly closer at</h4>` + (p.length
+      return `<h4><span class="${cls}">${name}</span> has lower observed error at</h4>` + (p.length
         ? `<ol class="diff-list">${p.map(item).join("")}</ol>`
         : `<p class="muted diff-none">No station yet.</p>`); };
     el.innerHTML = `<h3>Biggest differences</h3>
       <p class="muted" style="margin:0 0 10px;font-size:13px">Forecasts made ${H_LABEL[S.mapH]} ahead. Stations with at least ${minDays} days
-        where one service's average error is at least ${Math.round(DIFF_MIN * 100)}% smaller.</p>
-      ${rows.length ? list(1, "Yr", "yr") + list(-1, "WeatherNext", "wn")
+        where one service's average error is at least ${Math.round(DIFF_MIN * 100)}% smaller. Descriptive differences; no station uncertainty test.</p>
+      ${rows.length ? list(1, "Yr", "yr") + list(-1, wnName(), "wn")
         : `<p class="empty">No station has ${minDays} days of data at this horizon yet.</p>`}
       <p class="muted" style="margin:12px 0 0;font-size:13px">Select a station on the map or in the list for details.</p>`;
     el.onclick = e => { const b = e.target.closest(".diff-pick"); if (b) { S.station = b.dataset.id; renderStation(); } };
   }
 
   async function renderStation() {
+    const request = ++stationRequest;
     const el = document.getElementById("station-panel");
     const s = D.meta.stations.find(x => x.id === S.station);
     if (!s) { renderDiffs(el); return; }
     el.onclick = e => { if (e.target.closest(".diff-back")) { S.station = null; renderStation(); } };
-    const st = D.stations?.[S.v]?.[S.mapH]?.[s.id];
+    const st = selected("stations")?.[S.v]?.[S.mapH]?.[s.id];
     let rec = null;
     try { rec = await fetch(`${DATA}recent/${s.id}.json`).then(r => r.ok ? r.json() : null); } catch (e) {}
+    if (request !== stationRequest) return;
     const f = S.v === "t" ? s.flag : null;
     const higher = dz => `${Math.abs(dz)} m ${dz > 0 ? "higher" : "lower"}`;
     const flagText = !f ? "" : `<p class="note" style="font-size:13px"><b>Height note.</b> ${f.dz != null
@@ -515,18 +531,19 @@
     el.innerHTML = `<button class="diff-back">← Biggest differences</button>
       <h3>${esc(s.name)}</h3>
       <p class="muted" style="margin:0 0 8px;font-size:14px">${s.elev != null ? Math.round(s.elev) + " m above sea level · " : ""}${esc(s.county || "")}</p>
-      <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>WeatherNext ${fmt(st?.wn)}</b> ${unit()}${
+      <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>${wnName()} ${fmt(st?.wn)}</b> ${unit()}${
         st?.wnh != null && st.wnh !== st.wn ? ` · height-adjusted ${fmt(st.wnh)}` : ""}</p>
       ${flagText}${silentStations().has(s.id) ? `<p class="note" style="font-size:13px"><b>No measurements since ${dayMonth(s.last_obs)}.</b>
-        The station has stopped reporting to Frost, so it adds nothing new to the scores until it is back.</p>` : ""}
+        No newer measurements occur in the finalized scored history through ${D.meta.last_day}; the live station may have recovered since.</p>` : ""}
       <p class="muted" style="margin:0 0 4px;font-size:13px">Last 7 days: forecast made 1 day ahead vs what happened</p>
       <div class="chart"><canvas id="station-chart"></canvas></div>
       ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's forecast values are not shown, because its data terms don't clearly allow publishing them; its errors are included in every score.</p>`}`;
     if (!rec) { el.querySelector(".chart").innerHTML = `<p class="empty">No recent data.</p>`; return; }
     const ds = [line("Measured", rec[`obs_${S.v}`], css("--obs"), { pointRadius: 0, borderWidth: 2 }),
                 line("Yr", rec[`yr_${S.v}`], css("--yr"), { pointRadius: 0 })];
-    if (rec[`wn_${S.v}`]?.some(x => x != null)) {
-      ds.push(line("WeatherNext", rec[`wn_${S.v}`], css("--wn"), { pointRadius: 0 }));
+    const wnValues = rec[isRain() ? "wn_p_p50" : `wn_${S.v}`];
+    if (wnValues?.some(x => x != null)) {
+      ds.push(line(wnName(), wnValues, css("--wn"), { pointRadius: 0 }));
       el.querySelector(".chart").insertAdjacentHTML("afterend", wnNotice());
     }
     const o = baseOptions(unit()); o.scales.y.beginAtZero = S.v !== "t";
@@ -544,8 +561,9 @@
   // Storm replays: what each service said 7 days ... 6 hours before a notable event.
   const EV_ICON = { rain: "Rain", wind: "Wind", cold: "Cold" };
   async function renderReplays() {
+    const request = ++replayRequest;
     const card = document.getElementById("replays");
-    const list = D.events || [];
+    const list = (D.events || []).filter(e => e.day >= dates().start && e.day <= dates().end);
     card.hidden = !list.length;
     if (!list.length) return;
     const sel = document.getElementById("replay-pick");
@@ -555,6 +573,7 @@
     sel.onchange = () => { S.replay = sel.value; renderReplays(); };
     let r = null;
     try { r = await fetch(`${DATA}events/${S.replay}.json`).then(x => x.ok ? x.json() : null); } catch (e) {}
+    if (request !== replayRequest) return;
     const body = document.getElementById("replay-body");
     if (!r) { body.innerHTML = `<p class="empty">This replay could not be loaded.</p>`; return; }
     const pts = r.points;  // farthest ahead first
@@ -584,17 +603,17 @@
   function renderPatterns() {
     hSelect("pat-h", "patH");
     document.getElementById("pat-h-label").textContent = H_LABEL[S.patH];
-    const rows = D.patterns?.[S.v]?.[S.patH] || [];
+    const rows = selected("patterns")?.[S.v]?.[S.patH] || [];
     const bar = (x, max, c) => x == null ? "" :
       `<span style="display:inline-block;height:8px;width:${Math.max(2, 80 * x / max)}px;background:var(${c});border-radius:0 4px 4px 0;vertical-align:middle;margin-left:6px"></span>`;
     const max = Math.max(...rows.flatMap(r => [r.mae_yr || 0, r.mae_wn || 0]), 0.01);
     document.getElementById("patterns").innerHTML = rows.length ? `<div class="table-scroll"><table>
-      <tr><th>Situation</th><th>Forecasts</th><th>Yr error</th><th>WeatherNext error</th><th>Difference</th></tr>
+      <tr><th>Situation</th><th>Paired hours</th><th>Yr error</th><th>${wnName()} error</th><th>Difference</th></tr>
       ${rows.map(r => `<tr><td>${esc(r.label)}</td><td>${r.n.toLocaleString()}</td>
         <td>${fmt(r.mae_yr)}${bar(r.mae_yr, max, "--yr")}</td><td>${fmt(r.mae_wn)}${bar(r.mae_wn, max, "--wn")}</td>
         <td>${fmt(r.diff)}</td></tr>`).join("")}</table></div>` : `<p class="empty">No data yet.</p>`;
 
-    const cal = D.calibration?.[S.v]?.[S.patH];
+    const cal = selected("calibration")?.[S.v]?.[S.patH];
     document.querySelector(".two").style.gridTemplateColumns = S.v === "p" ? "1fr" : "";
     document.getElementById("calibration").hidden = S.v === "p";
     document.getElementById("calibration").innerHTML = S.v === "p" ? "" : `<h3>Honest about uncertainty?</h3>
@@ -605,11 +624,11 @@
         <td>${Math.round(cal[p].inside * 100)}%</td><td>${fmt(cal.q?.[p]?.pinball)}</td>
         <td>${cal.q?.[p]?.width == null ? "–" : fmt(cal.q[p].width, 1) + " " + unit()}</td>
         <td>${cal[p].n.toLocaleString()}</td></tr>`).join("")}</table></div>
-        <p class="muted" style="font-size:13px">Range score and width: lower is better. The score rewards ranges that
+        <p class="muted" style="font-size:13px">Lower range score is better; width must be judged with coverage. The score rewards ranges that
         catch the measurement while staying narrow${cal.q ? `; both use the ${cal.q.n.toLocaleString()} forecasts where both services gave a range, and Yr's main value counts as its middle` : ""}.</p>`
         : `<p class="muted">No data yet.</p>`}`;
 
-    const rain = S.v === "p" ? D.rain?.[S.patH] : null;
+    const rain = S.v === "p" ? selected("rain")?.[S.patH] : null;
     const RAIN_ROW = { yr: ["yr", "Yr"], wn50: ["wn", "WeatherNext (median)"], wn: ["wn", "WeatherNext (average)"] };
     document.getElementById("rain").innerHTML = !rain ? "" : `<h3>Catching rain</h3>
       <p class="sub" style="font-size:14px">A wet hour is more than 0.1 mm. ${rain.wet_hours.toLocaleString()} wet and
