@@ -279,6 +279,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     stations = stations or load_stations()
     heights = load_heights() if heights is None else heights
     station_flags = flags(heights)
+    offshore = {sid for sid, h in heights.get("stations", {}).items() if h.get("offshore")}
     elevation = {s["station_id"]: s.get("elevation_m") for s in stations}
     files = {}
 
@@ -341,7 +342,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
     dump("bias.json", bias)
 
     from .views import build_views
-    dump("views.json", build_views(scored, periods, elevation) if days else {})
+    dump("views.json", build_views(scored, periods, elevation, offshore) if days else {})
 
     from .replay import steadiness
     dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})
@@ -357,7 +358,6 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
 
     from .replay import build_replays
     (out_dir / "events").mkdir(exist_ok=True)
-    offshore = {sid for sid, h in heights.get("stations", {}).items() if h.get("offshore")}
     index, replays = build_replays(scored, publish_values, now_ts, offshore)
     dump("events.json", index)
     for eid, r in replays.items():

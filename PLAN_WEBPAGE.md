@@ -124,11 +124,12 @@ separate coordinated cleanup; a normal encryption commit cannot erase them.
    hidden from both charts; the naive guess ("same as yesterday") moved to the tiles and table.
    See DECISIONS.md "Horizon chart: difference first".
 
-## Existing local app
+## Retired local app
 
-Unchanged. `app.py`, the Windows task and `data/weather.db` keep working. Run
-both in parallel for a week, compare, then stop the Windows task. The Streamlit
-app can stay as a private deep-dive tool.
+The PC collector was retired on 11 Oct 2026. The local database and its archive were
+deleted without a backup and are lost. The cloud history is the only retained record;
+full local-run comparisons and retirement coverage re-runs are no longer possible.
+The legacy app/code remains for reference and fixture tests, not live collection.
 
 ## Steps and status
 
@@ -152,7 +153,7 @@ app can stay as a private deep-dive tool.
        (09-05..09-22), 50 stations, 97,581 rows, 2.2 MB. Sanity-checked (temperature MAE
        0.8–1.3 °C rising with horizon, leads within ±3 h); not compared day-by-day with
        Streamlit, whose pairing rules differ by design.*
-- [ ] 10. After ~1 week of parallel running: compare, then remove the Windows task.
+- [x] 10. PC collector retired on 11 Oct 2026. Subsequent loss of the database/archive is recorded in AGENTS.md and CHANGELOG.md.
 - [x] 11. Terms read; forecast values stay private (DECISIONS policy).
 - [x] 12. Handoff docs consolidated (26 Sep).
 - [x] 13. Naive baseline + skill, pinball score + range width, health line (see "Improvements").
@@ -165,3 +166,10 @@ app can stay as a private deep-dive tool.
   history, coverage-gated preparation, fail-closed restore, and history-first
   publication with origin confirmation. Pushed as 3e6ec36; first scheduled run verified successfully (36497119777); no new day ready.
 - [x] 15. Monthly summary and rain median headline (28 Sep). Live in run 36497119777; monthly summary observed on the published page.
+
+## Local scorecard checkpoints — 2026-10-12 (Codex)
+
+- UTC rain totals now use interval ends 01:00 through next midnight, without changing stored history. Replays disclose hourly-median sums and protect the final interval's publication age.
+- `views.json` contains both calendar periods across map/trend/Patterns/bias/uncertainty/steadiness and practical event counts. Primary rain uses common median pairs; legacy exports remain compatible.
+- The first answer/compact scores precede optional detail; all active stations have a selector, charts have table alternatives, and event views include land/offshore groups.
+- 143 cloud tests and browser checks at 1280/375/320 px, light/dark, pass. These changes are local on `codex/scorecard-corrections`, pending review/publication.

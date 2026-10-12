@@ -144,8 +144,9 @@ References: [GitHub schedule limitations](https://docs.github.com/en/actions/ref
 **Settings → Secrets and variables → Actions → Variables**:
 
 - `WEATHERNEXT_ENABLED` = `0` pauses WeatherNext collection.
-- The public workflow forces `WX_PUBLISH_FORECAST_VALUES=0`. Keep this policy
-  until publication of the underlying values is explicitly resolved.
+- `WX_PUBLISH_FORECAST_VALUES` follows the repository variable (default `0`). The user enabled
+  past values on 2 Oct 2026; targets must be at least one hour old, with the required attribution.
+  Set the variable to `0` to disable value publication. Local exports also enforce the target-age gate.
 
 ## Encrypted history and local decryption
 

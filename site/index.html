@@ -9,41 +9,49 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to comparison</a>
 <header class="wrap hero">
   <p class="eyebrow">Forecast scorecard · Norway</p>
   <h1>Yr vs WeatherNext</h1>
-  <p class="health" id="health" role="status" hidden></p>
-  <section class="summary" id="summary" aria-labelledby="summary-h" hidden>
-    <h2 id="summary-h">Month by month</h2>
-    <div id="summary-now"></div>
-    <details id="summary-earlier"><summary>Earlier months</summary><div id="summary-list"></div></details>
-    <p class="muted summary-note">A service is only named ahead where the 95% test below says so, and not before
-      7 days of data in the month. Rain compares WeatherNext's average and its median with Yr.</p>
-  </section>
-  <p class="lede">Every three hours we save what <b class="yr">Yr</b> and Google's AI model
-    <b class="wn">WeatherNext</b> predict for 50 weather stations. Once the weather has happened,
-    we check both forecasts against the measurements. Lower error is better.</p>
+  <details class="health-box" id="health-box"><summary class="health" id="health" role="status" hidden></summary><p id="health-detail" class="muted"></p></details>
+  <p class="lede">Which forecast is closer in Norway? We compare Yr and WeatherNext with weather station measurements.</p>
   <p class="fresh" id="fresh">Loading…</p>
 </header>
 
-<main class="wrap">
-  <div class="controls" role="toolbar" aria-label="Filters">
-    <div class="seg" id="var-seg" role="radiogroup" aria-label="Weather variable"></div>
-    <div class="seg" id="period-seg" role="radiogroup" aria-label="Period">
+<main class="wrap" id="main">
+  <div class="controls" role="group" aria-label="Filters">
+    <div class="seg" id="var-seg" role="group" aria-label="Weather variable"></div>
+    <div class="seg" id="period-seg" role="group" aria-label="Period">
       <button data-v="all" aria-pressed="true">All time</button>
       <button data-v="last30" aria-pressed="false">Last 30 days</button>
     </div>
   </div>
 
+  <p class="answer" id="answer" aria-live="polite"></p>
+  <p class="scope muted" id="scope"></p>
+
   <section class="tiles" id="tiles" aria-live="polite"></section>
   <p class="muted rain-why" id="rain-why" hidden>For rain we lead with WeatherNext's median, because averaging many
     scenarios spreads light drizzle across nearly every hour.</p>
 
-  <section class="card">
+  <nav class="section-nav" aria-label="Scorecard sections">
+    <a href="#practical">Events</a><a href="#horizons">Horizons</a><a href="#station-section">Stations</a><a href="#more-analysis">More analysis</a>
+  </nav>
+
+  <section class="card" id="practical">
+    <div class="card-head"><div><h2 id="practical-heading">Does it catch the weather that matters?</h2>
+      <p class="sub" id="practical-sub"></p></div>
+      <label class="pick">Forecast made <select id="event-h"></select> ahead</label>
+    </div>
+    <label class="pick inline">Stations <select id="event-region"><option value="all">All stations</option><option value="land">Land</option><option value="offshore">Offshore</option></select></label>
+    <div id="practical-body"></div>
+  </section>
+
+  <section class="card" id="horizons">
     <div class="card-head">
       <div><h2>Who is closer, by how far ahead</h2>
         <p class="sub" id="horizon-sub"></p></div>
-      <div class="seg" id="horizon-view" role="radiogroup" aria-label="Chart view"></div>
+      <div class="seg" id="horizon-view" role="group" aria-label="Chart view"></div>
     </div>
     <div class="chart-legend" id="horizon-legend"></div>
     <div class="chart"><canvas id="horizon-chart" aria-label="Forecast error by how far ahead"></canvas></div>
@@ -51,44 +59,16 @@
     <details class="table-view"><summary>Show as table</summary><div id="horizon-table"></div></details>
   </section>
 
-  <section class="card" id="steady" hidden>
-    <h2>How steady are the forecasts?</h2>
-    <p class="sub">Take one hour at one station. How much did each service's forecast for it change between
-      being made, say, 2 days ahead and 1 day ahead? Smaller changes mean a steadier forecast.</p>
-    <p class="steady-flip" id="steady-flip"></p>
-    <div class="chart steady-chart"><canvas id="steady-chart" aria-label="How much forecasts changed between horizons"></canvas></div>
-    <p class="muted chart-note" id="steady-note"></p>
-    <details class="table-view"><summary>Show as table</summary><div id="steady-table"></div></details>
-  </section>
 
-  <section class="card" id="bias" hidden>
-    <div class="card-head">
-      <div><h2>Which way do they miss?</h2>
-        <p class="sub" id="bias-sub"></p></div>
-      <label class="pick">Forecast made <select id="bias-h"></select> ahead</label>
-    </div>
-    <p class="bias-lead" id="bias-lead"></p>
-    <div class="chart bias-chart"><canvas id="bias-chart" aria-label="Average signed error by time of day"></canvas></div>
-    <p class="muted chart-note" id="bias-note"></p>
-    <details class="table-view"><summary>Show as table</summary><div id="bias-table"></div></details>
-  </section>
 
-  <section class="card">
-    <div class="card-head">
-      <div><h2>Over time</h2>
-        <p class="sub">Daily average error, with a 7-calendar-day average when at least 3 days have data. Gaps stay visible.</p></div>
-      <label class="pick">Forecast made <select id="trend-h"></select> ahead</label>
-    </div>
-    <div class="chart"><canvas id="trend-chart" aria-label="Daily error over time"></canvas></div>
-    <details class="table-view"><summary>Show daily values as a table</summary><div id="trend-table"></div></details>
-  </section>
 
-  <section class="card">
+  <section class="card" id="station-section">
     <div class="card-head">
       <div><h2>Where the errors differ</h2>
         <p class="sub">Blue: Yr has lower observed error. Orange: WeatherNext does. These are descriptive differences, not station verdicts. A grey ring marks missing measurements in scored history. Select a station for details.</p></div>
       <label class="pick">Forecast made <select id="map-h"></select> ahead</label>
     </div>
+    <label class="pick inline">Station <select id="station-pick" aria-label="Choose any station"></select></label>
     <div class="map-grid">
       <div id="map" role="region" aria-label="Station map"></div>
       <div id="station-panel" class="station-panel" aria-live="polite"><p class="muted">Select a station on the map.</p></div>
@@ -106,7 +86,39 @@
     <div id="replay-body"></div>
   </section>
 
-  <section class="card">
+
+  <details class="more-analysis" id="more-analysis">
+    <summary>More analysis: trends, bias, forecast changes and uncertainty</summary>
+  <section class="card" id="steady" hidden>
+    <h2>How steady are the forecasts?</h2>
+    <p class="sub">Take one hour at one station. How much did each service's forecast for it change between
+      being made, say, 2 days ahead and 1 day ahead? Smaller changes mean a steadier forecast.</p>
+    <p class="steady-flip" id="steady-flip"></p>
+    <div class="chart steady-chart"><canvas id="steady-chart" aria-label="How much forecasts changed between horizons"></canvas></div>
+    <p class="muted chart-note" id="steady-note"></p>
+    <details class="table-view"><summary>Show as table</summary><div id="steady-table"></div></details>
+  </section>
+  <section class="card" id="bias" hidden>
+    <div class="card-head">
+      <div><h2>Which way do they miss?</h2>
+        <p class="sub" id="bias-sub"></p></div>
+      <label class="pick">Forecast made <select id="bias-h"></select> ahead</label>
+    </div>
+    <p class="bias-lead" id="bias-lead"></p>
+    <div class="chart bias-chart"><canvas id="bias-chart" aria-label="Average signed error by time of day"></canvas></div>
+    <p class="muted chart-note" id="bias-note"></p>
+    <details class="table-view"><summary>Show as table</summary><div id="bias-table"></div></details>
+  </section>
+  <section class="card" id="trend">
+    <div class="card-head">
+      <div><h2>Over time</h2>
+        <p class="sub">Daily average error, with a 7-calendar-day average when at least 3 days have data. Gaps stay visible.</p></div>
+      <label class="pick">Forecast made <select id="trend-h"></select> ahead</label>
+    </div>
+    <div class="chart"><canvas id="trend-chart" aria-label="Daily error over time"></canvas></div>
+    <details class="table-view"><summary>Show daily values as a table</summary><div id="trend-table"></div></details>
+  </section>
+  <section class="card" id="patterns-section">
     <h2>Patterns to watch</h2>
     <p class="sub">How the error changes with the weather and the terrain, for forecasts made
       <span id="pat-h-label"></span> ahead.</p>
@@ -117,15 +129,25 @@
       <div id="rain"></div>
     </div>
   </section>
+  </details>
 
-  <section class="card about">
-    <h2>How to read this fairly</h2>
+  <details class="card monthly" id="monthly"><summary id="summary-h">Month by month</summary>
+  <section class="summary" id="summary" aria-label="Monthly summaries" hidden>
+    <div id="summary-now"></div>
+    <details id="summary-earlier"><summary>Earlier months</summary><div id="summary-list"></div></details>
+    <p class="muted summary-note">A service is only named ahead where the 95% test below says so, and not before
+      7 days of data in the month. Rain compares WeatherNext's average and its median with Yr.</p>
+  </section>
+  </details>
+
+  <details class="card about" id="about"><summary>How to read this fairly and data attribution</summary>
     <ul>
       <li><b>Same moment, same head start.</b> Both forecasts are saved in the same run. "24 h ahead" means
         what you could have seen on Yr and WeatherNext 24 hours before the weather happened.</li>
       <li><b>Yr has a home advantage.</b> For the first 2–3 days, Yr's forecasts are corrected using
-        measurements from Norwegian weather stations, including many of these ones. WeatherNext is not.
-        That's fair if you ask "which is best for Norway today?", not if you ask "which model is better in general?".</li>
+        measurements from Norwegian weather stations, including many of these ones. WeatherNext 3 also trains its
+        temperature output against station observations, which differs from Yr's local forecast corrections.
+        This compares the products people receive, rather than isolating the underlying models.</li>
       <li><b>WeatherNext averages many possible outcomes.</b> For temperature and wind we score its average,
         which smooths out extremes and tends to lower the average error. Its median, almost identical so far, is in the
         tiles and the table. For rain we lead with the median instead, as explained under the rain tiles.</li>
@@ -136,6 +158,8 @@
         2 days back for 2 days ahead, and so on. A useful forecast should beat it, and both do by a wide margin.</li>
       <li><b>Station measurements vs forecast grids.</b> A forecast describes an area; a station measures one spot.
         Both models face the same challenge.</li>
+      <li><b>Past scores keep retired stations.</b> The active collection count above can be smaller than the historical
+        scoring network. Earlier station measurements and forecasts stay in the record.</li>
       <li><b>Grid height.</b> WeatherNext's temperature is for the average terrain height of its ~5 km grid area,
         not the station's height. In steep terrain the area can be a few hundred metres higher than a station
         in a fjord or valley, so WeatherNext reads colder there (about 0.65 °C per 100 m). Stations where this matters are
@@ -145,7 +169,7 @@
         (interpolated between grid points); earlier days sometimes used a neighbouring grid point.</li>
     </ul>
     <p class="attrib" id="attrib"></p>
-  </section>
+  </details>
 </main>
 
 <footer class="wrap foot">

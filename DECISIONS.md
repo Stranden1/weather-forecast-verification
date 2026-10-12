@@ -1,6 +1,8 @@
 # Decisions
 
-_Updated 2026-09-28_
+_Latest additions 2026-10-12; historical local rules below describe the retired app._
+
+Current live record: encrypted cloud `history/`. The PC collector and database/archive were retired/lost on 11 Oct 2026; the old SQLite source-of-truth statements are superseded by AGENTS.md.
 
 - SQLite remains the local source of truth; WeatherNext extends the existing
   forecast model rather than introducing a separate datastore.
@@ -547,3 +549,10 @@ SN20925 (Wisting) is the first.
 - Rain's primary point-error views use WeatherNext's median, on hours where observation, Yr, WeatherNext mean and median exist. Never fall back silently to the mean. Mean alternatives remain explicitly labelled in rain detection, monthly text and replays.
 - Trends place each calendar day on the axis, preserve gaps, and calculate averages within seven calendar days with at least three available days. Inside-range rates and range scores/widths use one common provider cohort.
 - Per-station lists/maps describe observed differences; a percentage threshold alone is not an uncertainty test and does not justify a station winner verdict.
+
+## Practical views and presentation — 2026-10-12 (Codex)
+
+- Lead with a short one-day answer; retain details, methodology and attribution in accessible disclosures. Statistical period controls do not relabel monthly/health/latest-seven-day station scopes.
+- Event definitions are fixed: 2 m air temperature <0 °C; 10 m mean wind >=10 m/s; precipitation >0.1 mm/h (water equivalent, including snow). Count shared station-hours rather than claiming independent nights/storms or operational alerts.
+- Show detection/misses/false alarms and event-only error descriptively, with horizon, dates, counts and land/offshore grouping from retained height metadata. No new event significance verdict or composite score.
+- This work changes exported analysis and presentation only. New collector fields, complete daily-run retention, external backups/secrets, workflow settings and publication remain separate actions.

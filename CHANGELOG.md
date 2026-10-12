@@ -1,5 +1,15 @@
 # Changelog
 
+## Scorecard corrections: presentation and events checkpoint — 2026-10-12 (Codex)
+
+- A concise one-day answer and compact tiles lead the page. Monthly prose, forecast changes, bias, trends, uncertainty and methodology remain available in disclosures.
+- Added descriptive threshold detection from existing history: air temperature <0 °C, mean wind >=10 m/s, precipitation >0.1 mm/h (water equivalent). Shared-hour catches, misses, false alarms and event-only error are shown for all/land/offshore, by horizon and selected period. No event winner verdicts.
+- Every active station is reachable through a keyboard-accessible selector; trend/station/replay charts have data tables. Controls have honest group semantics; light muted-text contrast improved; tiny uncertainty endpoints retain enough decimals to explain verdicts.
+- Healthy collection is compact with expandable source details (including ECMWF); station warnings explicitly refer to finalized history, not current recovery.
+- Validated 143 cloud tests and the reusable `tests/scorecard_ui_test.cjs`: light/dark at 1280, 375 and 320 px; rain/filter consistency, station selection, one-point measured references, no captured JS errors or page-wide overflow. Real-history JSON is 936,986 bytes for 224,292 rows.
+- Mobile answer at y=409 px, first tile y=547 px, collapsed page height 5,332 px (previous live height ~10,085 px). Desktop height 3,548 px. Screenshots retained in ignored `work/scorecard-2026-10-12/`.
+- Updated retired-PC and publication guidance. History, collectors, encryption keys, workflows and deployed settings remain unchanged. Local branch only; publication awaits review.
+
 ## Scorecard corrections: periods and rain checkpoint — 2026-10-12 (Codex)
 
 - Added `views.json`: period-scoped map, trends, Patterns, bias, rain detection, matched uncertainty and steadiness. Legacy exports remain compatible.

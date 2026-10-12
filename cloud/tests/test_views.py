@@ -8,6 +8,7 @@ import pandas as pd
 
 from cloud.score import SCORED_COLUMNS
 from cloud.summarize import build
+from cloud.views import practical, primary_pairs
 
 STATIONS = [{"station_id": "SN1", "name": "Station", "latitude": 60, "longitude": 10, "elevation_m": 10}]
 
@@ -22,6 +23,38 @@ def history():
 
 
 class ViewTest(unittest.TestCase):
+    def test_freezing_detection_counts_and_empty_groups(self):
+        d = history()
+        d['obs_t'] = [-2, -1, 2, 1]
+        d['yr_t'] = [-1, 1, -1, 2]
+        d['wn_t'] = [-1, -2, 1, 2]
+        result = practical(primary_pairs(d, 't'), 't', {'SN1'})
+        self.assertEqual(result['all']['events'], 2)
+        self.assertEqual([result['all']['yr'][k] for k in ('hits', 'misses', 'false_alarms')], [1, 1, 1])
+        self.assertEqual(result['all']['wn']['pod'], 1.0)
+        self.assertEqual(result['land']['n'], 0)
+        self.assertIsNone(result['land']['yr']['pod'])
+        self.assertEqual(result['offshore']['n'], 4)
+
+    def test_rain_detection_uses_median_and_strict_wet_threshold(self):
+        d = history()
+        d['obs_p'] = [0.1, 0.2, 1, 0]
+        d['wn_p_p50'] = [0.1, 0.2, 0, None]
+        result = practical(primary_pairs(d, 'p'), 'p', set())['all']
+        self.assertEqual((result['n'], result['events']), (3, 2))
+        self.assertEqual([result['wn'][k] for k in ('hits', 'misses', 'false_alarms')], [1, 1, 0])
+
+    def test_wind_threshold_includes_ten_meters_per_second(self):
+        d = history()
+        d['obs_w'] = [10, 9.9, 2, 1]
+        d['yr_w'] = [10, 9.9, 2, 1]
+        d['wn_w'] = [9.9, 10, 2, 1]
+        result = practical(primary_pairs(d, 'w'), 'w', set())['all']
+        self.assertEqual(result['events'], 1)
+        self.assertEqual(result['yr']['hits'], 1)
+        self.assertEqual(result['wn']['misses'], 1)
+        self.assertEqual(result['wn']['false_alarms'], 1)
+
     def export(self, frame, publish=True, now="2026-11-02T00:00:00Z"):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

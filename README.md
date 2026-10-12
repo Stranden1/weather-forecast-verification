@@ -1,25 +1,25 @@
 # WeatherApp
 
 Checks which forecast is more accurate in Norway: Yr/MET or Google WeatherNext 3,
-against Frost observations at a shared network of 50 stations. Temperature, wind and
+against Frost observations at a shared Norwegian station network. Temperature, wind and
 hourly precipitation are scored. Start with [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
-It has two parts:
+The cloud is the only live pipeline:
 
 - **Cloud pipeline** (`cloud/`, `site/`, `.github/workflows/`): collects every 3 hours on
   GitHub Actions, keeps only scored rows in `history/`, and publishes a static scorecard on
   GitHub Pages. See [PLAN_WEBPAGE.md](PLAN_WEBPAGE.md) and [SETUP_CLOUD.md](SETUP_CLOUD.md).
-- **Local app** (this page, below): a Windows scheduled task stores full forecast history in
-  SQLite, with a detailed Streamlit dashboard. It runs in parallel until the cloud pipeline
-  is proven.
+- **Legacy local app**: retired on 11 Oct 2026. Its database and 7z archive were deleted
+  without a backup and are lost. The code below remains for reference and fixture tests.
+  Encrypted `history/` is the only retained record; keep `WX_STATE_KEY` safe outside Git.
 
 **Project HQ** (`project_hq/`) is a local, read-only viewer of the project documents:
 `.\.venv\Scripts\python.exe -B project_hq\run.py`, then open http://127.0.0.1:8510.
 
-## Run the existing local installation
+## Legacy local installation (retired)
 
-Your existing `.env`, `.venv`, database and scheduled task remain in place.
-From PowerShell:
+The existing `.env` and `.venv` remain. These legacy commands cannot recover the lost
+database, and local collection is not part of the cloud maintenance workflow:
 
 ```powershell
 cd E:\WeatherApp
@@ -50,17 +50,26 @@ MET/Frost data. A clone does not include historical observations or forecasts.
 The station snapshot in `config/stations.json` documents the existing network;
 it is not automatically imported and does not replace the live database.
 
-The existing Windows scheduled task does not need reinstalling. On a new machine,
-use `install_background_task.bat` only after manual collection is validated.
+Do not reinstall the retired Windows task during cloud maintenance. A new local installation
+would be a separate collection project, with no copy of the lost full history.
 
 ## Tests
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -v
-.\.venv\Scripts\python.exe tests/dashboard_ui_test.py
+.\.venv\Scripts\python.exe -B -m unittest discover -s cloud/tests -t .
 ```
 
-The UI test uses a disposable database and checks that browsing makes no writes.
+Optional page regression checks use a disposable export of history and installed Playwright/Chrome:
+
+```powershell
+node tests/scorecard_ui_test.cjs <temporary-export-directory> work/scorecard-preview
+```
+
+Expose the installed Playwright package through `NODE_PATH` if needed. The browser check
+blocks external requests by default; `WX_TEST_MAP_TILES=1` permits OpenStreetMap tiles.
+It checks both themes at 1280 and 375 px, period/rain consistency, station selection,
+single-point replays and horizontal overflow. Screenshots stay in ignored `work/`.
+The legacy `tests/dashboard_ui_test.py` uses a disposable database, not production data.
 
 ## What Git stores
 

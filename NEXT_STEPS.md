@@ -1,50 +1,36 @@
 # Next steps
 
-_Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-10-12._
+_Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
 
-## Open items
+## Ready to review
 
-### Pipeline
-1. **Station recovery.** Wisting is retired locally, with history preserved; publication pending. Revsbotn resumed 10-minute measurements on 12 Oct at 11:40/11:50 UTC: keep it active and verify recovery in subsequent exact-hour collection. Enningdalen and Alvheim have recovered. Finalized-history warnings lag raw observation recovery.
-2. **Measure the activated timer.** Job 8590224 is enabled with :07/:37 UTC POST
-   requests and failure/recovery/disable notifications. External test returned 204;
-   run 37495000121 succeeded and correctly skipped at 65 min. Verify recurring HTTP
-   204 responses, a timer-triggered collection once >=150 min old, and an advancing
-   public health timestamp. Then evaluate several days of coverage. GitHub hourly
-   fallback remains; prior gaps reached 9 h 21 min. Renew the repository-only token
-   before 5 Nov 2026 (expires 17:15 UTC); enter it directly in the timer, never chat/files.
-3. **Old plaintext history:** coordinate cleanup of earlier public Git commits/caches if
-   publication protection requires it; no main-history rewrite has been performed.
+1. Review `codex/scorecard-corrections` against `main`, including the already prepared Wisting retirement. Three checkpoints are validated locally; rebase over any newer immutable history commits before publishing. No deployment has been performed.
 
-### Features
-- **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
-  a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
-  a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
-4. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (56.3 mm at Bergen, corrected UTC day) is
-   left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
-6. **Revisit the results** at about 30 paired days, and again once winter arrives. Watch whether
-   the height adjustment over-warms cold valley stations (Røros, Dividalen, Grønliheia).
+## Operations
 
-### Housekeeping
-7. `scoring/scorer.py` still holds the old hour-floored join (`strftime` on `observed_at`),
-   off the dashboard path. Mark it deprecated or remove it.
-8. `work/` holds ~20 MB of local evidence. Keep `work/temperature-backfill/first-run.json` and
-   `second-run.json` (original availability metadata); the rest can be archived.
-9. Address dependency deprecation warnings before library/Python upgrades (NumPy timedeltas,
-    pandas concatenation and boolean inversion in replay filtering).
-10. Correct stale publication wording in SETUP_CLOUD.md: it still says the workflow forces
-    forecast values off, although the repository variable enables past values.
+2. Confirm Revsbotn's resumed reporting in exact-hour cloud observations; keep it active. Fresh 10-minute Frost records were verified at 11:40/11:50 UTC on 12 Oct. Enningdalen and Alvheim recovered. Finalized-score warnings can lag live recovery.
+3. Watch a real collecting/deploying run and tests after the Ubuntu runner migration begins **19 Oct 2026**. Existing Python 3.12/workflows are unchanged.
+4. Renew the repository-only timer token **before 5 Nov 2026 17:15 UTC / 18:15 Oslo**. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
+5. Confirm a separate secure copy of `WX_STATE_KEY` and encrypted `history/`, and validate an isolated recovery from that copy. Current history decrypts; independent backup recovery remains unverified. No full project backup is needed.
+6. Old plaintext Git objects/caches: coordinate cleanup only if the publication policy still requires it. Never rewrite current immutable day files or main history as routine maintenance.
 
-## Standing reminders
-- Past WeatherNext values are live (`WX_PUBLISH_FORECAST_VALUES=1`, verified 5 Oct);
-  only target times at least 1 h old may be shown. Set the variable to 0 to disable them.
-- Watch the first workflow run after the announced 19 Oct Ubuntu runner image change.
-- Both working state and scored history use `WX_STATE_KEY` (GitHub secret, local `.env`).
-  Losing all key copies means losing access to both. Keep a separate secure key backup.
-- Restart the local Streamlit dashboard before any manual WeatherNext fetch from Admin; a
-  running process keeps old code in memory.
-- If Yr collection becomes Delayed or Stale, check promptly: missed Yr history cannot be recovered.
-- Revalidate wind height/unit metadata when changing the station network or collectors.
-- Keep `WX_STATE_KEY` and other credentials backed up outside GitHub; without the key `history/` is unreadable.
-- Setting GitHub secrets from PowerShell 5.1 by piping adds a BOM; use `gh secret set --body`.
+## Next product/data decisions
+
+- Prioritize Yr rain-probability reliability versus IFS/AIFS temperature/wind comparisons. Probability needs a verified provider threshold and matching observed interval. Four-model results require common provider cohorts; AIFS rain is six-hour data interpolated to hours.
+- Decide whether to retain a coherent forecast run for daily max/min, frost nights and daily precipitation. Existing history describes rolling leads and cannot recreate the lost full local runs. Keep new capture compact and additive.
+- Choose prospective quality/provenance fields and any alternative WeatherNext rain outputs (native versus satellite-calibrated/experimental), before broader variable/network expansion. No collection expansion has started.
+- Consider partial-provider replays only after deciding how to explain missing counterpart hours; never present an incomplete total as a full day.
+- Revisit results at 30 paired days, after another month and during winter. Hold thresholds/metrics steady; investigate land/offshore, sampling-method cohorts, and height adjustment in cold valleys before making recommendations.
+
+## Housekeeping
+
+- Deprecate/remove only legacy unpaired entry points in `scoring/scorer.py`; the module has actively used helpers.
+- Address NumPy timedelta/pandas concatenation warnings before dependency upgrades. Boolean inversion in event filtering was corrected in the rain checkpoint.
+- Keep `work/temperature-backfill/first-run.json` and `second-run.json` as provenance. Retain current `work/scorecard-2026-10-12/` screenshots for review; archive other evidence only deliberately.
+
+## Standing rules
+
+- Cloud history is the only retained record. Never delete, rewrite or reset day files. Local database and archive are lost; do not restart the retired PC collector as cloud maintenance.
+- Past WeatherNext values are enabled in the published project; require targets at least one hour old and retain attribution. Disable through `WX_PUBLISH_FORECAST_VALUES=0` if needed.
+- Preserve one shared active station network and revalidate measurement height/unit metadata when changing it. Retired station histories remain in aggregate scores.
+- Protect credentials outside Git. PowerShell secret updates should use `gh secret set --body`, not a pipe that may add a BOM.
