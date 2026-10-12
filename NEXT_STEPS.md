@@ -4,7 +4,7 @@ _Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
 
 ## Ready to review
 
-1. Review `codex/scorecard-corrections` against `main`, including the already prepared Wisting retirement. Three checkpoints are validated locally; rebase over any newer immutable history commits before publishing. No deployment has been performed.
+1. Verify the next real collect/deploy of scorecard commit `39c2617`, now on `origin/main` with CI passed. The 15:07 UTC run 38267891738 gated/skipped deployment; at 15:10 UTC the live page was still the previous version. Review the new private forecast viewer on `codex/scorecard-corrections`; that checkpoint remains local. Rebase over any newer immutable history commits before an approved push. Private future-value screenshots must never be published.
 
 ## Operations
 
@@ -16,6 +16,7 @@ _Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
 
 ## Next product/data decisions
 
+- Follow `FORECAST_PLAN.md`: the owner chose a private forecast comparison; the local viewer is ready (`PRIVATE_FORECAST.md`). Next proposed scope is complete 48-hour snapshots for the same 49 stations in bounded encrypted state, then a separately fixed daily forecast. Approve capture scope before changing/deploying the collectors; no capture expansion has started.
 - Prioritize Yr rain-probability reliability versus IFS/AIFS temperature/wind comparisons. Probability needs a verified provider threshold and matching observed interval. Four-model results require common provider cohorts; AIFS rain is six-hour data interpolated to hours.
 - Decide whether to retain a coherent forecast run for daily max/min, frost nights and daily precipitation. Existing history describes rolling leads and cannot recreate the lost full local runs. Keep new capture compact and additive.
 - Choose prospective quality/provenance fields and any alternative WeatherNext rain outputs (native versus satellite-calibrated/experimental), before broader variable/network expansion. No collection expansion has started.
@@ -26,7 +27,7 @@ _Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
 
 - Deprecate/remove only legacy unpaired entry points in `scoring/scorer.py`; the module has actively used helpers.
 - Address NumPy timedelta/pandas concatenation warnings before dependency upgrades. Boolean inversion in event filtering was corrected in the rain checkpoint.
-- Keep `work/temperature-backfill/first-run.json` and `second-run.json` as provenance. Retain current `work/scorecard-2026-10-12/` screenshots for review; archive other evidence only deliberately.
+- Keep `work/temperature-backfill/first-run.json` and `second-run.json` as provenance. Retain `work/scorecard-2026-10-12/` and private `work/forecast-comparison-2026-10-12/` evidence for review; archive other evidence only deliberately.
 
 ## Standing rules
 

@@ -16,6 +16,11 @@ The cloud is the only live pipeline:
 **Project HQ** (`project_hq/`) is a local, read-only viewer of the project documents:
 `.\.venv\Scripts\python.exe -B project_hq\run.py`, then open http://127.0.0.1:8510.
 
+**Private forecast comparison** (`private_forecast/`) reads future Yr/WeatherNext
+snapshots from encrypted cloud state, without collecting or publishing them.
+See [PRIVATE_FORECAST.md](PRIVATE_FORECAST.md). It needs no local database; the
+current timeline explicitly shows gaps in the saved verification snapshots.
+
 ## Legacy local installation (retired)
 
 The existing `.env` and `.venv` remain. These legacy commands cannot recover the lost

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Private forecast comparison</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#forecast">Skip to forecast</a>
+  <main>
+    <header>
+      <div class="eyebrow">YOUR WEATHER LAB <span class="badge">Private · on this PC</span></div>
+      <div class="title-row"><h1>What’s coming?</h1><button id="theme" aria-label="Switch colour theme">Dark theme</button></div>
+      <p class="intro">Yr and WeatherNext, side by side. Where do their forecasts differ?</p>
+    </header>
+    <p id="status" class="status" role="status">Reading the cloud snapshot…</p>
+    <section class="controls" aria-label="Forecast controls">
+      <label>Place <select id="station"></select></label>
+      <div><span class="control-label" id="range-label">Look ahead</span><div class="segmented" role="group" aria-labelledby="range-label">
+        <button data-hours="24" aria-pressed="false">24 hours</button><button data-hours="48" aria-pressed="true">48 hours</button>
+      </div></div>
+      <button id="reload" class="subtle">Re-read snapshot</button>
+    </section>
+    <section id="forecast" class="card" aria-labelledby="chart-heading">
+      <div class="chart-head"><div><p class="eyebrow" id="place-name"></p><h2 id="chart-heading">Temperature</h2></div>
+        <div class="segmented variables" role="group" aria-label="Weather variable">
+          <button data-variable="t" aria-pressed="true">Temperature</button><button data-variable="w" aria-pressed="false">Wind</button><button data-variable="p" aria-pressed="false">Precipitation</button>
+        </div>
+      </div>
+      <p id="story" class="story"></p>
+      <div class="legend"><span><i class="yr-key"></i>Yr</span><span><i class="wn-key"></i>WeatherNext</span><span id="range-key">Shaded bands: middle 80% of forecast possibilities</span></div>
+      <div id="plot"><svg id="chart" role="img" aria-label="Forecast comparison chart"></svg></div>
+      <p id="coverage" class="caption"></p>
+      <button id="largest-gap" class="subtle">Show largest gap</button>
+      <div class="hour-label">Choose a saved hour <span>Times in Oslo</span></div>
+      <div id="hours" class="hours" role="group" aria-label="Choose forecast hour"></div>
+    </section>
+    <section class="selected" aria-labelledby="selected-heading">
+      <div class="selected-head"><h2 id="selected-heading"></h2><p id="difference"></p></div>
+      <div class="provider-grid">
+        <article class="provider yr"><h3>Yr</h3><p id="yr-value" class="value">—</p><p id="yr-range"></p><p id="yr-extra" class="caption"></p><p id="yr-issued" class="caption"></p></article>
+        <article class="provider wn"><h3>WeatherNext</h3><p id="wn-value" class="value">—</p><p id="wn-range"></p><p id="wn-extra" class="caption"></p><p id="wn-issued" class="caption"></p></article>
+      </div>
+      <p class="caption" id="interval-note"></p>
+    </section>
+    <details class="card"><summary>Read the numbers</summary><div class="table-scroll"><table><caption id="table-caption">Saved forecast hours</caption><thead><tr><th scope="col">Oslo time</th><th scope="col">Yr</th><th scope="col">WeatherNext</th><th scope="col">Difference</th></tr></thead><tbody id="table-body"></tbody></table></div></details>
+    <details class="card"><summary>What this view can tell you</summary>
+      <p>These are forecasts collected at the same moment, with each provider’s original issue time shown. Temperature and wind use WeatherNext’s average; precipitation uses its median—the middle outcome.</p>
+      <p>The cloud currently saves selected hours for accuracy checks. Lines stop where hours are missing; blank space does not mean calm or dry weather. Daily high/low and precipitation totals need a complete forecast timeline and are not calculated here.</p>
+      <p>Differences show what the models expect, not which will be correct. Shaded ranges describe forecast possibilities; they are not a guarantee. For measured results, see the <a href="https://stranden1.github.io/weather-forecast-verification/" target="_blank" rel="noopener noreferrer">public accuracy scorecard</a>.</p>
+      <p>The typical gap is the median absolute difference at shared saved hours. “Show largest gap” selects the biggest difference in this window; it does not identify a forecast error.</p>
+      <p>Re-read uses the cloud state already fetched to this PC. Refresh instructions are in PRIVATE_FORECAST.md. This viewer makes no forecast requests, changes no history, and keeps future values out of the public site.</p>
+    </details>
+    <footer><p>Private research comparison · future forecasts stay on this PC</p><details><summary>Sources and experimental data notice</summary><div id="notices"></div></details></footer>
+  </main>
+</body>
+</html>

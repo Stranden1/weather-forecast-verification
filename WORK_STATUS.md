@@ -1,24 +1,22 @@
 # Work status
 
-## Scorecard corrections and presentation — 2026-10-12 (Codex)
+## Private forecast comparison — 2026-10-12 (Codex)
 
-**Complete and validated locally on `codex/scorecard-corrections`; not pushed or deployed.**
+**Complete and validated locally on `codex/scorecard-corrections`; not pushed/deployed.**
 
-### Checkpoints
-- `3373c75`: UTC rain-day totals/events and final-hour publication gate; 132 tests passed.
-- `d1f9669`: consistent rain medians, calendar periods and matched uncertainty across statistical views; 140 tests passed.
-- Final presentation/events checkpoint: concise answer, optional detail, accessible station selector/chart tables and event detection with land/offshore groups; 143 tests passed. See Git log for its commit.
-
-### Verification
-- Existing .venv; all 143 cloud tests pass. Real-history rebuild: 37 days, 224,292 rows; JSON 936,986 bytes. No history changes.
-- Browser smoke check passes at 1280, 375 and 320 px in both themes, including filter/rain consistency, all-station selection and single-point replays. No captured JS errors or page-wide overflow.
-- Phone answer y=409 px, first tile y=547 px, collapsed height 5,332 px versus previous ~10,085 px. Screenshots and validation.json: `work/scorecard-2026-10-12/` (ignored, retained).
-- Prepared Wisting retirement predates this branch. Revsbotn resumed 10-minute observations at 11:40/11:50 UTC on 12 Oct; kept active. Scores can lag current recovery.
-- All encrypted history files decrypt using the current key. A separate backup/restore from an independent key copy has NOT been verified.
+### Done
+- Owner chose a private forecast UI. `private_forecast/` reads fetched encrypted cloud state in memory and serves only on loopback; no retired database or collector required.
+- Active stations, 24/48-hour windows, temperature/wind/precipitation, same-fetch comparisons, ranges, honest gaps, issue ages, median rain, largest-gap shortcut, tables and both themes.
+- Private data/access controls: no credential delivery, caching, external assets, state/history writes or public export. No capture expansion or scheduling change.
+- Eight private tests pass; the existing 143 cloud tests also pass. Browser checks pass at 1280/375/320 px in light/dark, including missing-hour line/range breaks, missing providers, rain median, empty stations, keyboard selection and prominent mobile values. No captured JS errors or page-wide overflow.
+- Private screenshots, validation.json and aggregate disagreement.json are in ignored `work/forecast-comparison-2026-10-12/`; never publish future-value screenshots. The validation server is stopped.
+- PRIVATE_FORECAST.md gives launch instructions; FORECAST_PLAN.md gives evidence, ranked next work and the proposed finish line. Earlier scorecard checkpoint is archived atop CHANGELOG.md.
 
 ### When returning
-Review this branch against `main`, then publish if satisfied; include/rebase any new scored-history commits first. No push, workflow dispatch, secret rotation, collector change or new data capture was performed.
+Review the private viewer; see Git log for its local checkpoint. Earlier scorecard commits are now on `origin/main` at `39c2617`, with CI passed. At 15:10 UTC the live page was still the previous version: run 38267891738 gated/skipped collection and deployment. Verify the next actual deployment. This new viewer has not been pushed or deployed; this task performed neither action.
 
-Choose additional collection separately: coherent daily runs, observation quality/provenance and alternative WeatherNext rain fields. IFS/AIFS and Yr probability views remain proposals. See NEXT_STEPS.md for the 19 Oct runner and before-5-Nov token work.
+The private timeline intentionally has gaps: current cloud capture saves scoring windows. Approve prospective bounded 48-hour capture before collector changes, then choose fixed daily/night scope. Daily extrema/totals cannot be recovered from lost full local runs or inferred from incomplete timelines.
 
-**Data:** the PC collector is retired; weather.db and archive are lost. `history/` is the only retained record; protect `WX_STATE_KEY` independently.
+Rain-probability reliability and IFS/AIFS views remain proposals using retained data. Then collect through winter and review occasionally; more station/variable counts are lower priority. Operations still need the 19 Oct runner check, before-5-Nov token renewal and independent history/key recovery confirmation (NEXT_STEPS.md).
+
+**Data:** cloud history is the only retained record; keep it and WX_STATE_KEY safe. No history edits, push, workflow dispatch, secret rotation or collector changes in this task.

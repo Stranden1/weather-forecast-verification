@@ -556,3 +556,10 @@ SN20925 (Wisting) is the first.
 - Event definitions are fixed: 2 m air temperature <0 °C; 10 m mean wind >=10 m/s; precipitation >0.1 mm/h (water equivalent, including snow). Count shared station-hours rather than claiming independent nights/storms or operational alerts.
 - Show detection/misses/false alarms and event-only error descriptively, with horizon, dates, counts and land/offshore grouping from retained height metadata. No new event significance verdict or composite score.
 - This work changes exported analysis and presentation only. New collector fields, complete daily-run retention, external backups/secrets, workflow settings and publication remain separate actions.
+
+## Private prediction comparison — 2026-10-12 (Codex)
+
+- The owner chose a private side-by-side forecast UI, rather than public future WeatherNext values. Keep the existing public one-hour age gate and attribution.
+- `private_forecast/` reads already fetched encrypted cloud state in memory and serves only on 127.0.0.1. No collection, database, state/history writes, credential delivery, public-site export or remote sharing. Private future-value screenshots belong only in ignored local work directories.
+- Use the latest shared collection, retain original issue times and missing provider hours, and stop lines/ranges at gaps. Temperature/wind use WeatherNext's mean; precipitation uses its median and original interval end. Largest gap means prediction disagreement, never measured error.
+- Complete 48-hour capture and a fixed daily forecast remain proposals in FORECAST_PLAN.md. Do not infer daily extrema/totals or event probabilities from sparse snapshots or hourly quantiles.
