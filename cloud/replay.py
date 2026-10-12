@@ -144,10 +144,15 @@ def _observations(scored: pd.DataFrame) -> pd.DataFrame:
     """One measured row per station and hour (identical across horizons)."""
     cols = ["station", "target", "obs_t", "obs_w", "obs_p"]
     o = scored.reindex(columns=cols).drop_duplicates(["station", "target"])
-    o = o.assign(day=o.target.astype(str).str[:10])
+    o = o.assign(day=o.target.astype(str).str[:10], rain_day=rain_day(o.target))
     for c in cols[2:]:
         o[c] = pd.to_numeric(o[c], errors="coerce")
     return o
+
+
+def rain_day(target: pd.Series) -> pd.Series:
+    """UTC day of the rainfall interval: an end at midnight belongs to the previous day."""
+    return (pd.to_datetime(target, utc=True) - pd.Timedelta(hours=1)).dt.strftime("%Y-%m-%d")
 
 
 def find_events(scored: pd.DataFrame, offshore: set[str] = frozenset()) -> list[dict]:
@@ -160,12 +165,16 @@ def find_events(scored: pd.DataFrame, offshore: set[str] = frozenset()) -> list[
         return []
     o = _observations(scored)
     found: dict[tuple[str, str], list[dict]] = {}
-    rain = o.groupby(["day", "station"]).obs_p.agg(["sum", "count"]).reset_index()
+    rain = o.groupby(["rain_day", "station"]).obs_p.agg(["sum", "count"]).reset_index()
+    rain = rain.rename(columns={"rain_day": "day"})
     for r in rain[(rain["count"] >= 24) & (rain["sum"] >= RAIN_DAY_MM)].itertuples():
         found.setdefault((r.day, "rain"), []).append({"station": r.station, "value": round(float(r.sum), 1)})
     for kind, col, test, pick in (("wind", "obs_w", lambda s: s >= STRONG_WIND_MS, "max"),
                                   ("cold", "obs_t", lambda s: s <= COLD_C, "min")):
-        hit = o[test(o[col]) & ~(o.station.isin(offshore) if kind == "wind" else False)]
+        mask = test(o[col])
+        if kind == "wind":
+            mask &= ~o.station.isin(offshore)
+        hit = o[mask]
         for (day, station), g in hit.groupby(["day", "station"]):
             found.setdefault((day, kind), []).append(
                 {"station": station, "value": round(float(getattr(g[col], pick)()), 1)})
@@ -205,13 +214,13 @@ def replay(scored: pd.DataFrame, event: dict, publish_values: bool,
     is set and the target is at least PUBLISH_MIN_AGE_H in the past (`cutoff`).
     """
     kind, var = event["type"], EVENT_TYPES[event["type"]]["var"]
-    d = scored[(scored.station == event["station"])
-               & (scored.target.astype(str).str[:10] == event["day"])].copy()
+    days = rain_day(scored.target) if kind == "rain" else scored.target.astype(str).str[:10]
+    d = scored[(scored.station == event["station"]) & (days == event["day"])].copy()
     d["h"] = pd.to_numeric(d["h"], errors="coerce")
     out = {k: event[k] for k in ("id", "day", "type", "label", "unit", "station", "value", "stations")}
     points = []
     if kind == "rain":
-        out["what"] = "day total"
+        out["what"] = "UTC day total (00:00–24:00)"
         for h in sorted(PRECIP_HORIZONS, reverse=True):
             g = d[d.h == h]
             yr, wn, wn50 = _num(g, "yr_p"), _num(g, "wn_p"), _num(g, "wn_p_p50")
@@ -241,7 +250,7 @@ def replay(scored: pd.DataFrame, event: dict, publish_values: bool,
                                "wn": _r(getattr(r, f"wn_{var}"), 1)})
         else:
             out["observed"] = event["value"]
-    last_target = pd.Timestamp(f"{event['day']}T23:00:00Z") if kind == "rain" else (
+    last_target = pd.Timestamp(f"{event['day']}T00:00:00Z") + pd.Timedelta(days=1) if kind == "rain" else (
         pd.Timestamp(out["target"]) if "target" in out else pd.Timestamp(f"{event['day']}T23:00:00Z"))
     show_wn = publish_values and (cutoff is None or last_target <= cutoff)
     if not show_wn:

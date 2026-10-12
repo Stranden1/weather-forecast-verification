@@ -1,70 +1,23 @@
 # Project status
 
-_Updated 2026-10-09. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-12. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-The local collector and cloud dashboard work, but cloud cadence and station freshness
-need attention. Before timer activation, health reported 10/16 expected collections
-in 48 h, with gaps up to 9 h 21 min. Keep the PC collector running. cron-job.org job
-8590224 is now enabled at :07/:37 UTC. Its external test returned 204 and the resulting
-GitHub run correctly respected the 150-minute gate. Since then (6 Oct 16:37 UTC) the
-cloud has collected every 2.5-3.0 h.
+The cloud is the only live pipeline. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted `history/` is the only retained record; preserve it and protect `WX_STATE_KEY` separately.
 
-**PC collector: not yet safe to retire (8 Oct check).** On 7 Oct, the only finished day
-since the timer, the cloud had 92-93% of the PC's scored station-hours on the 45 shared
-stations; all forecast gaps were runs GitHub skipped before the timer. On horizon slots
-the timer covered (6 h-1 day) it had 99.9%; the one miss was a late Frost observation.
-Longer horizons can't be judged until ~12 Oct (2 days) and ~18 Oct (10 days). Details in
-CHANGELOG.md (8 Oct entry).
+Collection has run every 2.5–3.0 hours since the external timer began on 6 Oct. Live data verified on 12 Oct: 37 scored days through 11 Oct, 224,292 rows, with 25 paired days at the one-day horizon. Source status is healthy. One-day temperature/rain-median comparisons are too close; WeatherNext currently has a small overall wind advantage. These are short, mixed station/method cohorts.
 
-## Current capabilities
+## Current work
 
-- Local: retired 2026-10-11. data/weather.db and its archive were deleted that
-  day and are lost (raw local forecasts/observations). The cloud history/ is the
-  only record; scored days from the local era were migrated into it earlier.
-- Cloud: paired snapshots, encrypted immutable history, daily scoring, trends,
-  maps, uncertainty, baseline diagnostics, monthly summaries and storm replays.
-- Live page: 31 scored days through 5 Oct, 174,911 rows. Past WeatherNext values
-  are enabled, restricted to targets at least 1 h old, with attribution.
-- Collection uses an external request every 30 min, the hourly GitHub fallback and
-  a 150-minute gate. trigger=timer respects the gate; manual bypasses it.
-- The horizon card leads with a WeatherNext-minus-Yr difference chart (95% ranges, verdict colours,
-  horizons under 7 days hidden); an Error size view and the full table remain (9 Oct).
-- ECMWF IFS/AIFS are collected but not ranked on the page; steadiness is exported
-  but not displayed. Height-adjusted temperature stays a separate comparison.
+Local branch `codex/scorecard-corrections` starts from Wisting's retirement commit. Checkpoint 1 corrects daily rain boundaries and replay labels/publication timing; 132 cloud tests pass. Further rain/date-scope consistency, mobile clarity and practical event views are in progress. No new collection or deployment is authorized by this checkpoint.
 
-## Latest verification
+## Operations and retained capabilities
 
-- Local task: Ready, result 0, completed 6 Oct at 12:14 Oslo; next run 18:10.
-  All three sources report OK; recent forecast retrievals cover 50 stations.
-- Cloud scheduled run 37485951770 at 15:15 UTC on 6 Oct succeeded, including
-  collection and Pages deployment.
-- Observation coverage for 4-5 Oct: 93.9% and 95.1%, neither late-finalized.
-- Browser: dashboard renders, rain filter works, no captured console errors.
-- Tests: 119 cloud tests passed again after rebase, and CI 37453257669 passed;
-  79 local tests passed in the preceding review. Existing warnings remain.
-- Timer run 37453257515 passed: skipped at 135 minutes, with downstream steps skipped;
-  state revision and public health timestamp stayed unchanged.
-- External timer test 37495000121 passed at 16:21 UTC: skipped at 65 minutes, with
-  collection/persistence/Pages skipped. Service confirms the recurring job is enabled.
-- Database reads succeed; file is 6.21 GB, with 267 GB free on E:. Read-only SQLite
-  quick_check was interrupted at 45 seconds; full integrity remains unverified.
+- Cloud retains selected horizons, Yr/WeatherNext values, quantiles, probabilities, observations and IFS/AIFS. Full local runs are lost; fixed-run daily analyses need a separate prospective retention decision.
+- Wisting is inactive in local config (49 active stations); retirement is not yet published. Revsbotn resumed 10-minute reports on 12 Oct; Enningdalen and Alvheim report again. Page warnings use finalized scored history, so lag current recovery.
+- The live blend has a day-resampled uncertainty interval; map/list differences are descriptive, not station significance tests.
+- GitHub fallback and external timer remain unchanged. Watch Ubuntu runner migration from 19 Oct; renew timer token before 5 Nov 17:15 UTC.
+- Existing plaintext Git objects and secure history/key recovery remain separate open operational items. No history files were rewritten.
 
-## Open findings and next actions
-
-- Cloud/local station networks overlap at 45/50. Local discovery refreshes weekly;
-  cloud config/stations.json is a fixed snapshot. Reconcile before comparing coverage.
-- Enningdalen (SN1120) has no observations after 30 Sep 23:00 UTC locally or in cloud;
-  Wisting (SN20925, cloud only) stopped at 30 Sep 21:00 UTC and is gone from Frost; it was
-  retired on 12 Oct (`active: 0`, 49 active stations, its scored history is kept). The page now
-  warns about stations silent for 2 days; Revsbotn (SN94190) is the next one to check.
-- Local commits were rebased over the two scored-history commits and pushed with
-  user approval. History day files remain unchanged.
-- Re-run the coverage comparison on ~12 Oct and ~18 Oct before retiring the PC task
-  (CHANGELOG.md, 8 Oct). Renew the token before 5 Nov 2026.
-- The 1-day headline has 19 paired days despite 31 total scored days; October has
-  five days, correctly below the seven-day monthly verdict threshold.
-
-NEXT_STEPS.md holds open work. Earlier plaintext Git history remains a separate
-cleanup concern; keep secure backups of the database and encryption key.
+NEXT_STEPS.md tracks open work; WORK_STATUS.md holds the active checkpoint.

@@ -1,5 +1,27 @@
 # Changelog
 
+## Scorecard corrections: rain checkpoint — 2026-10-12 (Codex)
+
+- Corrected UTC rain-day selection to interval ends 01:00 through next midnight; raw history untouched.
+- Publication gate now waits until the final midnight interval is at least one hour old.
+- Replays label sums of hourly medians accurately and show the measured point when only one horizon exists.
+- Validated 132 cloud tests, including midnight-boundary regressions; real-history export reads 224,292 rows.
+- Work is on local branch `codex/scorecard-corrections`; publication pending. Next: rain metrics/date scopes and first-screen clarity.
+
+## Retire Wisting (SN20925) — 2026-10-12 (Claude)
+
+**Done, committed, not pushed.**
+
+- Frost returns 404 for SN20925 (source, time series and observations; name search finds nothing;
+  Alvheim works with the same credentials). Last measurement 30 Sep 21:00 UTC. No renamed
+  successor nearby (Hjelmsøybanken II SN20924 is 3° further west, a different site).
+- `config/stations.json`: `"active": 0` for SN20925, nothing else changed.
+- Checked on a rebuild from history, with and without the change: `rows` 224292 and `days` 37
+  unchanged; leaderboard identical (1 day temp: n 25438, Yr 0.914, WeatherNext 0.917);
+  `stations.json` still has SN20925's scores; `meta.json` 49 stations (Wisting gone). Page: 49
+  markers, no console errors. `history/` tree hash unchanged. Tests: 130 OK.
+- New on the page: Revsbotn - Danielsvika has been silent since 9 Oct (see NEXT_STEPS item 1).
+
 ## Consistent station names — 2026-10-12 (Claude)
 
 **Done, committed, not pushed.**

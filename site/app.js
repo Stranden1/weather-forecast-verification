@@ -564,16 +564,16 @@
       <div class="chart"><canvas id="replay-chart" aria-label="Forecasts before the event"></canvas></div>
       ${r.wn_shown ? wnNotice() : `<p class="muted" style="font-size:12px">WeatherNext's values are not shown for this event.</p>`}
       <p class="muted" style="font-size:13px">${r.type === "rain"
-        ? "Each point is the day's total as forecast that far ahead: the sum of the 24 hourly forecasts made that long before each hour. Rain is only scored up to 2 days ahead."
+        ? "Each point sums the 24 hourly forecasts for the UTC calendar day, each made that far before its hour. These can come from different forecast runs. The sum of hourly medians is not the median of the daily total. Rain is only scored up to 2 days ahead."
         : "Each point is the forecast for the same hour, made that far ahead. The hour is the most extreme measured hour that has forecasts at the most horizons."}
         Events are picked from the measurements only, never from who got it wrong.</p>`;
     const labels = pts.map(p => H_LABEL[p.h] + " before");
     const ds = [line("Yr", pts.map(p => p.yr), css("--yr")),
-                line("Measured", pts.map(() => r.observed), css("--obs"), { borderDash: [6, 4], pointRadius: 0 })];
+                line("Measured", pts.map(() => r.observed), css("--obs"), { borderDash: [6, 4], pointRadius: pts.length === 1 ? 5 : 0, pointStyle: "crossRot" })];
     if (r.wn_shown) {
       ds.splice(1, 0, line("WeatherNext (average)", pts.map(p => p.wn), css("--wn")));
       if (pts.some(p => p.wn50 != null))
-        ds.splice(2, 0, line("WeatherNext (median)", pts.map(p => p.wn50), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", backgroundColor: css("--surface") }));
+        ds.splice(2, 0, line("Sum of WeatherNext hourly medians", pts.map(p => p.wn50), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", backgroundColor: css("--surface") }));
     }
     const o = baseOptions(r.unit);
     o.scales.y.beginAtZero = r.type !== "cold";

@@ -1,21 +1,14 @@
 # Work status
 
-_The latest task's checkpoint only. Archive it in CHANGELOG.md when replacing it._
+## Scorecard corrections and presentation — 2026-10-12 (Codex)
 
-**Data note, 2026-10-11:** `data/weather.db` and its 7z archive were deleted and are lost (no
-copy was made). The cloud `history/` is the only record.
-See CHANGELOG.md.
+**Checkpoint 1 validated; local branch `codex/scorecard-corrections`, not pushed.**
 
-## Retire Wisting (SN20925) — 2026-10-12 (Claude)
+- UTC rain totals/events now include interval ends 01:00 through next midnight. Final-hour publication protection tightened.
+- Hourly-median sums labelled correctly; single-point replays retain a visible measured reference.
+- 132 cloud tests pass; real-history export succeeds (37 days, 224,292 rows). No history, collectors, secrets or workflows changed.
+- Wisting retirement was already committed before this branch; Revsbotn resumed 10-minute measurements on 12 Oct at 11:40/11:50 UTC. Keep Revsbotn active.
 
-**Done, committed, not pushed.**
+**Remaining in this task:** consistent rain representations and calendar-date filters; careful station wording; compact first answer/accessibility; practical event comparisons from existing data; final browser verification and handoff.
 
-- Frost returns 404 for SN20925 (source, time series and observations; name search finds nothing;
-  Alvheim works with the same credentials). Last measurement 30 Sep 21:00 UTC. No renamed
-  successor nearby (Hjelmsøybanken II SN20924 is 3° further west, a different site).
-- `config/stations.json`: `"active": 0` for SN20925, nothing else changed.
-- Checked on a rebuild from history, with and without the change: `rows` 224292 and `days` 37
-  unchanged; leaderboard identical (1 day temp: n 25438, Yr 0.914, WeatherNext 0.917);
-  `stations.json` still has SN20925's scores; `meta.json` 49 stations (Wisting gone). Page: 49
-  markers, no console errors. `history/` tree hash unchanged. Tests: 130 OK.
-- New on the page: Revsbotn - Danielsvika has been silent since 9 Oct (see NEXT_STEPS item 1).
+**Data:** PC collector retired; weather.db and archive are lost. `history/` and `WX_STATE_KEY` are essential.

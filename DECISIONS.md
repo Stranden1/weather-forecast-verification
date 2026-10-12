@@ -534,3 +534,9 @@ Retire a station that Frost no longer has by setting `"active": 0` in `config/st
 stay in the leaderboard and `stations.json`; only collection, the map and `meta.json` drop it.
 SN20925 (Wisting) is the first.
 
+
+## UTC rain days and replay totals — 2026-10-12 (Codex)
+
+- Preserve the existing UTC calendar-day convention. Rain intervals ending 01:00 through the following midnight form a day; an end at 00:00 belongs to the previous day. Temperature/wind retain instant-date grouping.
+- Correct exported daily aggregates and event selection only; never rewrite immutable scored history.
+- A summed hourly-median forecast is labelled as a sum, not the median of an ensemble daily total. The final rain interval must be at least one hour old before publishing WeatherNext values.

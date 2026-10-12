@@ -1,16 +1,12 @@
 # Next steps
 
 _Open items only. Remove an item when it is done and record it in `CHANGELOG.md`.
-Updated 2026-10-11._
+Updated 2026-10-12._
 
 ## Open items
 
 ### Pipeline
-1. **Silent stations.** Wisting (SN20925) was retired from the network on 12 Oct (`"active": 0`;
-   Frost no longer has the source). Revsbotn - Danielsvika (SN94190) has had no measurements
-   since 9 Oct: check Frost for it (`availableTimeSeries`) and, if it is gone too, retire it the
-   same way. Do not remove stations from `history/` or scoring history. SN1120 (Enningdalen)
-   recovered by 10 Oct.
+1. **Station recovery.** Wisting is retired locally, with history preserved; publication pending. Revsbotn resumed 10-minute measurements on 12 Oct at 11:40/11:50 UTC: keep it active and verify recovery in subsequent exact-hour collection. Enningdalen and Alvheim have recovered. Finalized-history warnings lag raw observation recovery.
 2. **Measure the activated timer.** Job 8590224 is enabled with :07/:37 UTC POST
    requests and failure/recovery/disable notifications. External test returned 204;
    run 37495000121 succeeded and correctly skipped at 65 min. Verify recurring HTTP
@@ -25,7 +21,7 @@ Updated 2026-10-11._
 - **ECMWF IFS and AIFS on the page**: collected and scored from 27 Sep (not shown yet). Once
   a week or two of scored days exist, add them to the horizon chart/table. AIFS hourly rain is
   a 6-hour amount spread over the hours: compare it on 6 h totals, not hourly.
-4. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (46.8 mm at Bergen) is
+4. **Replays with incomplete WeatherNext (idea, needs the user):** 15 Sep (56.3 mm at Bergen, corrected UTC day) is
    left out because WeatherNext has 4 of 24 hours; Yr has full totals. Show Yr-only points, or explain.
 5. **Rain median on the remaining rain views:** the map, "Over time" chart and "Patterns" table still
    use WeatherNext's average; the headline views now lead with the median (done 28 Sep).

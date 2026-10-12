@@ -152,6 +152,7 @@ if __name__ == "__main__":
 def storm_rows(day="2026-10-05", station="SN1", rain_mm=1.0, wind=5.0, temp=3.0, hs=(6, 12, 24, 48),
                yr=0.5, wn=0.8, hours=range(24)):
     """Scored rows for one station-day: every hour measured, forecasts at each horizon."""
+    hours = list(hours)
     rows = []
     for hr in hours:
         T = f"{day}T{hr:02d}:00:00Z"
@@ -162,10 +163,25 @@ def storm_rows(day="2026-10-05", station="SN1", rain_mm=1.0, wind=5.0, temp=3.0,
             if h in (6, 12, 24, 48):
                 r.update(yr_p=yr, wn_p=wn, wn_p_p50=wn / 2)
             rows.append(r)
+    # Rain ends at 01:00 ... next midnight; temperature/wind remain instant values.
+    if set(hours) == set(range(24)):
+        end = (pd.Timestamp(day, tz="UTC") + pd.Timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        for h in hs:
+            if h in (6, 12, 24, 48):
+                rows.append({"target": end, "station": station, "h": h, "lead_h": float(h),
+                             "obs_p": rain_mm, "yr_p": yr, "wn_p": wn, "wn_p_p50": wn / 2})
     return frame(rows)
 
 
 class EventTest(unittest.TestCase):
+    def test_rain_uses_interval_start_day_not_end_date(self):
+        df = storm_rows(rain_mm=0.5)
+        df.loc[df.target == "2026-10-05T00:00:00Z", "obs_p"] = 100.0
+        self.assertFalse(any(e["type"] == "rain" for e in replay.find_events(df)))
+        df.loc[df.target == "2026-10-06T00:00:00Z", "obs_p"] = 10.0
+        rain = [e for e in replay.find_events(df) if e["type"] == "rain"]
+        self.assertEqual([(e["day"], e["value"]) for e in rain], [("2026-10-05", 21.5)])
+
     def test_triggers_and_grouping_per_day(self):
         df = pd.concat([storm_rows(station="A", rain_mm=1.0), storm_rows(station="B", rain_mm=1.5),
                         storm_rows(station="C", rain_mm=0.1, wind=16.0)], ignore_index=True)
@@ -205,6 +221,14 @@ class EventTest(unittest.TestCase):
 class ReplayTest(unittest.TestCase):
     NOW = pd.Timestamp("2026-10-10T00:00:00Z")
 
+    def test_rain_forecasts_include_next_midnight_and_exclude_first_midnight(self):
+        df = storm_rows(rain_mm=1.0, yr=0.5, wn=0.8)
+        df.loc[df.target == "2026-10-05T00:00:00Z", "yr_p"] = 100.0
+        df.loc[df.target == "2026-10-06T00:00:00Z", "yr_p"] = 2.0
+        r = replay.build_replays(df, True, self.NOW)[1]["2026-10-05-rain"]
+        self.assertEqual(r["points"][0]["yr"], 13.5)
+        self.assertEqual(r["what"], "UTC day total (00:00–24:00)")
+
     def test_rain_day_total_per_horizon(self):
         df = storm_rows(rain_mm=1.0, yr=0.5, wn=0.8)
         idx, reps = replay.build_replays(df, publish_values=True, now=self.NOW)
@@ -238,10 +262,10 @@ class ReplayTest(unittest.TestCase):
 
     def test_weathernext_values_never_for_the_last_hour_or_future(self):
         df = storm_rows(rain_mm=1.0)
-        too_soon = pd.Timestamp("2026-10-05T23:30:00Z")  # the day's last hour is < 1 h ago
+        too_soon = pd.Timestamp("2026-10-06T00:30:00Z")  # final interval end is < 1 h ago
         r = replay.build_replays(df, True, too_soon)[1]["2026-10-05-rain"]
         self.assertFalse(r["wn_shown"])
-        ok = pd.Timestamp("2026-10-06T00:00:00Z")         # 1 hour after 23:00
+        ok = pd.Timestamp("2026-10-06T01:00:00Z")         # 1 hour after midnight
         self.assertTrue(replay.build_replays(df, True, ok)[1]["2026-10-05-rain"]["wn_shown"])
 
     def test_stable_ids_and_empty_history(self):
