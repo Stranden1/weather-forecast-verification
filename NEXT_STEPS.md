@@ -1,8 +1,18 @@
 # Next steps
 
-_Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
+_Open items only. Updated 2026-10-14. Completed work is in CHANGELOG.md._
 
-## Ready to review
+## Order of work
+
+Follow REVIEW_2026-10-14.md, one task per session:
+
+- **Next: task 2, simplified M1 Yr archive.** Full Yr responses twice daily in a separate private GitHub repo, existing WX_STATE_KEY, slot-window retries and missing-slot manifests; no durable spool or object storage. Validate disabled by default. Explain private repo/push credential setup to the owner when needed; enable only with the owner's OK.
+- Task 3: read-only four-product temperature/wind comparison from existing history; short findings file, no page changes before review.
+- Task 4: read-only WeatherNext/IFS/AIFS pressure backfill study for the plan's eight-station pilot; short findings file.
+- Task 5: consolidate FORECAST_PLAN.md into PLAN_FORECAST_ARCHIVE.md (or mark replaced), adding a one-page summary.
+- Scorecard publication remains pending; do not push without authorization. Local evidence: work/scorecard-revisions-2026-10-14/.
+
+## Deployment follow-up
 
 1. Verify the next real collect/deploy of scorecard commit `39c2617`, now on `origin/main` with CI passed. The 15:07 UTC run 38267891738 gated/skipped deployment; at 15:10 UTC the live page was still the previous version. Review the new private forecast viewer on `codex/scorecard-corrections`; that checkpoint remains local. Rebase over any newer immutable history commits before an approved push. Private future-value screenshots must never be published.
 
@@ -16,9 +26,7 @@ _Open items only. Updated 2026-10-12. Completed work is in CHANGELOG.md._
 
 ## Next product/data decisions
 
-- Follow `FORECAST_PLAN.md`: the owner chose a private forecast comparison; the local viewer is ready (`PRIVATE_FORECAST.md`). Next proposed scope is complete 48-hour snapshots for the same 49 stations in bounded encrypted state, then a separately fixed daily forecast. Approve capture scope before changing/deploying the collectors; no capture expansion has started.
-- Prioritize Yr rain-probability reliability versus IFS/AIFS temperature/wind comparisons. Probability needs a verified provider threshold and matching observed interval. Four-model results require common provider cohorts; AIFS rain is six-hour data interpolated to hours.
-- Decide whether to retain a coherent forecast run for daily max/min, frost nights and daily precipitation. Existing history describes rolling leads and cannot recreate the lost full local runs. Keep new capture compact and additive.
+- Yr rain-probability reliability still needs a verified provider threshold and matching observed interval. Four-product and pressure studies follow the approved order above; broader coherent WeatherNext/ECMWF snapshot capture remains a later decision.
 - Choose prospective quality/provenance fields and any alternative WeatherNext rain outputs (native versus satellite-calibrated/experimental), before broader variable/network expansion. No collection expansion has started.
 - Consider partial-provider replays only after deciding how to explain missing counterpart hours; never present an incomplete total as a full day.
 - Revisit results at 30 paired days, after another month and during winter. Hold thresholds/metrics steady; investigate land/offshore, sampling-method cohorts, and height adjustment in cold valleys before making recommendations.

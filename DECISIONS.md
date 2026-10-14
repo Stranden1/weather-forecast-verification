@@ -563,3 +563,36 @@ SN20925 (Wisting) is the first.
 - `private_forecast/` reads already fetched encrypted cloud state in memory and serves only on 127.0.0.1. No collection, database, state/history writes, credential delivery, public-site export or remote sharing. Private future-value screenshots belong only in ignored local work directories.
 - Use the latest shared collection, retain original issue times and missing provider hours, and stop lines/ranges at gaps. Temperature/wind use WeatherNext's mean; precipitation uses its median and original interval end. Largest gap means prediction disagreement, never measured error.
 - Complete 48-hour capture and a fixed daily forecast remain proposals in FORECAST_PLAN.md. Do not infer daily extrema/totals or event probabilities from sparse snapshots or hourly quantiles.
+
+## Scorecard usability — 2026-10-13 (Codex)
+
+- Use the system theme until the reader explicitly chooses light/dark; persist the choice and label the button with its next action. On phones, page filters scroll with the document so map controls remain usable.
+- Station markers use solid provider colours plus shapes to show the direction of the observed error difference. Equal errors and absent paired data have distinct neutral markers. Neither colour nor the existing 10% list threshold is a statistical winner verdict; retain that explanation beside the map.
+- Station percentages mean the lower average error relative to the other service's larger error, on the existing paired cohort. Keep this meaning visible; explain our height adjustment in station details. Only existing bootstrap-confirmed headline verdicts get a winning-provider text/rule cue.
+- Keep health warnings and the existing stale threshold intact when changing their visual emphasis. The rest of the design direction still awaits owner approval.
+
+## Station map marker refinement — 2026-10-14 (owner preference)
+
+- Supersedes the 13 Oct provider-shape choice: use small round dots for both providers, thin outlines, 8 px in the overview and gentle growth capped at 12 px when zoomed in. Retain distinct equal/missing-data styling, provider colours, nearby legend, text/accessibility labels and descriptive-only station comparisons.
+- Make mouse-wheel, pinch and button zoom available so nearby stations can be separated. Keep a larger transparent click area and keyboard access without enlarging the visible dots.
+
+## Owner decisions — 14 Oct 2026, 20:03 Oslo
+
+1. **M1 approved, simplified form:** full Yr responses twice daily (slots after 08:30 and 20:30
+   UTC), slot window as the retry (no durable spool), a missing-slot record when the window closes,
+   simple manifests. Store in a **separate private GitHub repo**. No object storage yet.
+2. **Keys (owner asked Claude to choose): one key.** Encrypt the archive with the existing
+   `WX_STATE_KEY`. A second key doesn't add real protection here: both would sit in the same
+   GitHub secrets and the same `.env`. It would double what must be backed up. The owner keeps one
+   copy of that key in a password manager and one offline (printed or USB, at home). Revisit only
+   if the archive is ever shared with someone else.
+3. **Four-product temperature/wind comparison: approved** (read-only, existing history).
+4. **Pressure backfill for WeatherNext and IFS/AIFS: approved** (read-only study, 8-station
+   pilot from the plan, §6). Yr pressure starts with M1.
+5. **Scorecard prototype: revise** (list below), then commit validated steps. Do not push.
+
+### Scorecard implementation — 2026-10-14
+
+- The approved revision list is in REVIEW_2026-10-14.md; it supersedes the earlier pending design approval. Apply the journal style to all sections, show the blend only for a better verdict, and keep published forecasts visually primary.
+- Land/offshore summaries use the existing height metadata and selected paired data, with at least seven days. Unknown classifications are omitted; counts are descriptive, not significance tests. Keep height/lake caveats with station differences.
+- Preserve full WeatherNext attribution text beside value charts as footnotes. Commit validated steps without pushing.

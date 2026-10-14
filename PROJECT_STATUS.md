@@ -1,27 +1,28 @@
 # Project status
 
-_Updated 2026-10-12. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-14. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-Cloud collection is healthy and is the only live pipeline. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted `history/` is the only retained record. Protect it and `WX_STATE_KEY` independently.
+The cloud pipeline is the only live collection system. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted history/ is the only retained record. Protect it and WX_STATE_KEY independently.
 
-Verified data: 37 scored days through 11 Oct, 224,292 rows; 25 paired days at one day. Main one-day temperature/rain-median results are too close; WeatherNext has a small overall wind advantage. Regional/event differences are more informative, but are short-sample descriptions rather than station winner claims.
+Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 paired one-day days. One-day temperature is Yr 0.91 vs WeatherNext 0.92 °C, too close to call. These are the existing public validation fixtures, not a fresh live-health audit.
 
-## Ready for review
+## Local scorecard ready
 
-Local branch `codex/scorecard-corrections` has three validated checkpoints after Wisting's retirement commit. It corrects UTC daily rain aggregation, median/date-scope consistency and station wording; adds a compact first answer and accessible controls/tables; and shows catches/misses/false alarms for freezing, wind and wet hours with land/offshore groups. Monthly and detailed analyses remain available in disclosures.
+Task 1 of REVIEW_2026-10-14.md is complete. The journal styling now covers events, horizons, replays, expanded analysis, monthly summaries and methodology. The blend finding appears below the scores only with a supported better verdict. Published horizon values are primary; height adjustments use smaller hollow grey markers and thin dashed ranges. The map reports land/offshore counts for the selected period/horizon, and the biggest differences show existing height/lake notes. Replay notices retain their full wording as footnotes; Open source links to the repository. Wholly empty sections hide.
 
-143 cloud tests pass. Browser checks pass in both themes at 1280/375/320 px, with no captured JS errors or page-wide overflow. Real-history export is ~937 KB. Phone answer now appears at y=409 px; collapsed page length ~5,332 px versus ~10,085 px previously. Screenshots/logs are in `work/scorecard-2026-10-12/`. The scorecard commits are now on `origin/main` at `39c2617`, and CI passed (run 38266975312). At the 15:10 UTC check, the live page was still the previous version; run 38267891738 gated/skipped deployment. Verify the next actual collecting/deploying run.
+The export adds an offshore field from the existing height metadata (unknown stays null). Scoring, station membership, collectors, history, site/data, secrets and scheduling are unchanged. Earlier prototype improvements are retained. Changes are committed locally; no push/deployment.
 
-The owner chose a private prediction view. `private_forecast/` now reads future Yr/WeatherNext snapshots from fetched encrypted cloud state on loopback only, with station/24–48 h selection, ranges, gaps, issue ages, largest-gap navigation and tables. Eight private data/access tests and browser checks in both themes at all three widths pass. It needs no database and changes no collection. Start with `PRIVATE_FORECAST.md`; the ranked finish plan is `FORECAST_PLAN.md`. Private screenshots stay in ignored `work/forecast-comparison-2026-10-12/`.
+Validation: 143 cloud tests; browser checks at 1280/375/320 px in light/dark, with real fonts/map tiles, expanded sections, filters, charts/tables, keyboard and zoom behavior, blend visibility, map counts and empty data. Evidence: work/scorecard-revisions-2026-10-14/. Existing NumPy/pandas deprecation warnings remain.
 
-## Operations and remaining choices
+The earlier scorecard corrections are on origin/main at 39c2617 with CI passed; a subsequent real deployment still needs verification. The private forecast viewer remains available on codex/scorecard-corrections; PRIVATE_FORECAST.md describes launch. Future-value screenshots remain private in ignored work/.
 
-- Since 6 Oct timer activation, measured collection gaps were 2.5–3.0 h. Timer/fallback and workflows are unchanged.
-- Wisting is inactive locally (49 active stations); existing historical scores remain. Revsbotn resumed reports on 12 Oct; Enningdalen and Alvheim recovered. Finalized-history warnings can lag raw recovery.
-- Full local runs are lost. The private timeline is incomplete because current capture keeps scoring windows. Complete 48-hour/daily forecasts require prospective retention; new variables/quality fields and model comparisons need a scope decision.
-- All history decrypts with the current local key; a recovery from an independent backup is unverified.
-- Watch Ubuntu runner migration from 19 Oct. Renew timer token before 5 Nov 17:15 UTC. Older plaintext Git objects remain a separate policy/cleanup item.
+## Next and operations
 
-NEXT_STEPS.md holds open work; WORK_STATUS.md holds the completed checkpoint and review instructions.
+- Next session: simplified M1 Yr archive, approved in REVIEW_2026-10-14.md. Separate private repo, one existing encryption key, no spool; validate disabled first and obtain owner OK before enabling. Then four-product comparison, pressure pilot and plan consolidation, in that order.
+- Independent key/history backup and recovery are owner actions, still unverified. Older plaintext Git objects remain a separate cleanup decision.
+- Timer/fallback and workflows unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized-score warnings can lag recovery.
+- Check Ubuntu runner migration from 19 Oct; renew timer token before 5 Nov 17:15 UTC / 18:15 Oslo.
+
+NEXT_STEPS.md holds open work; WORK_STATUS.md holds the latest checkpoint.

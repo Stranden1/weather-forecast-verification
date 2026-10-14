@@ -1,5 +1,107 @@
 # Changelog
 
+## Smaller zoomable station markers — 2026-10-14 (Codex)
+
+**Requested map refinement complete and validated locally. Prototype remains uncommitted; not pushed/deployed.**
+
+### Done
+- All station markers are round: 8 px at overview, growing gently up to 12 px with zoom. Thin outlines and smaller missing-measurement rings reduce crowding. Separate transparent 24 px click areas, accessible labels and Enter/Space selection remain.
+- Mouse-wheel zoom enabled; button/pinch zoom and panning retained, with a short hint. Colours, equal/missing-data legend, station selection, cohorts and scores unchanged.
+- Passed browser regression checks at 1280/375/320 px in both themes with real fonts/tiles: overview/regional views, marker scaling, panning, button/desktop wheel zoom, keyboard markers, themes, filters, charts/tables, no page overflow or captured JS errors. JS syntax and Git whitespace checks pass. Cloud code is unchanged; its 143 tests last passed on 13 Oct.
+- Latest screenshots and browser-tests.log: work/scorecard-map-refinement-2026-10-14/. Reused isolated read-only public fixtures. Preview servers stopped; no live-health audit.
+
+### Remaining
+- Owner direction approval before extending the prototype to the other sections. After that work, repeat relevant checks and commit validated steps; do not push. Other open work stays in NEXT_STEPS.md.
+
+**Protected:** history, site/data, scoring/pairing, collectors, shared station network, secrets and scheduling unchanged. Existing review documents untouched. Previous checkpoint archived atop CHANGELOG.md.
+
+## Smaller zoomable station markers — 2026-10-14 (Codex)
+
+- Replaced the 16 px circles/squares and heavy outlines with round 8 px overview dots and thin outlines. Dots grow gently with zoom, capped at 12 px; missing-measurement rings shrink accordingly. The separate 24 px transparent click area and keyboard labels/Enter/Space remain.
+- Enabled mouse-wheel zoom, retained pinch/button zoom and panning, and added a short zoom hint. Provider colours, equal/missing-data meanings, selection, periods and descriptive comparisons are unchanged. The owner's preference supersedes the previous circle/square styling.
+- Browser regression checks passed at 1280/375/320 px, both themes, with real fonts/tiles: overview and regional zooms, panning, desktop wheel/button zoom, marker sizing, keyboard selection, theme/filter/chart/table checks, and no page overflow or captured JS errors. Screenshots/log: work/scorecard-map-refinement-2026-10-14/. Reused read-only public fixtures; cloud code is unchanged, with 143 cloud tests last passed on 13 Oct.
+- Handoffs updated. Prototype remains uncommitted; no push/deployment, history/data/scoring, collection, station network, secrets or scheduling changes. Existing review documents untouched.
+
+## Previous critique-fix checkpoint — archived 2026-10-14
+
+## Scorecard critique fixes — 2026-10-13 (Codex)
+
+**Requested fixes complete and validated locally. Prototype remains uncommitted; not pushed/deployed.**
+
+### Done
+- Fixed mobile filter overlap; 44 px filter/zoom targets. Station and horizon selectors are together, with a wrapping legend below the map.
+- Solid blue circles/orange squares show lower observed error; solid neutral means equal error, hollow means no paired data. Enter/Space select map stations. Percentages visibly say “lower error”; height adjustment is explained in station details.
+- Theme follows the system until chosen, updates on system changes, names its next action and saves explicit choices. Tidied small type/corners, moved dates beside the verdict context, added a confirmed-verdict text/rule cue, removed redundant Stations navigation and softened warning styling. The existing eight-hour stale threshold is preserved.
+- Passed 143 cloud tests and browser checks at 1280/375/320 px in light/dark with real fonts/tiles, zero page overflow/captured JS errors, unobstructed zoom, theme persistence, filters, station charts/tables, keyboard markers, height explanation and synthetic equal/missing/winner/tie cases.
+- Evidence: work/scorecard-review-fixes-2026-10-13/ (screenshots, browser-tests.log, cloud-tests.log). Reused the isolated read-only public fixtures in work/scorecard-direction-2026-10-13/data. Preview servers stopped; no live-health audit.
+
+### Remaining
+- Owner direction approval before extending the prototype to events, horizons, replays and detailed analyses. Hide wholly empty sections and consolidate methodology while preserving controls, tables, disclosures and attribution.
+- After the remaining design work, repeat relevant checks and commit validated steps; do not push. Operational/private-viewer items remain in NEXT_STEPS.md.
+
+**Protected:** history, site/data, scoring/pairing, collectors, shared station network, secrets and scheduling unchanged. Existing untracked review documents untouched. Previous checkpoint archived atop CHANGELOG.md.
+
+## Scorecard critique fixes — 2026-10-13 (Codex)
+
+- Fixed mobile filter/map overlap by making filters scroll with the page below 761 px. Filters and map zoom controls have 44 px touch targets.
+- Station selectors sit together; the legend is below the map. Full-strength provider colours and circle/square markers distinguish lower error; solid neutral means equal error, hollow means no paired data. Markers support Enter/Space and have descriptive accessible labels. Local differences remain descriptive, without station winner claims.
+- Percentages visibly say “lower error”; height adjustment is explained in station details. Dates now precede the headline; a heavier rule and text cue appear only for an existing confirmed provider verdict. Removed the redundant Stations navigation link.
+- Theme defaults to the system until explicitly chosen; the button names its next action, system changes update unchosen themes, and choices persist. Added 12 px eyebrow/13 px metadata tokens, square interface corners and a quieter health warning; the existing eight-hour stale threshold is unchanged.
+- Validation passed: 143 cloud tests; browser checks at 1280/375/320 px in both themes with real fonts/tiles, no page overflow or captured JS errors, uncovered zoom, theme persistence, station charts/tables, keyboard markers, height explanation, and synthetic equal/missing/winner/tie cases. Evidence: work/scorecard-review-fixes-2026-10-13/. Sandbox temp/local-Git limitations were resolved using workspace temp fixtures and an approved test run; existing dependency warnings remain.
+- No history, site/data, scoring, collection, station network, secrets, schedule, push or deployment changes. Prototype remains uncommitted; remaining-section redesign awaits direction approval.
+
+## Previous direction checkpoint — archived 2026-10-13
+
+## Public scorecard direction prototype — 2026-10-13 (Codex)
+
+**Prototype complete; awaiting owner approval. Uncommitted, not pushed/deployed.**
+
+### Done
+- Read AGENTS.md, the prior checkpoint, DECISIONS.md and PLAN_WEBPAGE.md; checked Git. The existing untracked REVIEW_2026-10-11.md and REVIEW_2026-10-11_codex.md are untouched.
+- Changed presentation in site/index.html, style.css and app.js for the opening and “Where the errors differ” only. Weather-journal identity, serif headline verdict, prominent blue Yr/orange WeatherNext values, blend in details, paper light default and saved dark-mode control.
+- Moved the station section directly below the opening; map imagery matches the theme and provider colours stay exact. Empty comparison lists and missing station chart/table disappear; station-map methodology is in “How to read this fairly”. Other sections retain their current layout.
+- Previewed with the existing .venv and python -m http.server 8765 --directory site, loopback only. Existing site/data lacks views.json, so screenshots used a read-only history export in an isolated ignored work/ fixture; no existing data files were changed.
+- Browser checks pass at 1280/375/320 px in both themes: zero horizontal overflow and captured JS errors, scores stay side by side, actual fonts/tiles loaded, filters/station chart/table work, keyboard focus/selection and theme persistence pass.
+- Screenshots and validation.json: work/scorecard-direction-2026-10-13/. Numbers remain Yr 0.91 vs WeatherNext 0.92 °C, “Too close to call.” The preview server is stopped.
+
+### Remaining after approval
+- Apply the approved direction to events, horizons, replays and detailed analyses; hide wholly empty sections and consolidate remaining methodology while preserving controls, disclosures, tables and required nearby attribution.
+- Refine chart styling and verify every existing feature at phone width in both themes. Run the full cloud suite and appropriate browser regression checks, then commit validated steps and update changed handoffs. Do not push.
+- The design direction is a proposal, not a final DECISIONS.md rule yet.
+
+**Protected:** no scoring/pairing, Python pipeline, site/data, history, station network, secrets, scheduled tasks, push or deployment changes. Prior private-viewer and operational follow-ups remain in NEXT_STEPS.md; the prior handoff is archived atop CHANGELOG.md.
+
+## Public scorecard design prototype — 2026-10-13 (Codex)
+
+- Prototyped the hero and station section only: weather-journal masthead, Newsreader/DM Sans typography, paper light default, explicit saved dark mode, headline verdict, two prominent provider scores, blend/supporting scores in a disclosure, and map-led station comparisons.
+- Map imagery adapts to the theme while provider marker colours remain unchanged. Empty comparison lists and missing station charts/tables are hidden. Map methodology moved into the existing fairness disclosure.
+- Browser validation: 1280/375/320 px, light/dark, no page overflow or captured JS errors; side-by-side values, fonts, real map tiles, filters, station selection/table, keyboard focus and saved theme checked. Public-data screenshots and validation.json are in ignored work/scorecard-direction-2026-10-13/.
+- Read-only history export went to an isolated preview fixture; existing site/data, history, pipeline, scoring, pairing, secrets and scheduling were unchanged. The two pre-existing untracked review documents were untouched.
+- Stopped at the requested direction-approval checkpoint. Prototype remains uncommitted; the full redesign, full test suite and validated commits await approval. No push or deployment.
+
+## Previous private-viewer handoff — archived 2026-10-13
+
+## Private forecast comparison — 2026-10-12 (Codex)
+
+**Complete and validated locally on `codex/scorecard-corrections`; not pushed/deployed.**
+
+### Done
+- Owner chose a private forecast UI. `private_forecast/` reads fetched encrypted cloud state in memory and serves only on loopback; no retired database or collector required.
+- Active stations, 24/48-hour windows, temperature/wind/precipitation, same-fetch comparisons, ranges, honest gaps, issue ages, median rain, largest-gap shortcut, tables and both themes.
+- Private data/access controls: no credential delivery, caching, external assets, state/history writes or public export. No capture expansion or scheduling change.
+- Eight private tests pass; the existing 143 cloud tests also pass. Browser checks pass at 1280/375/320 px in light/dark, including missing-hour line/range breaks, missing providers, rain median, empty stations, keyboard selection and prominent mobile values. No captured JS errors or page-wide overflow.
+- Private screenshots, validation.json and aggregate disagreement.json are in ignored `work/forecast-comparison-2026-10-12/`; never publish future-value screenshots. The validation server is stopped.
+- PRIVATE_FORECAST.md gives launch instructions; FORECAST_PLAN.md gives evidence, ranked next work and the proposed finish line. Earlier scorecard checkpoint is archived atop CHANGELOG.md.
+
+### When returning
+Review the private viewer; see Git log for its local checkpoint. Earlier scorecard commits are now on `origin/main` at `39c2617`, with CI passed. At 15:10 UTC the live page was still the previous version: run 38267891738 gated/skipped collection and deployment. Verify the next actual deployment. This new viewer has not been pushed or deployed; this task performed neither action.
+
+The private timeline intentionally has gaps: current cloud capture saves scoring windows. Approve prospective bounded 48-hour capture before collector changes, then choose fixed daily/night scope. Daily extrema/totals cannot be recovered from lost full local runs or inferred from incomplete timelines.
+
+Rain-probability reliability and IFS/AIFS views remain proposals using retained data. Then collect through winter and review occasionally; more station/variable counts are lower priority. Operations still need the 19 Oct runner check, before-5-Nov token renewal and independent history/key recovery confirmation (NEXT_STEPS.md).
+
+**Data:** cloud history is the only retained record; keep it and WX_STATE_KEY safe. No history edits, push, workflow dispatch, secret rotation or collector changes in this task.
+
 ## Private forecast comparison and finish plan — 2026-10-12 (Codex)
 
 - Owner chose an internal side-by-side prediction UI. Added `private_forecast/`, independent of the retired database/collector; read-only encrypted cloud state on loopback, no external assets or collection.
