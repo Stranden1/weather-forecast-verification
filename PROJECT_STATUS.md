@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-10-14. Current state only; history is in CHANGELOG.md._
+_Updated 2026-10-15. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -20,7 +20,7 @@ Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 pai
 
 ## Next and operations
 
-- Archive: inspect the first two real slots on 15 Oct (49/49 stations, manifests, 0 errors). Tasks 3–5 remain in REVIEW_2026-10-14.md order.
+- Archive: inspect the first two real slots on 15 Oct (49/49 stations, manifests, 0 errors). Task 3 (four-product comparison) is in FINDINGS_FOUR_PRODUCT_2026-10-15.md, awaiting review: at 6–48 h Yr and WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS, and the Yr+WeatherNext average beats all four. Tasks 4–5 remain.
 - Independent key/history backup and recovery remain owner actions. Older plaintext Git objects remain a separate cleanup decision.
 - Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Check Ubuntu runner migration from 19 Oct; renew timer token before 5 Nov 17:15 UTC / 18:15 Oslo.
