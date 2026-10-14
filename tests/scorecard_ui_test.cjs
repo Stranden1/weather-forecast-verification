@@ -93,7 +93,9 @@ async function main() {
         assert.equal(await page.locator('#blend-finding').isVisible(), score.verdict_avg === 'better');
         const eligible = meta.stations.filter(s => typeof s.offshore === 'boolean' && views.all.stations.t['24'][s.id]?.days >= meta.min_days_for_verdict);
         const offshore = eligible.filter(s => s.offshore).map(s => views.all.stations.t['24'][s.id]);
-        assert((await page.locator('#map-pattern').textContent()).includes(`WeatherNext lower at ${offshore.filter(r => r.wn < r.yr).length} of ${offshore.length} offshore stations`));
+        assert((await page.locator('#map-pattern').textContent()).includes(`Offshore: WeatherNext lower at all ${offshore.length}.`));
+        const land = eligible.filter(s => !s.offshore).map(s => views.all.stations.t['24'][s.id]);
+        assert((await page.locator('#map-pattern').textContent()).includes(`On land: Yr ${land.filter(r => r.yr < r.wn).length}, WeatherNext ${land.filter(r => r.wn < r.yr).length}`));
         assert(await page.locator('.station-caveat').count() > 0);
         assert.equal(await page.locator('.foot a').getAttribute('href'), 'https://github.com/Stranden1/weather-forecast-verification');
         assert(await page.evaluate(() => {

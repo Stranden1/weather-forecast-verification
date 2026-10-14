@@ -14,7 +14,7 @@ Validation: all 171 cloud tests pass with archive and transport tests using synt
 
 ## Local page and data checkpoints
 
-Task 1 scorecard revisions are committed as 944cd2d, with handoffs/reviews in 4e622eb. The journal style covers the whole page, supported blend findings are visible, published horizon values are primary, and station counts/caveats explain the map. Earlier 1280/375/320 light/dark browser checks passed. Evidence: work/scorecard-revisions-2026-10-14/. Publication remains pending.
+Task 1 scorecard revisions are committed as 944cd2d, with handoffs/reviews in 4e622eb. The journal style covers the whole page, supported blend findings are visible, published horizon values are primary, and station counts/caveats explain the map. The latest sentence shows both land counts and explicit ties; offshore unanimity is stated plainly. Earlier 1280/375/320 light/dark browser checks passed. Latest sentence checks also pass at all three widths in both themes; evidence: work/map-counts-2026-10-14/. Earlier full-page evidence: work/scorecard-revisions-2026-10-14/. Publication remains pending.
 
 Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 paired one-day days. One-day temperature Yr 0.91 vs WeatherNext 0.92 °C, too close to call. No fresh live pipeline-health audit was performed here. Earlier corrections are on origin/main at 39c2617; deployment follow-up remains open. The private forecast viewer remains available on codex/scorecard-corrections; PRIVATE_FORECAST.md describes launch.
 

@@ -558,14 +558,20 @@
     const eligible = D.meta.stations.filter(s => typeof s.offshore === "boolean" &&
       Number.isFinite(stats[s.id]?.yr) && Number.isFinite(stats[s.id]?.wn) &&
       stats[s.id].days >= D.meta.min_days_for_verdict);
-    const parts = [[true, "WeatherNext", "offshore"], [false, "Yr", "land"]].map(([offshore, name, group]) => {
+    const parts = [[true, "Offshore"], [false, "On land"]].map(([offshore, label]) => {
       const rows = eligible.filter(s => s.offshore === offshore).map(s => stats[s.id]);
-      const lower = rows.filter(r => offshore ? r.wn < r.yr : r.yr < r.wn).length;
-      return rows.length ? `${name} lower at ${lower} of ${rows.length} ${group} stations` : "";
+      if (!rows.length) return "";
+      const yr = rows.filter(r => r.yr < r.wn).length;
+      const wn = rows.filter(r => r.wn < r.yr).length;
+      const equal = rows.length - yr - wn;
+      if (offshore && (yr === rows.length || wn === rows.length)) {
+        return `${label}: ${wn === rows.length ? "WeatherNext" : "Yr"} lower at all ${rows.length}.`;
+      }
+      return `${label}: Yr ${yr}, WeatherNext ${wn}${equal ? `, equal error ${equal}` : ""} of ${rows.length}.`;
     }).filter(Boolean);
     const el = document.getElementById("map-pattern");
     el.hidden = !parts.length;
-    el.textContent = parts.length ? `${parts.join("; ")}. ${H_LABEL[S.mapH]} ahead, ${periodText()}; stations with at least ${D.meta.min_days_for_verdict} paired days. Descriptive counts, not winner tests.` : "";
+    el.textContent = parts.length ? `${parts.join(" ")} ${H_LABEL[S.mapH]} ahead, ${periodText()}; stations with at least ${D.meta.min_days_for_verdict} paired days. Counts show lower average error, not winner tests.` : "";
   }
 
   // With no station selected the panel lists descriptive differences: stations with
