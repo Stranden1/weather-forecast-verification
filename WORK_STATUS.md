@@ -1,14 +1,16 @@
 # Work status
 
-## Four-product comparison (task 3) — 2026-10-15 (Claude)
+## Pressure backfill pilot (task 4) — 2026-10-15 (Claude)
 
 **Done**
-- Read-only comparison of Yr, WeatherNext, IFS and AIFS temperature/wind on the shared cohort in
-  `history/` (27 Sep–13 Oct, 17 days). Findings: `FINDINGS_FOUR_PRODUCT_2026-10-15.md`. Script and
-  aggregate output: `work/four-product-2026-10-15/` (ignored). No code, history, state or page changes.
-- Headline (6–48 h): Yr and WN too close to call; IFS clearly worst; AIFS beats IFS; Yr+WN average
-  beats all four and adding ECMWF makes the average worse. Offshore, Yr is the weakest product.
-- 171 cloud tests pass.
+- Read-only MSLP pilot for the eight §6 stations: 28 fixed 00/12 UTC runs (29 Sep–12 Oct), leads
+  6–120 h every 6 h, WeatherNext (Earth Engine) and IFS/AIFS (Open-Meteo Single Runs API) against
+  Frost QFF. Findings: `FINDINGS_PRESSURE_PILOT_2026-10-15.md`. Script, raw responses and output:
+  `work/pressure-pilot-2026-10-15/` (ignored; raw holds past WeatherNext values, keep private).
+- Backfill was complete for all three products (28/28 runs, every value). WeatherNext MAE is lowest
+  at every lead and station, but it is an ensemble mean against single ECMWF runs, so this is not a
+  fair model verdict. IFS and AIFS are about equal.
+- No code, history, state or page changes. 171 cloud tests pass.
 
-**Remaining:** owner review of the findings' three page suggestions; no page change until approved.
-Task 2 slot checks (15 Oct) are still open; tasks 4–5 follow.
+**Remaining:** owner review. Possible next step: an ECMWF ensemble-mean series for a fair comparison.
+Task 2 slot checks (15 Oct) are still open; task 5 follows.

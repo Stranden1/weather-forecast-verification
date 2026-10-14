@@ -8,7 +8,7 @@ Follow REVIEW_2026-10-14.md, one task per session:
 
 - **Task 2, first real slots:** archive enabled 14 Oct 21:54 UTC; activation run captured nothing (outside window), wrote policy, 0 errors. Check 15 Oct am (08:30–13:00 UTC) and pm (20:30–01:00) slots: 49/49 stations in `Stranden1/yr-archive`, closed manifests, 0 errors in `health.json.yr_archive`, unchanged main scoring/health.
 - Task 3 done 15 Oct: `FINDINGS_FOUR_PRODUCT_2026-10-15.md`. Owner review of its page suggestions before any page change.
-- Task 4: read-only WeatherNext/IFS/AIFS pressure backfill study for the plan's eight-station pilot; short findings file.
+- Task 4 done 15 Oct: `FINDINGS_PRESSURE_PILOT_2026-10-15.md`. Owner review; a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Task 5: consolidate FORECAST_PLAN.md into PLAN_FORECAST_ARCHIVE.md (or mark replaced), adding a one-page summary.
 
 ## Operations
