@@ -1,5 +1,9 @@
 # A useful finish line for WeatherApp
 
+> **Replaced on 15 Oct 2026** by the one-page summary at the top of
+> [PLAN_FORECAST_ARCHIVE.md](PLAN_FORECAST_ARCHIVE.md), which carries over this plan's open items
+> and rules. Kept unchanged below as the 12 Oct record; do not plan from it.
+
 _2026-10-12. The owner chose a private forecast comparison. First viewer prepared
 locally; cloud capture and public deployment are unchanged._
 

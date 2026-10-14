@@ -1,5 +1,64 @@
 # Forecast archive and scientific expansion plan
 
+## One-page summary — updated 15 October 2026
+
+This is the project's **only forecast plan**. `FORECAST_PLAN.md` (12 Oct) is replaced; its open
+items and rules are carried over below. Sections 1–13 are the 14 Oct design audit, kept for
+detail. Where they conflict with this summary or with the owner decisions of 14 Oct
+(DECISIONS.md), the summary and DECISIONS win. In particular, M1 has **no durable retry spool**,
+uses a **private GitHub repo** rather than object storage, uses **one key** (`WX_STATE_KEY`), and
+has no observation vintages or recovery-time targets.
+
+**What the project answers.** (1) *What is coming at my place?* A private side-by-side forecast
+view (`private_forecast/`, local only). (2) *When should I trust each forecast?* The public
+accuracy page.
+
+**Done**
+- M1 Yr archive: full Yr responses twice daily (08:30 and 20:30 UTC windows) in
+  `Stranden1/yr-archive`, enabled 14 Oct 21:54 UTC. The first real windows (15 Oct) still need checking.
+- Four-product temperature/wind comparison (`FINDINGS_FOUR_PRODUCT_2026-10-15.md`): at 6–48 h, Yr and
+  WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS, and the Yr+WeatherNext
+  average beats all four. Offshore, Yr is the weakest product.
+- Pressure pilot, 8 stations (`FINDINGS_PRESSURE_PILOT_2026-10-15.md`): WeatherNext and IFS/AIFS
+  pressure backfill completely. WeatherNext's ensemble mean has the lowest error, but a fair test
+  needs an ECMWF ensemble mean.
+
+**Next, in order** (each needs the owner's OK)
+1. Check the first Yr archive windows: 49/49 stations, manifests, 0 errors.
+2. Owner: back up `WX_STATE_KEY` (password manager plus offline) and one copy of `history/` off
+   this PC; then test a recovery from that copy (§10).
+3. Decide on the page suggestions in the two findings files. No page change before that.
+4. Gate fix: record success per source, so a WeatherNext outage cannot hide behind Yr rows.
+5. Twice-daily WeatherNext/ECMWF snapshots with pressure, dew point and cloud (§3, §5). This also
+   fills the private 48-hour forecast view. At 3–5 GB/year, decide storage first.
+6. Fixed daily forecast summaries (morning or evening decision), once enough snapshots exist.
+7. Yr rain-probability reliability, once MET's threshold and interval are confirmed (§8).
+8. Later, exploratory: disagreement as an error predictor, quantile/geography audit, dew point,
+   then MOS correction. Do not train models yet (§9).
+
+**Open decisions**
+- Which findings-file suggestions go on the page.
+- Scope, timing and storage for WeatherNext/ECMWF snapshot capture.
+- Daily view: a calendar-day summary, an overnight-freezing comparison, or both (Oslo dates proposed).
+- An authoritative source for Yr's hourly rain-probability threshold.
+
+**Rules carried over from FORECAST_PLAN.md**
+- Show the human forecast view in Oslo time; keep accuracy rows in UTC. Handle 23/25-hour
+  daylight-saving days in any local daily score.
+- Do not stitch unrelated issue times into one daily summary. Use one predeclared forecast choice
+  per day, and check full-interval coverage first.
+- Highs and lows from hourly samples are not the station's true daily extremes. Air below 0 °C
+  is not a road-ice forecast.
+- A sum of hourly ensemble medians is not the median of the daily total; p10/p50/p90 do not give
+  exact event probabilities.
+- WeatherNext future values stay private; keep the one-hour public age gate and attribution.
+
+**Finish line.** Once the forecast view and one useful daily or probability view work, the project
+is a stable product: automated collection, short occasional reviews, small fixes when evidence
+calls for them.
+
+---
+
 _Design audit: 14 October 2026. Implementation requires owner approval. No production code, scoring, schedules, secrets, station configuration or historical files were changed._
 
 ## 1. Recommendation and evidence boundary

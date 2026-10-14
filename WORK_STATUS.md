@@ -1,16 +1,13 @@
 # Work status
 
-## Pressure backfill pilot (task 4) — 2026-10-15 (Claude)
+## Forecast plans consolidated (task 5) — 2026-10-15 (Claude)
 
 **Done**
-- Read-only MSLP pilot for the eight §6 stations: 28 fixed 00/12 UTC runs (29 Sep–12 Oct), leads
-  6–120 h every 6 h, WeatherNext (Earth Engine) and IFS/AIFS (Open-Meteo Single Runs API) against
-  Frost QFF. Findings: `FINDINGS_PRESSURE_PILOT_2026-10-15.md`. Script, raw responses and output:
-  `work/pressure-pilot-2026-10-15/` (ignored; raw holds past WeatherNext values, keep private).
-- Backfill was complete for all three products (28/28 runs, every value). WeatherNext MAE is lowest
-  at every lead and station, but it is an ensemble mean against single ECMWF runs, so this is not a
-  fair model verdict. IFS and AIFS are about equal.
-- No code, history, state or page changes. 171 cloud tests pass.
+- Added a one-page summary at the top of `PLAN_FORECAST_ARCHIVE.md`: status, what is done, ranked
+  next steps, open decisions, rules carried over from `FORECAST_PLAN.md`, and the finish line.
+- Marked `FORECAST_PLAN.md` as replaced (text kept as the 12 Oct record). Dated note in DECISIONS.md.
+- Vault copy: `E:\AgnosticBrain\plans\weatherapp-forecast-archive.md`, linked from the project file.
+- Docs only; 171 cloud tests pass.
 
-**Remaining:** owner review. Possible next step: an ECMWF ensemble-mean series for a fair comparison.
-Task 2 slot checks (15 Oct) are still open; task 5 follows.
+**Remaining:** all five REVIEW_2026-10-14 tasks are done except the task 2 slot checks (15 Oct
+windows). Next steps follow the summary's order.

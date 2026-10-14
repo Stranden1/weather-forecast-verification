@@ -604,3 +604,8 @@ SN20925 (Wisting) is the first.
 - Use an immutable first-slot cutoff; never manufacture missing slots before activation or reopen finalized slots. Record missing/partial closure at the next successful collecting run. If no network was captured during the slot, disclose use of the network at detection.
 - Gzip then Fernet; all raw objects/attempt/closure manifests encrypted. Unknown/raw fields and numeric precision retained as exact response JSON bytes. Request metadata uses only endpoint, coordinates, actual timestamps/status and a caching-header allowlist; no contacts/tokens/cookies.
 - Archive publication is additive, normal fast-forward Git with byte-for-byte readback of newly added files. Failed uploads are retried by fresh collection only within the existing window. Archive status must not influence the main weather-source success gate or alter history/state/scoring. Setup is documented in SETUP_YR_ARCHIVE.md.
+
+## Plans consolidated — 2026-10-15
+
+- PLAN_FORECAST_ARCHIVE.md is the single forecast plan; its one-page summary leads. FORECAST_PLAN.md is marked replaced and kept as a record. References to proposals "in FORECAST_PLAN.md" (complete 48-hour capture, fixed daily forecast) now mean that summary.
+- Where the 14 Oct design audit body conflicts with the summary or the 14 Oct owner decisions, the summary and decisions win.
