@@ -6,15 +6,10 @@ _Open items only. Updated 2026-10-14. Completed work is in CHANGELOG.md._
 
 Follow REVIEW_2026-10-14.md, one task per session:
 
-- **Task 2 activation checkpoint:** simplified M1 Yr archive is implemented and validated locally, disabled. Follow SETUP_YR_ARCHIVE.md: owner creates an initialized private archive repo and repository-only push token, stored directly as WX_YR_ARCHIVE_TOKEN. Configure repo and immutable first UTC cutoff; keep ENABLED=0 until explicit push/activation OK. Then verify two actual cloud slots and unchanged scoring/health. Local evidence: work/yr-archive-2026-10-14/. No durable spool or object storage; existing WX_STATE_KEY is reused.
+- **Task 2 activation checkpoint:** code is pushed (09abaf0) and runs disabled. Before enabling, the owner must (a) set variable WX_YR_ARCHIVE_REPO to `Stranden1/yr-archive` (it is still the placeholder `Stranden1/your-archive-name`) and (b) add a README to `Stranden1/yr-archive` so it has a `main` branch (the repo is empty). Then set WX_YR_ARCHIVE_ENABLED=1, start one manual collect, check the archive step and unchanged health, and inspect the first two real windows (08:30 and 20:30 UTC). The start cutoff 2026-10-15T08:30:00Z must be moved later if activation happens after that window; it is immutable after the first publication.
 - Task 3: read-only four-product temperature/wind comparison from existing history; short findings file, no page changes before review.
 - Task 4: read-only WeatherNext/IFS/AIFS pressure backfill study for the plan's eight-station pilot; short findings file.
 - Task 5: consolidate FORECAST_PLAN.md into PLAN_FORECAST_ARCHIVE.md (or mark replaced), adding a one-page summary.
-- Scorecard publication remains pending; do not push without authorization. Local evidence: work/scorecard-revisions-2026-10-14/.
-
-## Deployment follow-up
-
-1. Verify the next real collect/deploy of scorecard commit `39c2617`, now on `origin/main` with CI passed. The 15:07 UTC run 38267891738 gated/skipped deployment; at 15:10 UTC the live page was still the previous version. Review the new private forecast viewer on `codex/scorecard-corrections`; that checkpoint remains local. Rebase over any newer immutable history commits before an approved push. Private future-value screenshots must never be published.
 
 ## Operations
 
