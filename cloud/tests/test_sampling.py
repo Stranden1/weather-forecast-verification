@@ -181,6 +181,8 @@ class HeightTest(unittest.TestCase):
             board = json.loads((Path(tmp) / "leaderboard.json").read_text(encoding="utf-8"))
             meta = json.loads((Path(tmp) / "meta.json").read_text(encoding="utf-8"))
             per = json.loads((Path(tmp) / "stations.json").read_text(encoding="utf-8"))
+        self.assertEqual({s["id"]: s["offshore"] for s in meta["stations"]},
+                         {"LAND": False, "SEA": True, "NOTE": False})
         s = board["t"]["24"]["all"]
         self.assertIn("mae_wnh", s)
         self.assertIn(s["verdict_h"], ("yr", "weathernext", "too_close"))

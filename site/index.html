@@ -5,17 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yr vs WeatherNext</title>
 <meta name="description" content="Which forecast is more accurate in Norway: Yr or Google's AI model WeatherNext? Checked every day against real weather observations.">
+<script>
+(() => {
+  let saved;
+  try { saved = localStorage.getItem("wx-theme"); } catch {}
+  document.documentElement.dataset.theme = saved === "light" || saved === "dark"
+    ? saved : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to comparison</a>
 <header class="wrap hero">
-  <p class="eyebrow">Forecast scorecard · Norway</p>
-  <h1>Yr vs WeatherNext</h1>
+  <div class="masthead">
+    <div class="masthead-brand">
+      <svg class="weather-mark" viewBox="0 0 52 52" fill="none" aria-hidden="true"><circle cx="26" cy="20" r="10"/><path d="M26 3v4M9 9l3 3M43 9l-3 3M4 20h5M43 20h5M6 33h40M12 40h28M20 47h12"/></svg>
+      <div><p class="eyebrow">Norway / Forecast scorecard</p><h1>Yr vs WeatherNext</h1></div>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">Dark mode</button>
+  </div>
+  <div class="edition-line"><p class="lede">Two forecasts. The weather has the final say.</p><p class="fresh" id="fresh">Loading…</p></div>
   <details class="health-box" id="health-box"><summary class="health" id="health" role="status" hidden></summary><p id="health-detail" class="muted"></p></details>
-  <p class="lede">Which forecast is closer in Norway? We compare Yr and WeatherNext with weather station measurements.</p>
-  <p class="fresh" id="fresh">Loading…</p>
 </header>
 
 <main class="wrap" id="main">
@@ -27,19 +42,39 @@
     </div>
   </div>
 
-  <p class="answer" id="answer" aria-live="polite"></p>
+  <section class="head-to-head" aria-label="One-day forecast comparison">
+  <p class="comparison-kicker" id="comparison-kicker">The one-day comparison</p>
   <p class="scope muted" id="scope"></p>
-
+  <h2 class="answer" id="answer" aria-live="polite"></h2>
+  <p class="comparison-context" id="comparison-context"></p>
   <section class="tiles" id="tiles" aria-live="polite"></section>
-  <p class="muted rain-why" id="rain-why" hidden>For rain we lead with WeatherNext's median, because averaging many
-    scenarios spreads light drizzle across nearly every hour.</p>
+  <p class="blend-finding" id="blend-finding" hidden></p>
+  <details class="score-details"><summary>Scores &amp; comparison details</summary><div id="score-detail-body"></div></details>
+  </section>
 
   <nav class="section-nav" aria-label="Scorecard sections">
-    <a href="#practical">Events</a><a href="#horizons">Horizons</a><a href="#station-section">Stations</a><a href="#more-analysis">More analysis</a>
+    <a href="#practical">Events</a><a href="#horizons">Horizons</a><a href="#more-analysis">More analysis</a>
   </nav>
 
+  <section class="card" id="station-section">
+    <div class="card-head">
+      <div><p class="section-kicker">Across the station network</p><h2>Where the errors differ</h2>
+        <p class="sub">Explore the local differences, from the coast to the mountains.</p></div>
+    </div>
+    <div class="map-tools"><label class="pick inline">Station <select id="station-pick" aria-label="Choose any station"></select></label>
+      <label class="pick">Forecast made <select id="map-h"></select> ahead</label></div>
+    <p class="map-pattern" id="map-pattern" hidden></p>
+    <div class="map-grid">
+      <div class="map-atlas"><div id="map" role="region" aria-label="Station map" aria-describedby="map-key map-note"></div>
+        <p class="map-key" id="map-key"><span><i class="map-marker map-marker-yr" aria-hidden="true"></i> Lower Yr error</span><span><i class="map-marker map-marker-wn" aria-hidden="true"></i> Lower WeatherNext error</span><span><i class="map-marker map-marker-equal" aria-hidden="true"></i> Equal error</span><span><i class="map-marker map-marker-missing" aria-hidden="true"></i> No paired data</span></p>
+        <p class="chart-note muted" id="map-note">Zoom in to separate nearby stations: use +/−, scroll or pinch. Colours show measured average error differences, not statistical winner verdicts. An outer ring marks no recent measurements in the scored history.</p>
+      </div>
+      <div id="station-panel" class="station-panel" aria-live="polite"><p class="muted">Select a station on the map.</p></div>
+    </div>
+  </section>
+
   <section class="card" id="practical">
-    <div class="card-head"><div><h2 id="practical-heading">Does it catch the weather that matters?</h2>
+    <div class="card-head"><div><p class="section-kicker">Weather that matters</p><h2 id="practical-heading">Does it catch the weather that matters?</h2>
       <p class="sub" id="practical-sub"></p></div>
       <label class="pick">Forecast made <select id="event-h"></select> ahead</label>
     </div>
@@ -49,7 +84,7 @@
 
   <section class="card" id="horizons">
     <div class="card-head">
-      <div><h2>Who is closer, by how far ahead</h2>
+      <div><p class="section-kicker">Looking ahead</p><h2>Who is closer, by how far ahead</h2>
         <p class="sub" id="horizon-sub"></p></div>
       <div class="seg" id="horizon-view" role="group" aria-label="Chart view"></div>
     </div>
@@ -62,22 +97,9 @@
 
 
 
-  <section class="card" id="station-section">
-    <div class="card-head">
-      <div><h2>Where the errors differ</h2>
-        <p class="sub">Blue: Yr has lower observed error. Orange: WeatherNext does. These are descriptive differences, not station verdicts. A grey ring marks missing measurements in scored history. Select a station for details.</p></div>
-      <label class="pick">Forecast made <select id="map-h"></select> ahead</label>
-    </div>
-    <label class="pick inline">Station <select id="station-pick" aria-label="Choose any station"></select></label>
-    <div class="map-grid">
-      <div id="map" role="region" aria-label="Station map"></div>
-      <div id="station-panel" class="station-panel" aria-live="polite"><p class="muted">Select a station on the map.</p></div>
-    </div>
-  </section>
-
   <section class="card" id="replays" hidden>
     <div class="card-head">
-      <div><h2>Storm replays</h2>
+      <div><p class="section-kicker">Notable days</p><h2>Storm replays</h2>
         <p class="sub">What each service said 7 days, 5 days ... 6 hours before a notable day, next to what was measured.
           Heavy rain is a day with at least 20 mm, strong wind at least 15 m/s at a land station
           (at the offshore platforms that is an ordinary day), a cold snap at most −5 °C.</p></div>
@@ -90,7 +112,7 @@
   <details class="more-analysis" id="more-analysis">
     <summary>More analysis: trends, bias, forecast changes and uncertainty</summary>
   <section class="card" id="steady" hidden>
-    <h2>How steady are the forecasts?</h2>
+    <p class="section-kicker">Between forecast runs</p><h2>How steady are the forecasts?</h2>
     <p class="sub">Take one hour at one station. How much did each service's forecast for it change between
       being made, say, 2 days ahead and 1 day ahead? Smaller changes mean a steadier forecast.</p>
     <p class="steady-flip" id="steady-flip"></p>
@@ -100,7 +122,7 @@
   </section>
   <section class="card" id="bias" hidden>
     <div class="card-head">
-      <div><h2>Which way do they miss?</h2>
+      <div><p class="section-kicker">Direction of error</p><h2>Which way do they miss?</h2>
         <p class="sub" id="bias-sub"></p></div>
       <label class="pick">Forecast made <select id="bias-h"></select> ahead</label>
     </div>
@@ -111,7 +133,7 @@
   </section>
   <section class="card" id="trend">
     <div class="card-head">
-      <div><h2>Over time</h2>
+      <div><p class="section-kicker">The daily record</p><h2>Over time</h2>
         <p class="sub">Daily average error, with a 7-calendar-day average when at least 3 days have data. Gaps stay visible.</p></div>
       <label class="pick">Forecast made <select id="trend-h"></select> ahead</label>
     </div>
@@ -119,7 +141,7 @@
     <details class="table-view"><summary>Show daily values as a table</summary><div id="trend-table"></div></details>
   </section>
   <section class="card" id="patterns-section">
-    <h2>Patterns to watch</h2>
+    <p class="section-kicker">Weather and terrain</p><h2>Patterns to watch</h2>
     <p class="sub">How the error changes with the weather and the terrain, for forecasts made
       <span id="pat-h-label"></span> ahead.</p>
     <label class="pick inline">Forecast made <select id="pat-h"></select> ahead</label>
@@ -150,7 +172,9 @@
         This compares the products people receive, rather than isolating the underlying models.</li>
       <li><b>WeatherNext averages many possible outcomes.</b> For temperature and wind we score its average,
         which smooths out extremes and tends to lower the average error. Its median, almost identical so far, is in the
-        tiles and the table. For rain we lead with the median instead, as explained under the rain tiles.</li>
+        score details and the table. For rain we lead with the median because averaging many scenarios spreads light drizzle across nearly every hour.</li>
+      <li><b>Reading the station map.</b> Colours show observed error differences, not statistically tested station winners.
+        The lists show stations with at least 7 paired days and at least 10% smaller error; a grey ring marks missing measurements in finalized history.</li>
       <li><b>"Too close to call"</b> means the 95% uncertainty range of the difference still includes zero.
         Days are the unit: errors from nearby stations on the same day are not independent.</li>
       <li><b>"Same as yesterday" sets the bar.</b> This naive guess predicts the value measured at the same time of day
@@ -173,7 +197,7 @@
 </main>
 
 <footer class="wrap foot">
-  <span>Open source · updated automatically every 3 hours</span>
+  <span><a href="https://github.com/Stranden1/weather-forecast-verification">Open source</a> · updated automatically every 3 hours</span>
 </footer>
 
 <script src="vendor/chart.umd.js"></script>

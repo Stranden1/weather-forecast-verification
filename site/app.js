@@ -43,7 +43,7 @@
   const hs = () => (S.v === "p" ? D.meta.precip_horizons : D.meta.horizons);
   const dayMonth = iso => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Europe/Oslo" });
   // Stations whose latest measurement is more than NO_OBS_H before the end of the last scored day.
-  // Stations that never reported (last_obs null) are left out: the map already shows them as "No data yet".
+  // Stations that never reported (last_obs null) are left out; missing pairs are marked separately on the map.
   function silentStations() {
     const m = D.meta; if (!m?.last_day) return new Map();
     const end = Date.parse(m.last_day + "T24:00:00Z");
@@ -106,9 +106,10 @@
     const s = D.leaderboard?.[S.v]?.[24]?.[S.period], el = document.getElementById("answer");
     if (!el) return;
     const w = s && wnPick(s);
-    el.innerHTML = !s?.n || w.main == null ? "No paired forecasts yet for this selection." :
-      `<b>${(VERDICT[w.verdict] || VERDICT.not_enough_data)[0]}</b> for ${esc(D.meta.variables[S.v].name.toLowerCase())} forecasts made 1 day ahead.
-       <span>${s.days} matched days · ${s.n.toLocaleString()} paired station-hours. Lower average error is better.</span>`;
+    el.textContent = !s?.n || w.main == null ? "Waiting for paired forecasts" : (VERDICT[w.verdict] || VERDICT.not_enough_data)[0] + ".";
+    document.getElementById("comparison-kicker").textContent = `${D.meta.variables[S.v].name} / 1 day ahead`;
+    document.getElementById("comparison-context").textContent = s?.n && w.main != null
+      ? `Checked against station measurements across Norway. Lower average error is better.` : "";
     document.getElementById("scope").textContent = `${periodText()}${isRain() ? " · WeatherNext's median throughout primary rain views" : ""}`;
   }
 
@@ -149,10 +150,14 @@
     const h = hs().includes(24) ? 24 : hs()[0];
     const s = D.leaderboard?.[S.v]?.[h]?.[S.period];
     const el = document.getElementById("tiles");
-    document.getElementById("rain-why").hidden = !isRain();
-    if (!s || !s.n) { el.innerHTML = `<div class="tile empty" style="grid-column:1/-1">No scored forecasts yet for this selection.</div>`; return; }
+    const detailBody = document.getElementById("score-detail-body");
+    const blend = document.getElementById("blend-finding");
+    blend.hidden = !(s?.n && s.verdict_avg === "better" && Number.isFinite(s.mae_avg) && Number.isFinite(s.avg_gain));
+    blend.textContent = blend.hidden ? "" : `Average of both: ${fmt(s.mae_avg)} ${unit()} average error, about ${Math.round(s.avg_gain * 100)}% lower than the better single service. Our blend; an aggregate result.`;
+    el.hidden = !s?.n;
+    detailBody.parentElement.hidden = !s?.n;
+    if (!s?.n) { el.innerHTML = ""; detailBody.innerHTML = ""; return; }
     const w = wnPick(s);
-    const [vt, cls] = VERDICT[w.verdict] || VERDICT.not_enough_data;
     const ci = w.lo != null ? `95% range of the difference: ${rangeFmt(w.lo)} to ${rangeFmt(w.hi)} ${unit()}` :
       `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`;
     const skill = (p, x) => x == null ? "" :
@@ -168,25 +173,23 @@
       (s.verdict_avg == null ? "" : `<div class="d">${s.avg_gain_lo == null ? `A verdict needs at least ${D.meta.min_days_for_verdict} days of data`
         : `95% range: ${signedPct(s.avg_gain_lo)} to ${signedPct(s.avg_gain_hi)}`}
         <span class="badge">${AVG_VERDICT[s.verdict_avg] || AVG_VERDICT.not_enough_data}</span></div>`);
-    const details = html => `<details><summary>Details</summary>${html}</details>`;
     const avgTile = s.mae_avg == null ? "" : `
-      <div class="tile"><p class="k"><span class="dot avg"></span>Both, averaged · 1 day ahead</p>
-        <div class="v">${fmt(s.mae_avg)} <small>${unit()} avg. error</small></div>${details(gain +
-        `<div class="d">Our blend: the midpoint of the two forecasts. Its improvement is an aggregate result, not a guarantee at each station. Bias ${fmt(s.bias_avg)} ${unit()}</div>`)}</div>`;
-    el.classList.toggle("four", !!avgTile);
+      <div class="detail-blend"><h3>Both, averaged</h3>
+        <p><b>${fmt(s.mae_avg)} ${unit()}</b> average error · our blend of the two forecasts.</p>${gain}
+        <p class="d">The midpoint of the two forecasts; improvement is an aggregate result, not a guarantee at each station. Bias ${fmt(s.bias_avg)} ${unit()}</p></div>`;
     const adjVerdict = isRain() ? `<div class="d">Using WeatherNext's average instead: <span class="badge ${clsa}">${va}</span></div>`
       : s.mae_wnh == null ? "" :
       `<div class="d">After a standard height adjustment: <span class="badge ${clsh}">${vh}</span></div>`;
     el.innerHTML = `
-      <div class="tile"><p class="k"><span class="dot yr"></span>Yr · 1 day ahead</p>
+      <div class="tile competitor competitor-yr${w.verdict === "yr" ? " has-lower-error" : ""}"><p class="k">Yr</p>
         <div class="v">${fmt(s.mae_yr)} <small>${unit()} avg. error</small></div>
-        ${details(`<div class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</div>${skill("yr", s.base?.skill_yr)}`)}</div>
-      <div class="tile"><p class="k"><span class="dot wn"></span>WeatherNext${isRain() ? " (median)" : ""} · 1 day ahead</p>
+        <p class="competitor-source">MET Norway${w.verdict === "yr" ? ' <span class="winner-label">Lower error</span>' : ""}</p></div>
+      <div class="tile competitor competitor-wn${w.verdict === "weathernext" ? " has-lower-error" : ""}"><p class="k">WeatherNext${isRain() ? " <small>median</small>" : ""}</p>
         <div class="v">${fmt(w.main)} <small>${unit()} avg. error</small></div>
-        ${details(`<div class="d">Bias ${fmt(w.bias)} ${unit()} · ${w.altWord} version ${fmt(w.alt)}</div>${skill("wn", w.skill)}${adj}`)}</div>${avgTile}
-      <div class="tile"><p class="k">Verdict · ${s.days} days, ${s.n.toLocaleString()} forecasts</p>
-        <div class="v" style="font-size:24px"><span class="badge ${cls}" style="font-size:15px">${vt}</span></div>
-        ${details(`<div class="d">${ci}</div>${adjVerdict}`)}</div>`;
+        <p class="competitor-source">Google DeepMind${w.verdict === "weathernext" ? ' <span class="winner-label">Lower error</span>' : ""}</p></div>`;
+    detailBody.innerHTML = `<p class="detail-evidence">${s.days} matched days · ${s.n.toLocaleString()} paired station-hours.<br>${ci}</p>
+      <div class="score-detail-grid"><div><h3 class="yr">Yr</h3><p class="d">Bias ${fmt(s.bias_yr)} ${unit()} (positive = forecast too high)</p>${skill("yr", s.base?.skill_yr)}</div>
+      <div><h3 class="wn">${wnName()}</h3><p class="d">Bias ${fmt(w.bias)} ${unit()} · ${w.altWord} version ${fmt(w.alt)} ${unit()}</p>${skill("wn", w.skill)}${adj}${adjVerdict}</div></div>${avgTile}`;
   }
 
   // Error by horizon. The default view plots WeatherNext's error minus Yr's with its 95% range,
@@ -229,9 +232,10 @@
     const datasets = series.map((x, j) => {
       const data = H.map((h, i) => { const [y, lo, hi, v] = x.get(b[h][S.period]);
         return y == null ? null : { x: i + (j - (k - 1) / 2) * step, y, lo, hi, v, h }; }).filter(Boolean);
-      const colors = data.map(p => verdictColor(p.v));
-      return { label: x.label, data, showLine: false, pointStyle: x.shape, pointRadius: 6, pointHoverRadius: 8,
-        borderWidth: 2, pointBorderColor: colors, pointBackgroundColor: j === 0 ? colors : css("--surface") };
+      const secondary = x.shape === "triangle";
+      const colors = data.map(p => secondary ? css("--ink-3") : verdictColor(p.v));
+      return { label: x.label, data, showLine: false, pointStyle: x.shape, pointRadius: secondary ? 4 : 7, pointHoverRadius: 8, secondary,
+        borderWidth: secondary ? 1 : 2, pointBorderColor: colors, pointBackgroundColor: j === 0 ? colors : css("--surface") };
     });
     document.getElementById("horizon-legend").innerHTML =
       series.map((x, j) => `<span>${shapeMark(x.shape, j > 0)}${esc(x.label)}</span>`).join("") +
@@ -280,7 +284,8 @@
     c.data.datasets.forEach((d, j) => { if (!c.isDatasetVisible(j)) return;
       d.data.forEach(p => { if (p.lo == null || p.hi == null) return;
         const px = x.getPixelForValue(p.x), lo = y.getPixelForValue(p.lo), hi = y.getPixelForValue(p.hi);
-        ctx.save(); ctx.strokeStyle = verdictColor(p.v); ctx.lineWidth = 2; ctx.beginPath();
+        ctx.save(); ctx.strokeStyle = d.secondary ? css("--ink-3") : verdictColor(p.v); ctx.lineWidth = d.secondary ? 1 : 2;
+        if (d.secondary) ctx.setLineDash([3, 3]); ctx.beginPath();
         ctx.moveTo(px, lo); ctx.lineTo(px, hi);
         ctx.moveTo(px - 5, lo); ctx.lineTo(px + 5, lo); ctx.moveTo(px - 5, hi); ctx.lineTo(px + 5, hi);
         ctx.stroke(); ctx.restore(); }); });
@@ -295,7 +300,7 @@
     ];
     if (rain) ds.push(line("WeatherNext (average)", g("mae_wn"), css("--wn"), { borderDash: [5, 4], pointStyle: "rectRot", backgroundColor: css("--surface") }));
     else if (g("mae_wnh").some(x => x != null))
-      ds.push(line("WeatherNext, height-adjusted (our estimate)", g("mae_wnh"), css("--wn"), { borderDash: [2, 3], pointStyle: "triangle", backgroundColor: css("--surface") }));
+      ds.push(line("WeatherNext, height-adjusted (our estimate)", g("mae_wnh"), css("--ink-3"), { borderWidth: 1, pointRadius: 3, borderDash: [2, 3], pointStyle: "triangle", backgroundColor: css("--surface") }));
     document.getElementById("horizon-legend").innerHTML = "";
     chart("horizon-chart", { type: "line", options: baseOptions(`Average error (${unit()})`), data: { labels: H.map(h => H_LABEL[h]), datasets: ds } });
   }
@@ -483,11 +488,14 @@
       </table></div>`;
   }
 
-  function mix(a, b, t) { // hex blend for the diverging scale
-    const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-    const [x, y] = [p(a), p(b)];
-    return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, "0")).join("");
+  function resizeMapMarkers() {
+    const size = Math.max(8, Math.min(12, 8 + map.getZoom() - 5));
+    map.getContainer().style.setProperty("--station-dot-size", `${size}px`);
+    for (const marker of markers) {
+      if (marker instanceof L.CircleMarker) marker.setRadius(size / 2 + 3);
+    }
   }
+
   function renderMap() {
     hSelect("map-h", "mapH");
     const st = selected("stations")?.[S.v]?.[S.mapH] || {};
@@ -501,9 +509,10 @@
     if (!map) {
       // Leaflet only adds the tile layer (and its attribution text) once the map has a view, and a
       // fit made before that comes out a quarter step too tight, so start from a rough view.
-      map = L.map("map", { scrollWheelZoom: false, zoomSnap: 0.25 }).setView([64.5, 13], 4);
+      map = L.map("map", { scrollWheelZoom: true, touchZoom: true, zoomSnap: 0.25 }).setView([64.5, 13], 4);
+      map.on("zoomend", resizeMapMarkers);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { maxZoom: 10, attribution: "© OpenStreetMap contributors" }).addTo(map);
+        { maxZoom: 10, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>' }).addTo(map);
       // Then fit every station (offshore Wisting at 73.5° N included), so a narrow window doesn't cut
       // off the far north. Quarter zoom steps fit tighter. The bottom padding is the attribution
       // bar's height (two lines on a phone), so no station sits under it.
@@ -511,30 +520,52 @@
         paddingBottomRight: [16, map.attributionControl.getContainer().offsetHeight + 12], animate: false });
     }
     markers.forEach(m => m.remove()); markers = [];
-    const neutral = css("--neutral"), yr = css("--yr"), wn = css("--wn");
-    // Colour strength relative to the largest station difference (min 0.1 unit).
-    const scale = Math.max(0.1, ...Object.values(st).filter(r => r.yr != null && r.wn != null)
-      .map(r => Math.abs(r.wn - r.yr)));
     const silent = silentStations();
     for (const s of D.meta.stations) {
       const r = st[s.id], quiet = silent.get(s.id);
-      let color = neutral, tip = `${esc(s.name)}<br>No data yet`;
+      let kind = "missing", tip = `<b>${esc(s.name)}</b><br>No paired data for this variable, horizon and period`;
       if (r && r.yr != null && r.wn != null) {
-        const d = r.wn - r.yr, t = Math.min(1, Math.abs(d) / scale);
-        color = d > 0 ? mix(neutral, yr, t) : mix(neutral, wn, t);
+        const d = r.wn - r.yr;
+        kind = d > 0 ? "yr" : d < 0 ? "wn" : "equal";
         tip = `<b>${esc(s.name)}</b><br>Yr ${fmt(r.yr)} · ${wnName()} ${fmt(r.wn)} ${unit()}<br>${r.n} paired hours · ${r.days} days` +
           (s.flag && S.v === "t" ? "<br>Height note: see station details" : "");
       }
       if (quiet) tip += `<br>No measurements since ${dayMonth(quiet)}`;
-      // A grey ring around stations without recent measurements. The map tiles are light in both
-      // themes, so the ring uses a fixed dark grey rather than a theme colour.
-      if (quiet) markers.push(L.circleMarker([s.lat, s.lon], { radius: 13, weight: 3, color: "#5f5f5f", fill: false,
+      // A grey ring around stations without recent measurements, visible on either basemap.
+      if (quiet) markers.push(L.circleMarker([s.lat, s.lon], { radius: 7, weight: 1, color: css("--ink-3"), fill: false,
         interactive: false }).addTo(map));
-      const m = L.circleMarker([s.lat, s.lon], { radius: 8, weight: 2, color: css("--surface"), fillColor: color, fillOpacity: 1 })
-        .bindTooltip(tip).on("click", () => { S.station = s.id; renderStation(); }).addTo(map);
+      const chooseStation = () => { S.station = s.id; renderStation(); };
+      const m = L.marker([s.lat, s.lon], { title: s.name, alt: s.name,
+        icon: L.divIcon({ className: "map-marker-target", iconSize: [24, 24], iconAnchor: [12, 12],
+          html: `<span class="map-marker map-marker-${kind}" aria-hidden="true"></span>` }) })
+        .bindTooltip(tip).on("click", chooseStation).addTo(map);
+      const icon = m.getElement();
+      const meaning = { yr: "lower Yr error", wn: "lower WeatherNext error", equal: "equal error", missing: "no paired data" }[kind];
+      icon.setAttribute("aria-label", `Select ${s.name}: ${meaning}`);
+      icon.addEventListener("keydown", e => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault(); e.stopPropagation(); chooseStation();
+      });
       markers.push(m);
     }
+    renderMapPattern();
+    resizeMapMarkers();
     renderStation();
+  }
+
+  function renderMapPattern() {
+    const stats = selected("stations")?.[S.v]?.[S.mapH] || {};
+    const eligible = D.meta.stations.filter(s => typeof s.offshore === "boolean" &&
+      Number.isFinite(stats[s.id]?.yr) && Number.isFinite(stats[s.id]?.wn) &&
+      stats[s.id].days >= D.meta.min_days_for_verdict);
+    const parts = [[true, "WeatherNext", "offshore"], [false, "Yr", "land"]].map(([offshore, name, group]) => {
+      const rows = eligible.filter(s => s.offshore === offshore).map(s => stats[s.id]);
+      const lower = rows.filter(r => offshore ? r.wn < r.yr : r.yr < r.wn).length;
+      return rows.length ? `${name} lower at ${lower} of ${rows.length} ${group} stations` : "";
+    }).filter(Boolean);
+    const el = document.getElementById("map-pattern");
+    el.hidden = !parts.length;
+    el.textContent = parts.length ? `${parts.join("; ")}. ${H_LABEL[S.mapH]} ahead, ${periodText()}; stations with at least ${D.meta.min_days_for_verdict} paired days. Descriptive counts, not winner tests.` : "";
   }
 
   // With no station selected the panel lists descriptive differences: stations with
@@ -548,20 +579,18 @@
     const pick = sign => rows.filter(x => sign * x.gap >= DIFF_MIN)
       .sort((a, b) => sign * (b.gap - a.gap)).slice(0, DIFF_TOP);
     const item = ({ s, r, gap }) => {
-      const adj = S.v === "t" && gap > 0 && r.wnh != null && r.wnh !== r.wn ? ` · height-adjusted ${fmt(r.wnh)}` : "";
-      return `<li><button class="diff-pick" data-id="${esc(s.id)}">${esc(s.name)}</button>
-        <span class="muted">${Math.round(Math.abs(gap) * 100)}% smaller error · Yr ${fmt(r.yr)} vs ${wnName()} ${fmt(r.wn)}&nbsp;${unit()}${adj}</span></li>`;
+      const f = S.v === "t" ? s.flag : null;
+      const note = f ? [f.dz != null ? `WeatherNext grid height ${Math.abs(f.dz)} m ${f.dz >= 0 ? "above" : "below"} station.` : "", f.note || ""].filter(Boolean).join(" ") : "";
+      return `<li><div class="diff-row"><button class="diff-pick" data-id="${esc(s.id)}">${esc(s.name)}</button><strong class="diff-gap">${Math.round(Math.abs(gap) * 100)}%<small> lower error</small></strong></div>
+        <span class="muted">Yr ${fmt(r.yr)} vs ${wnName()} ${fmt(r.wn)}&nbsp;${unit()}</span>${note ? `<span class="muted station-caveat">${esc(note)}</span>` : ""}</li>`;
     };
     const list = (sign, name, cls) => { const p = pick(sign);
-      return `<h4><span class="${cls}">${name}</span> has lower observed error at</h4>` + (p.length
-        ? `<ol class="diff-list">${p.map(item).join("")}</ol>`
-        : `<p class="muted diff-none">No station yet.</p>`); };
-    el.innerHTML = `<h3>Biggest differences</h3>
-      <p class="muted" style="margin:0 0 10px;font-size:13px">Forecasts made ${H_LABEL[S.mapH]} ahead. Stations with at least ${minDays} days
-        where one service's average error is at least ${Math.round(DIFF_MIN * 100)}% smaller. Descriptive differences; no station uncertainty test.</p>
-      ${rows.length ? list(1, "Yr", "yr") + list(-1, wnName(), "wn")
-        : `<p class="empty">No station has ${minDays} days of data at this horizon yet.</p>`}
-      <p class="muted" style="margin:12px 0 0;font-size:13px">Select a station on the map or in the list for details.</p>`;
+      return p.length ? `<div class="diff-group diff-${cls}"><h4>${name} has lower error</h4><ol class="diff-list">${p.map(item).join("")}</ol></div>` : ""; };
+    const lists = list(1, "Yr", "yr") + list(-1, wnName(), "wn");
+    el.hidden = !lists;
+    el.closest(".map-grid").classList.toggle("map-only", !lists);
+    requestAnimationFrame(() => map.invalidateSize());
+    el.innerHTML = lists ? `<p class="section-kicker">${H_LABEL[S.mapH]} ahead / Local comparison</p><h3>Biggest differences</h3><p class="chart-note muted">Percentages compare average error with the other service at the same station.</p>${lists}` : "";
     el.onclick = e => { const b = e.target.closest(".diff-pick"); if (b) { S.station = b.dataset.id; renderStation(); } };
   }
 
@@ -571,6 +600,9 @@
     const s = D.meta.stations.find(x => x.id === S.station);
     const picker = document.getElementById("station-pick"); if (picker) picker.value = s?.id || "";
     if (!s) { if (charts["station-chart"]) { charts["station-chart"].destroy(); delete charts["station-chart"]; } renderDiffs(el); return; }
+    el.hidden = false;
+    el.closest(".map-grid").classList.remove("map-only");
+    requestAnimationFrame(() => map.invalidateSize());
     el.onclick = e => { if (e.target.closest(".diff-back")) { S.station = null; renderStation(); } };
     const st = selected("stations")?.[S.v]?.[S.mapH]?.[s.id];
     let rec = null;
@@ -587,14 +619,19 @@
       <h3>${esc(s.name)}</h3>
       <p class="muted" style="margin:0 0 8px;font-size:14px">${s.elev != null ? Math.round(s.elev) + " m above sea level · " : ""}${esc(s.county || "")}</p>
       <p style="margin:0 0 12px;font-size:14px">Average error ${H_LABEL[S.mapH]} ahead: <b>Yr ${fmt(st?.yr)}</b> · <b>${wnName()} ${fmt(st?.wn)}</b> ${unit()}${
-        st?.wnh != null && st.wnh !== st.wn ? ` · height-adjusted ${fmt(st.wnh)}` : ""}</p>
+        st?.wnh != null && st.wnh !== st.wn ? ` · WeatherNext height-adjusted ${fmt(st.wnh)} ${unit()} (our estimate)` : ""}</p>
+      ${S.v === "t" && st?.wnh != null && st.wnh !== st.wn ? '<p class="chart-note muted">Height-adjusted means we estimate WeatherNext temperature at the station’s elevation using a standard temperature change with height. The main comparison uses the published forecast.</p>' : ""}
       ${flagText}${silentStations().has(s.id) ? `<p class="note" style="font-size:13px"><b>No measurements since ${dayMonth(s.last_obs)}.</b>
         No newer measurements occur in the finalized scored history through ${D.meta.last_day}; the live station may have recovered since.</p>` : ""}
       <p class="muted" style="margin:0 0 4px;font-size:13px">Last 7 days: forecast made 1 day ahead vs what happened</p>
       <div class="chart"><canvas id="station-chart" aria-label="Recent measured and forecast values at this station"></canvas></div>
       <details class="table-view"><summary>Show hourly values as a table</summary><div id="station-table"></div></details>
       ${D.meta.publish_forecast_values ? "" : `<p class="muted" style="font-size:12px">WeatherNext's forecast values are not shown, because its data terms don't clearly allow publishing them; its errors are included in every score.</p>`}`;
-    if (!rec) { el.querySelector(".chart").innerHTML = `<p class="empty">No recent data.</p>`; return; }
+    if (!rec) {
+      el.querySelector(".chart").hidden = true;
+      el.querySelector(".table-view").hidden = true;
+      return;
+    }
     const ds = [line("Measured", rec[`obs_${S.v}`], css("--obs"), { pointRadius: 0, borderWidth: 2 }),
                 line("Yr", rec[`yr_${S.v}`], css("--yr"), { pointRadius: 0 })];
     const wnValues = rec[isRain() ? "wn_p_p50" : `wn_${S.v}`];
@@ -641,8 +678,8 @@
     body.innerHTML = `<p style="margin:0 0 8px;font-size:15px"><b>${esc(r.label)} at ${esc(name(r.station))}, ${r.day}</b>:
         measured ${fmt(r.observed, 1)} ${r.unit} (${esc(r.what)}).${others ? ` <span class="muted">Also: ${others} ${r.unit}.</span>` : ""}</p>
       <div class="chart"><canvas id="replay-chart" aria-label="Forecasts before the event"></canvas></div>
-      <details class="table-view"><summary>Show replay values as a table</summary><div id="replay-table"></div></details>
       ${r.wn_shown ? wnNotice() : `<p class="muted" style="font-size:12px">WeatherNext's values are not shown for this event.</p>`}
+      <details class="table-view"><summary>Show replay values as a table</summary><div id="replay-table"></div></details>
       <p class="muted" style="font-size:13px">${r.type === "rain"
         ? "Each point sums the 24 hourly forecasts for the UTC calendar day, each made that far before its hour. These can come from different forecast runs. The sum of hourly medians is not the median of the daily total. Rain is only scored up to 2 days ahead."
         : "Each point is the forecast for the same hour, made that far ahead. The hour is the most extreme measured hour that has forecasts at the most horizons."}
@@ -761,6 +798,7 @@
   function renderSummary() {
     const months = D.summary?.months || [];
     const el = document.getElementById("summary");
+    document.getElementById("monthly").hidden = !months.length;
     if (!months.length) return;
     // Header line in bold, then one line per variable with its label ("Temperature:") in bold.
     const line = s => { const i = s.indexOf(": ");
@@ -776,7 +814,39 @@
 
   function render() {
     renderAnswer(); renderTiles(); renderPractical(); renderHorizon(); renderSteadiness(); renderBias(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
+    // Hide wholly empty sections, keeping selectors available when another horizon has data.
+    document.getElementById("practical").hidden = !Object.values(selected("practical")?.[S.v] || {}).some(groups => Object.values(groups).some(g => g.n));
+    document.getElementById("horizons").hidden = !Object.values(D.leaderboard?.[S.v] || {}).some(h => h[S.period]?.n);
+    document.getElementById("trend").hidden = !Object.values(selected("trend")?.[S.v] || {}).some(rows => rows.length);
+    document.getElementById("patterns-section").hidden = !Object.values(selected("patterns")?.[S.v] || {}).some(rows => rows.length);
+    document.getElementById("more-analysis").hidden = [...document.querySelectorAll("#more-analysis > section")].every(el => el.hidden);
+    document.querySelectorAll(".section-nav a").forEach(a => { a.hidden = document.querySelector(a.getAttribute("href")).hidden; });
   }
+
+  const themeToggle = document.getElementById("theme-toggle");
+  const systemTheme = matchMedia("(prefers-color-scheme: dark)");
+  let hasThemeChoice = false;
+  try { hasThemeChoice = ["light", "dark"].includes(localStorage.getItem("wx-theme")); } catch {}
+  const syncThemeControl = () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    themeToggle.textContent = next === "light" ? "Light mode" : "Dark mode";
+    themeToggle.setAttribute("aria-label", `Switch to ${next} mode`);
+  };
+  systemTheme.addEventListener("change", e => {
+    if (hasThemeChoice) return;
+    document.documentElement.dataset.theme = e.matches ? "dark" : "light";
+    syncThemeControl();
+    if (D.meta?.variables) render();
+  });
+  syncThemeControl();
+  themeToggle.onclick = () => {
+    const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = theme;
+    hasThemeChoice = true;
+    try { localStorage.setItem("wx-theme", theme); } catch {}
+    syncThemeControl();
+    if (D.meta?.variables) render();
+  };
 
   load().then(() => {
     const m = D.meta || {};
@@ -799,6 +869,5 @@
     seg(document.getElementById("horizon-view"), [["diff", "Difference"], ["mae", "Error size"]],
         () => S.hView, v => (S.hView = v));
     render();
-    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
   });
 })();

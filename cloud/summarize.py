@@ -400,6 +400,7 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
         "wn_value_attribution": WN_VALUE_ATTRIBUTION,  # shown next to every chart with WeatherNext values
         "stations": [{"id": s["station_id"], "name": display_name(s.get("name") or s.get("station_name")),
                       "lat": s["latitude"], "lon": s["longitude"], "elev": s.get("elevation_m"),
+                      "offshore": heights.get("stations", {}).get(s["station_id"], {}).get("offshore"),
                       "county": display_name(s.get("county")), "last_obs": last_obs.get(s["station_id"]),
                       **({"flag": station_flags[s["station_id"]]} if s["station_id"] in station_flags else {})}
                      for s in stations],
