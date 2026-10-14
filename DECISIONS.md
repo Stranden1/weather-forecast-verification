@@ -596,3 +596,11 @@ SN20925 (Wisting) is the first.
 - The approved revision list is in REVIEW_2026-10-14.md; it supersedes the earlier pending design approval. Apply the journal style to all sections, show the blend only for a better verdict, and keep published forecasts visually primary.
 - Land/offshore summaries use the existing height metadata and selected paired data, with at least seven days. Unknown classifications are omitted; counts are descriptive, not significance tests. Keep height/lake caveats with station differences.
 - Preserve full WeatherNext attribution text beside value charts as footnotes. Commit validated steps without pushing.
+
+## Simplified Yr archive implementation — 2026-10-14
+
+- REVIEW_2026-10-14.md owner approval supersedes the broader archive plan for M1: separate private Git repository, existing WX_STATE_KEY, no durable retry spool, raw Yr and simple manifests only. Enable only after separate owner OK.
+- Receipt windows are UTC 08:30–13:00 and 20:30–01:00 (end exclusive). Collection start, request start and response receipt must fit the same slot. First successfully published response per station is frozen; later normal collections fill only missing stations. Keep every response's actual acquisition times and identify multi-attempt slots explicitly; they are not simultaneous network snapshots.
+- Use an immutable first-slot cutoff; never manufacture missing slots before activation or reopen finalized slots. Record missing/partial closure at the next successful collecting run. If no network was captured during the slot, disclose use of the network at detection.
+- Gzip then Fernet; all raw objects/attempt/closure manifests encrypted. Unknown/raw fields and numeric precision retained as exact response JSON bytes. Request metadata uses only endpoint, coordinates, actual timestamps/status and a caching-header allowlist; no contacts/tokens/cookies.
+- Archive publication is additive, normal fast-forward Git with byte-for-byte readback of newly added files. Failed uploads are retried by fresh collection only within the existing window. Archive status must not influence the main weather-source success gate or alter history/state/scoring. Setup is documented in SETUP_YR_ARCHIVE.md.

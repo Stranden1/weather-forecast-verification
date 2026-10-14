@@ -4,25 +4,25 @@ _Updated 2026-10-14. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
-The cloud pipeline is the only live collection system. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted history/ is the only retained record. Protect it and WX_STATE_KEY independently.
+The cloud pipeline is the only live collection system. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted history/ is the retained scoring record. Protect it and WX_STATE_KEY independently.
 
-Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 paired one-day days. One-day temperature is Yr 0.91 vs WeatherNext 0.92 °C, too close to call. These are the existing public validation fixtures, not a fresh live-health audit.
+Simplified M1 Yr archive is implemented and validated locally, disabled by default. It retains full existing Yr responses twice daily in a separate private Git repository, using the existing key, first-published per-station selection, slot-window retries and immutable partial/missing manifests. Raw bytes preserve native fields/intervals and precision. No durable spool, extra normal weather requests or schedule change. The immutable activation cutoff prevents false missing records for earlier windows.
 
-## Local scorecard ready
+The private transport checks repository privacy, scopes the new credential, adds only encrypted objects and verifies pushed bytes. Archive failures remain separate from weather-source success/gating and are reported after main publication. Existing history/state/scoring and shared 49-station network are unchanged. Code is committed locally; nothing pushed or activated.
 
-Task 1 of REVIEW_2026-10-14.md is complete. The journal styling now covers events, horizons, replays, expanded analysis, monthly summaries and methodology. The blend finding appears below the scores only with a supported better verdict. Published horizon values are primary; height adjustments use smaller hollow grey markers and thin dashed ranges. The map reports land/offshore counts for the selected period/horizon, and the biggest differences show existing height/lake notes. Replay notices retain their full wording as footnotes; Open source links to the repository. Wholly empty sections hide.
+Validation: all 171 cloud tests pass with archive and transport tests using synthetic keys and temporary bare Git remotes. Two read-only acquisition probes each captured 49/49 active stations, with zero errors and exact encrypted readback: ~0.459 MB and 8–11 seconds per batch, suggesting ~0.335 GB/year plus manifests. These back-to-back probes were outside scheduled windows; actual private-GitHub slots and independent backup recovery remain unverified. Evidence: work/yr-archive-2026-10-14/; existing NumPy/pandas deprecation warnings remain.
 
-The export adds an offshore field from the existing height metadata (unknown stays null). Scoring, station membership, collectors, history, site/data, secrets and scheduling are unchanged. Earlier prototype improvements are retained. Changes are committed locally; no push/deployment.
+## Local page and data checkpoints
 
-Validation: 143 cloud tests; browser checks at 1280/375/320 px in light/dark, with real fonts/map tiles, expanded sections, filters, charts/tables, keyboard and zoom behavior, blend visibility, map counts and empty data. Evidence: work/scorecard-revisions-2026-10-14/. Existing NumPy/pandas deprecation warnings remain.
+Task 1 scorecard revisions are committed as 944cd2d, with handoffs/reviews in 4e622eb. The journal style covers the whole page, supported blend findings are visible, published horizon values are primary, and station counts/caveats explain the map. Earlier 1280/375/320 light/dark browser checks passed. Evidence: work/scorecard-revisions-2026-10-14/. Publication remains pending.
 
-The earlier scorecard corrections are on origin/main at 39c2617 with CI passed; a subsequent real deployment still needs verification. The private forecast viewer remains available on codex/scorecard-corrections; PRIVATE_FORECAST.md describes launch. Future-value screenshots remain private in ignored work/.
+Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 paired one-day days. One-day temperature Yr 0.91 vs WeatherNext 0.92 °C, too close to call. No fresh live pipeline-health audit was performed here. Earlier corrections are on origin/main at 39c2617; deployment follow-up remains open. The private forecast viewer remains available on codex/scorecard-corrections; PRIVATE_FORECAST.md describes launch.
 
 ## Next and operations
 
-- Next session: simplified M1 Yr archive, approved in REVIEW_2026-10-14.md. Separate private repo, one existing encryption key, no spool; validate disabled first and obtain owner OK before enabling. Then four-product comparison, pressure pilot and plan consolidation, in that order.
-- Independent key/history backup and recovery are owner actions, still unverified. Older plaintext Git objects remain a separate cleanup decision.
-- Timer/fallback and workflows unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized-score warnings can lag recovery.
+- Owner setup and push/activation OK are the next archive checkpoint: SETUP_YR_ARCHIVE.md. Keep ENABLED=0 until approval, then inspect two real cloud slots. Tasks 3–5 remain in REVIEW_2026-10-14.md order.
+- Independent key/history backup and recovery remain owner actions. Older plaintext Git objects remain a separate cleanup decision.
+- Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Check Ubuntu runner migration from 19 Oct; renew timer token before 5 Nov 17:15 UTC / 18:15 Oslo.
 
 NEXT_STEPS.md holds open work; WORK_STATUS.md holds the latest checkpoint.
