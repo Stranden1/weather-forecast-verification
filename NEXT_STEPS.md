@@ -6,7 +6,7 @@ _Open items only. Updated 2026-10-14. Completed work is in CHANGELOG.md._
 
 Follow REVIEW_2026-10-14.md, one task per session:
 
-- **Task 2 activation checkpoint:** code is pushed (09abaf0) and runs disabled. Before enabling, the owner must (a) set variable WX_YR_ARCHIVE_REPO to `Stranden1/yr-archive` (it is still the placeholder `Stranden1/your-archive-name`) and (b) add a README to `Stranden1/yr-archive` so it has a `main` branch (the repo is empty). Then set WX_YR_ARCHIVE_ENABLED=1, start one manual collect, check the archive step and unchanged health, and inspect the first two real windows (08:30 and 20:30 UTC). The start cutoff 2026-10-15T08:30:00Z must be moved later if activation happens after that window; it is immutable after the first publication.
+- **Task 2, first real slots:** archive enabled 14 Oct 21:54 UTC; activation run captured nothing (outside window), wrote policy, 0 errors. Check 15 Oct am (08:30–13:00 UTC) and pm (20:30–01:00) slots: 49/49 stations in `Stranden1/yr-archive`, closed manifests, 0 errors in `health.json.yr_archive`, unchanged main scoring/health.
 - Task 3: read-only four-product temperature/wind comparison from existing history; short findings file, no page changes before review.
 - Task 4: read-only WeatherNext/IFS/AIFS pressure backfill study for the plan's eight-station pilot; short findings file.
 - Task 5: consolidate FORECAST_PLAN.md into PLAN_FORECAST_ARCHIVE.md (or mark replaced), adding a one-page summary.

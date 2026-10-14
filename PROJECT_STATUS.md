@@ -6,9 +6,9 @@ _Updated 2026-10-14. Current state only; history is in CHANGELOG.md._
 
 The cloud pipeline is the only live collection system. The PC collector was retired on 11 Oct; weather.db and its archive were deleted and are lost. Encrypted history/ is the retained scoring record. Protect it and WX_STATE_KEY independently.
 
-Simplified M1 Yr archive is deployed on main (09abaf0) but still disabled (WX_YR_ARCHIVE_ENABLED=0). It retains full existing Yr responses twice daily in a separate private Git repository, using the existing key, first-published per-station selection, slot-window retries and immutable partial/missing manifests. Raw bytes preserve native fields/intervals and precision. No durable spool, extra normal weather requests or schedule change. The immutable activation cutoff prevents false missing records for earlier windows.
+Simplified M1 Yr archive is deployed and enabled since 14 Oct 21:54 UTC; first save window is 15 Oct 08:30 UTC. It retains full existing Yr responses twice daily in a separate private Git repository, using the existing key, first-published per-station selection, slot-window retries and immutable partial/missing manifests. Raw bytes preserve native fields/intervals and precision. No durable spool, extra normal weather requests or schedule change. The immutable activation cutoff prevents false missing records for earlier windows.
 
-The private transport checks repository privacy, scopes the new credential, adds only encrypted objects and verifies pushed bytes. Archive failures remain separate from weather-source success/gating and are reported after main publication. Existing history/state/scoring and shared 49-station network are unchanged. Pushed 14 Oct; activation is blocked by two owner setup items (wrong repo variable, empty archive repo).
+The private transport checks repository privacy, scopes the new credential, adds only encrypted objects and verifies pushed bytes. Archive failures remain separate from weather-source success/gating and are reported after main publication. Existing history/state/scoring and shared 49-station network are unchanged. Activation run 38643799647: 0 archive errors, policy file written to Stranden1/yr-archive, main health unchanged.
 
 Validation: all 171 cloud tests pass with archive and transport tests using synthetic keys and temporary bare Git remotes. Two read-only acquisition probes each captured 49/49 active stations, with zero errors and exact encrypted readback: ~0.459 MB and 8–11 seconds per batch, suggesting ~0.335 GB/year plus manifests. These back-to-back probes were outside scheduled windows; actual private-GitHub slots and independent backup recovery remain unverified. Evidence: work/yr-archive-2026-10-14/; existing NumPy/pandas deprecation warnings remain.
 
@@ -20,7 +20,7 @@ Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 pai
 
 ## Next and operations
 
-- Archive activation: owner sets WX_YR_ARCHIVE_REPO=Stranden1/yr-archive and adds a README to that repo; then enable, run one manual collect, and inspect two real cloud slots. Tasks 3–5 remain in REVIEW_2026-10-14.md order.
+- Archive: inspect the first two real slots on 15 Oct (49/49 stations, manifests, 0 errors). Tasks 3–5 remain in REVIEW_2026-10-14.md order.
 - Independent key/history backup and recovery remain owner actions. Older plaintext Git objects remain a separate cleanup decision.
 - Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Check Ubuntu runner migration from 19 Oct; renew timer token before 5 Nov 17:15 UTC / 18:15 Oslo.
