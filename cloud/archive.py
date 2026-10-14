@@ -86,11 +86,17 @@ def network(stations: list[dict]) -> list[dict]:
 
 class Capture:
     def __init__(self, root: Path, start_day: date, stations: list[dict], at: datetime,
-                 revision: str | None = None, job_id: str | None = None):
+                 revision: str | None = None, job_id: str | None = None,
+                 not_before: datetime | None = None):
         self.root = Path(root)
         self.start_day = start_day
+        self.not_before = utc(not_before) if not_before else Slot(start_day, "am").start
+        if self.not_before.date() != start_day:
+            raise ValueError("Archive start date and timestamp disagree")
         self.network = network(stations)
         self.slot = active_slot(at, start_day)
+        if self.slot and self.slot.start < self.not_before:
+            self.slot = None
         self.id = uuid.uuid4().hex
         self.started = stamp(at)
         self.revision, self.job_id = revision, job_id
@@ -100,7 +106,8 @@ class Capture:
         self.closed: list[dict] = []
         write_object(self.root / ("policy" + SUFFIX), {
             "schema_version": SCHEMA, "provider": "yr", "policy_version": POLICY_VERSION,
-            "start_date": start_day.isoformat(), "key_reference": "WX_STATE_KEY"})
+            "start_date": start_day.isoformat(), "start_at": stamp(self.not_before),
+            "key_reference": "WX_STATE_KEY"})
         if self.slot:
             if (self.slot_path(self.slot) / ("manifest" + SUFFIX)).exists():
                 raise ValueError("Archive slot is already closed")
@@ -185,6 +192,8 @@ class Capture:
                 "missing_station_ids": missing, "objects": records,
                 "capture_errors": len(self.errors)})
         for slot in closed_slots(self.start_day, at):
+            if slot.start < self.not_before:
+                continue
             path = self.slot_path(slot) / ("manifest" + SUFFIX)
             if path.exists():
                 continue

@@ -12,18 +12,25 @@ from datetime import datetime, timedelta
 import requests
 
 from .config import wanted_leads
-from .timeutil import hours_between, iso, parse
+from .timeutil import hours_between, iso, now_utc, parse
 
 URL = "https://api.met.no/weatherapi/locationforecast/2.0/complete"
 
 
-def fetch(lat: float, lon: float, user_agent: str, session: requests.Session) -> dict:
+def fetch(lat: float, lon: float, user_agent: str, session: requests.Session,
+          response_sink=None) -> dict:
     if not user_agent or "example.com" in user_agent:
         raise ValueError("Set MET_USER_AGENT to an identifying app name and contact e-mail.")
-    r = session.get(URL, params={"lat": round(lat, 4), "lon": round(lon, 4)},
+    params = {"lat": round(lat, 4), "lon": round(lon, 4)}
+    started = now_utc() if response_sink else None
+    r = session.get(URL, params=params,
                     headers={"User-Agent": user_agent}, timeout=30)
     r.raise_for_status()
-    return r.json()
+    received = now_utc() if response_sink else None
+    payload = r.json()
+    if response_sink:
+        response_sink(r, params, started, received)
+    return payload
 
 
 def in_window(lead: float) -> bool:
@@ -73,12 +80,31 @@ def extract(payload: dict, station: str, fetched: datetime) -> list[dict]:
 
 
 def collect(stations: list[dict], user_agent: str, fetched: datetime,
-            pause: float = 0.12) -> tuple[list[dict], list[str]]:
+            pause: float = 0.12, raw_sink=None,
+            archive_errors: list[str] | None = None) -> tuple[list[dict], list[str]]:
+    """Collect the existing scored windows, optionally observing the same response.
+
+    The raw hook runs before extract() and makes no extra requests. Its failures
+    are separate from Yr errors and cannot prevent normal row extraction.
+    """
     session = requests.Session()
     out, errors = [], []
     for i, s in enumerate(stations):
+        def response_sink(response, params, started, received):
+            try:
+                raw_sink(s, response.content, {"endpoint": URL, "query": params,
+                         "request_started_at": iso(started), "response_received_at": iso(received),
+                         "status": response.status_code,
+                         "headers": {k.lower(): v for k, v in response.headers.items()
+                                     if k.lower() in ("date", "expires", "last-modified", "etag", "content-type")}})
+            except Exception:
+                if archive_errors is not None:
+                    archive_errors.append("Yr archive: response hook failed")
         try:
-            payload = fetch(s["latitude"], s["longitude"], user_agent, session)
+            if raw_sink:
+                payload = fetch(s["latitude"], s["longitude"], user_agent, session, response_sink)
+            else:
+                payload = fetch(s["latitude"], s["longitude"], user_agent, session)
             out.extend(extract(payload, s["station_id"], fetched))
         except Exception as exc:  # one bad station must not stop the run
             errors.append(f"Yr {s['station_id']}: {exc}")

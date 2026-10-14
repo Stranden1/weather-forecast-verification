@@ -19,7 +19,7 @@ NOW = datetime(2026, 10, 14, 9, 0, tzinfo=UTC)
 STATIONS = [{"station_id": "SN1", "latitude": 60.123456, "longitude": 10.567891, "elevation_m": 20},
             {"station_id": "SN2", "latitude": 61.2, "longitude": 11.5, "elevation_m": None}]
 # Preserve lexical precision as well as 1h/6h/12h fields, nulls and unknown future fields.
-BODY = b'{"properties":{"meta":{"updated_at":"2026-10-14T08:45:00Z"},"timeseries":[{"time":"2026-10-14T09:00:00Z","data":{"instant":{"details":{"air_temperature":1.123456789123456789,"dew_point_temperature":null}},"next_1_hours":{"details":{"precipitation_amount":0.03}},"next_6_hours":{"details":{"precipitation_amount":1.23}},"next_12_hours":{"details":{"precipitation_amount":2.34}},"unknown":{"hello":true}}}]}}'
+BODY = b'{"properties":{"meta":{"updated_at":"2026-10-14T08:45:00Z"},"timeseries":[{"time":"2026-10-14T15:00:00Z","data":{"instant":{"details":{"air_temperature":1.123456789123456789,"dew_point_temperature":null}},"next_1_hours":{"details":{"precipitation_amount":0.03}},"next_6_hours":{"details":{"precipitation_amount":1.23}},"next_12_hours":{"details":{"precipitation_amount":2.34}},"unknown":{"hello":true}}}]}}'
 
 
 def metadata(at=NOW):
@@ -51,6 +51,10 @@ class PolicyTest(unittest.TestCase):
         self.assertEqual(list(closed_slots(START, NOW)), [])
         with self.assertRaises(ValueError):
             active_slot(NOW.replace(tzinfo=None), START)
+        # Europe/Oslo changes offset on 25 Oct; windows stay fixed in UTC.
+        for offset in (1, 2):
+            transition = NOW.replace(day=25).astimezone(timezone(timedelta(hours=offset)))
+            self.assertEqual(active_slot(transition, START), Slot(date(2026, 10, 25), "am"))
 
 
 class ArchiveTest(unittest.TestCase):
@@ -190,3 +194,14 @@ class ArchiveTest(unittest.TestCase):
         c = self.capture()
         c.sink({"station_id": "other"}, BODY, metadata())
         self.assertEqual(len(c.errors), 1)
+
+    def test_evening_activation_does_not_invent_missing_morning(self):
+        start = NOW.replace(hour=20, minute=30)
+        c = Capture(self.root, START, STATIONS, start, not_before=start)
+        self.assertEqual(c.slot, Slot(START, "pm"))
+        c.finish(start)
+        self.assertEqual(c.closed, [])
+        next_day = start + timedelta(days=1)
+        second = Capture(self.root, START, STATIONS, next_day, not_before=start)
+        second.finish(next_day)
+        self.assertEqual({m["slot"] for m in second.closed if m["slot_date"] == START.isoformat()}, {"pm"})

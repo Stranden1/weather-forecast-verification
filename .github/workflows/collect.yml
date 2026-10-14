@@ -69,6 +69,11 @@ jobs:
           EARTH_ENGINE_PROJECT: ${{ secrets.EARTH_ENGINE_PROJECT }}
           EE_SERVICE_ACCOUNT_KEY: ${{ secrets.EE_SERVICE_ACCOUNT_KEY }}
           WEATHERNEXT_ENABLED: ${{ vars.WEATHERNEXT_ENABLED || '1' }}
+          # Yr sidecar: stays disabled until the separately reviewed activation.
+          WX_YR_ARCHIVE_ENABLED: ${{ vars.WX_YR_ARCHIVE_ENABLED || '0' }}
+          WX_YR_ARCHIVE_REPO: ${{ vars.WX_YR_ARCHIVE_REPO }}
+          WX_YR_ARCHIVE_START_AT: ${{ vars.WX_YR_ARCHIVE_START_AT }}
+          WX_YR_ARCHIVE_TOKEN: ${{ secrets.WX_YR_ARCHIVE_TOKEN }}
         run: python -m cloud.run all
 
       - name: Push encrypted history, confirm origin, then prune and push leased state

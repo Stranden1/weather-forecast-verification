@@ -9,6 +9,8 @@
 Environment: MET_USER_AGENT, FROST_CLIENT_ID, EARTH_ENGINE_PROJECT,
 EE_SERVICE_ACCOUNT_KEY (JSON text), WEATHERNEXT_ENABLED (default 1),
 OPENMETEO_ENABLED (default 1; ECMWF IFS/AIFS via Open-Meteo, no key needed).
+WX_YR_ARCHIVE_ENABLED (default 0), WX_YR_ARCHIVE_REPO, WX_YR_ARCHIVE_TOKEN,
+WX_YR_ARCHIVE_START_AT (UTC activation cutoff; see SETUP_YR_ARCHIVE.md).
 """
 from __future__ import annotations
 
@@ -17,7 +19,7 @@ import os
 import sys
 from datetime import timedelta
 
-from . import frost, health, openmeteo, score, summarize, weathernext, yr
+from . import archive_storage, frost, health, openmeteo, score, summarize, weathernext, yr
 from .config import OBS_FETCH_DAYS, SITE_DATA_DIR, load_stations
 from .store import State, _fernet, load_scored
 from .timeutil import iso, now_utc
@@ -26,7 +28,17 @@ from .timeutil import iso, now_utc
 def collect(state: State) -> list[str]:
     stations = load_stations()
     fetched = now_utc()
-    rows, yr_err = yr.collect(stations, os.getenv("MET_USER_AGENT", ""), fetched)
+    archive, archive_summary, archive_errors = None, None, []
+    try:
+        archive = archive_storage.from_env(stations, fetched)
+    except Exception:
+        archive_summary = {"enabled": True, "status": "error", "captured_stations": 0,
+                           "closed_slots": 0, "incomplete_slots": 0, "errors": 1, "published": False}
+    if archive and archive.sink:
+        rows, yr_err = yr.collect(stations, os.getenv("MET_USER_AGENT", ""), fetched,
+                                 raw_sink=archive.sink, archive_errors=archive_errors)
+    else:
+        rows, yr_err = yr.collect(stations, os.getenv("MET_USER_AGENT", ""), fetched)
     n_yr = state.add_pending(rows)
     n_wn, wn_err = 0, []
     wn_enabled = os.getenv("WEATHERNEXT_ENABLED", "1") == "1"
@@ -52,7 +64,12 @@ def collect(state: State) -> list[str]:
     except Exception as exc:
         obs, frost_err = [], [f"Frost failed: {exc}"]
     n_obs = state.add_obs(obs)
+    if archive:
+        archive.capture.errors.extend(archive_errors)
+        archive_summary = archive.finish(now_utc())
     errors = yr_err + wn_err + ec_err + frost_err
+    if archive_summary and archive_summary["errors"]:
+        errors.append("Yr archive: capture/publication incomplete; see private slot manifests")
     # Per source, so one source's many errors can never hide another's.
     sources = {"yr": health.source_summary("yr", n_yr, yr_err),
                "wn": health.source_summary("wn", n_wn, wn_err, enabled=wn_enabled),
@@ -63,6 +80,8 @@ def collect(state: State) -> list[str]:
     meta.setdefault("runs", []).append({"fetched_at": iso(fetched), "yr_rows": n_yr,
                                         "wn_rows": n_wn, "ecmwf_rows": n_ec, "obs_rows": n_obs,
                                         "errors": errors[:20], "sources": sources})
+    if archive_summary:
+        meta["runs"][-1]["yr_archive"] = archive_summary
     state.save_meta(meta)
     print(f"collect {iso(fetched)}: yr={n_yr} wn={n_wn} ecmwf={n_ec} obs={n_obs} errors={len(errors)}")
     for name, s in sources.items():
@@ -70,6 +89,8 @@ def collect(state: State) -> list[str]:
               + ("" if s["enabled"] else " (disabled)") + (f" first: {s['error']}" if s["error"] else ""))
     for e in errors[:20]:
         print("  !", e)
+    if archive_summary:
+        print("  yr_archive:", archive_summary)
     return errors
 
 
@@ -86,7 +107,8 @@ def main(argv=None) -> int:
         if not runs:
             return 1
         # CI runs this only AFTER saving successful sources and deploying health.
-        return int(any(s.get("errors", 0) for s in runs[-1].get("sources", {}).values()))
+        return int(any(s.get("errors", 0) for s in runs[-1].get("sources", {}).values())
+                   or runs[-1].get("yr_archive", {}).get("errors", 0) > 0)
     if a.step == "due":
         go, why = health.due(state.meta(), manual=a.manual)
         print(("collect: " if go else "skip: ") + why)

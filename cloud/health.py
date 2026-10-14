@@ -83,6 +83,9 @@ def build(meta: dict, now: datetime | None = None) -> dict:
     if not runs:
         return out
     last = runs[-1]
+    if "yr_archive" in last:
+        out["yr_archive"] = {k: last["yr_archive"].get(k) for k in
+                             ("enabled", "status", "captured_stations", "closed_slots", "incomplete_slots", "errors", "published")}
     ok = [r for r in runs if not failed(r)]
     out.update(last_run=last["fetched_at"], last_run_failed=failed(last),
                last_success=ok[-1]["fetched_at"] if ok else None)
