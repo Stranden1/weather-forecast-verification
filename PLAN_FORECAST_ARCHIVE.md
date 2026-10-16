@@ -1,6 +1,6 @@
 # Forecast archive and scientific expansion plan
 
-## One-page summary — updated 15 October 2026
+## One-page summary — updated 16 October 2026
 
 This is the project's **only forecast plan**. `FORECAST_PLAN.md` (12 Oct) is replaced; its open
 items and rules are carried over below. Sections 1–13 are the 14 Oct design audit, kept for
@@ -15,7 +15,8 @@ accuracy page.
 
 **Done**
 - M1 Yr archive: full Yr responses twice daily (08:30 and 20:30 UTC windows) in
-  `Stranden1/yr-archive`, enabled 14 Oct 21:54 UTC. The first real windows (15 Oct) still need checking.
+  `Stranden1/yr-archive`, enabled 14 Oct 21:54 UTC. Checked 16 Oct: the 15 Oct am and pm windows
+  each hold 49/49 stations, an index and a closed manifest, with 0 archive errors.
 - Four-product temperature/wind comparison (`FINDINGS_FOUR_PRODUCT_2026-10-15.md`): at 6–48 h, Yr and
   WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS, and the Yr+WeatherNext
   average beats all four. Offshore, Yr is the weakest product.
@@ -24,16 +25,15 @@ accuracy page.
   needs an ECMWF ensemble mean.
 
 **Next, in order** (each needs the owner's OK)
-1. Check the first Yr archive windows: 49/49 stations, manifests, 0 errors.
-2. Owner: back up `WX_STATE_KEY` (password manager plus offline) and one copy of `history/` off
+1. Owner: back up `WX_STATE_KEY` (password manager plus offline) and one copy of `history/` off
    this PC; then test a recovery from that copy (§10).
-3. Decide on the page suggestions in the two findings files. No page change before that.
-4. Gate fix: record success per source, so a WeatherNext outage cannot hide behind Yr rows.
-5. Twice-daily WeatherNext/ECMWF snapshots with pressure, dew point and cloud (§3, §5). This also
+2. Decide on the page suggestions in the two findings files. No page change before that.
+3. Gate fix: record success per source, so a WeatherNext outage cannot hide behind Yr rows.
+4. Twice-daily WeatherNext/ECMWF snapshots with pressure, dew point and cloud (§3, §5). This also
    fills the private 48-hour forecast view. At 3–5 GB/year, decide storage first.
-6. Fixed daily forecast summaries (morning or evening decision), once enough snapshots exist.
-7. Yr rain-probability reliability, once MET's threshold and interval are confirmed (§8).
-8. Later, exploratory: disagreement as an error predictor, quantile/geography audit, dew point,
+5. Fixed daily forecast summaries (morning or evening decision), once enough snapshots exist.
+6. Yr rain-probability reliability, once MET's threshold and interval are confirmed (§8).
+7. Later, exploratory: disagreement as an error predictor, quantile/geography audit, dew point,
    then MOS correction. Do not train models yet (§9).
 
 **Open decisions**
