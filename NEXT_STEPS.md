@@ -6,7 +6,7 @@ _Open items only. Updated 2026-10-16. Completed work is in CHANGELOG.md._
 
 All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checked 16 Oct: 49/49, closed manifests, 0 errors). Follow the one-page summary in PLAN_FORECAST_ARCHIVE.md, one task per session. Open owner reviews:
 
-- `FINDINGS_FOUR_PRODUCT_2026-10-15.md`: decide its page suggestions before any page change.
+- **~27 Oct, four-product rerun:** at 30 paired days, rerun `work/four-product-2026-10-15/analyze.py` on the longer period (same cohort rules, day-block intervals). If IFS/AIFS still trail Yr and WeatherNext, the owner decides then whether the page gets an ECMWF section (DECISIONS.md, 16 Oct). The blend stays Yr + WeatherNext only; no offshore wording change.
 - `FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Yr archive: occasionally confirm each day has am/pm folders with 49 stations and a manifest, and that `health.json.yr_archive.errors` is 0. A missed window shows as a partial/missing manifest.
 

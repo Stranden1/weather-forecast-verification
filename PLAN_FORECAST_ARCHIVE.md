@@ -27,7 +27,9 @@ accuracy page.
 **Next, in order** (each needs the owner's OK)
 1. Owner: back up `WX_STATE_KEY` (password manager plus offline) and one copy of `history/` off
    this PC; then test a recovery from that copy (§10).
-2. Decide on the page suggestions in the two findings files. No page change before that.
+2. Four-product page suggestions decided 16 Oct (DECISIONS.md): blend stays Yr + WeatherNext, no
+   offshore change, ECMWF section on hold until the ~27 Oct rerun at 30 paired days. Pressure
+   findings still need a decision.
 3. Gate fix: record success per source, so a WeatherNext outage cannot hide behind Yr rows.
 4. Twice-daily WeatherNext/ECMWF snapshots with pressure, dew point and cloud (§3, §5). This also
    fills the private 48-hour forecast view. At 3–5 GB/year, decide storage first.
@@ -37,7 +39,7 @@ accuracy page.
    then MOS correction. Do not train models yet (§9).
 
 **Open decisions**
-- Which findings-file suggestions go on the page.
+- Pressure findings: whether anything goes on the page. ECMWF section: decide after the ~27 Oct rerun.
 - Scope, timing and storage for WeatherNext/ECMWF snapshot capture.
 - Daily view: a calendar-day summary, an overnight-freezing comparison, or both (Oslo dates proposed).
 - An authoritative source for Yr's hourly rain-probability threshold.

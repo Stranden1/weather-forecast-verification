@@ -609,3 +609,18 @@ SN20925 (Wisting) is the first.
 
 - PLAN_FORECAST_ARCHIVE.md is the single forecast plan; its one-page summary leads. FORECAST_PLAN.md is marked replaced and kept as a record. References to proposals "in FORECAST_PLAN.md" (complete 48-hour capture, fixed daily forecast) now mean that summary.
 - Where the 14 Oct design audit body conflicts with the summary or the 14 Oct owner decisions, the summary and decisions win.
+
+## Four-product findings: page suggestions — 2026-10-16 (owner)
+
+Owner decisions on the three suggestions in FINDINGS_FOUR_PRODUCT_2026-10-15.md:
+
+1. **ECMWF comparison on the page: on hold.** Do not add IFS/AIFS scores or a "Yr and WeatherNext
+   beat ECMWF" statement yet. Rerun the four-product comparison at 30 paired days (about 27 Oct)
+   and decide again then, only if the ranking holds. Reasons: 17 days of one autumn period, and
+   run age favours Yr (~0.6 h versus 8–10 h for the ECMWF products).
+2. **The page's blend stays Yr + WeatherNext only.** Never add IFS or AIFS to the published
+   average: in the comparison it made the average worse, and on land no better than Yr alone.
+3. **No page change for offshore.** The existing land/offshore filter and map counts already show
+   WeatherNext ahead of Yr offshore. No wording that calls Yr the weakest offshore product until
+   30 paired days and winter data confirm it.
+
