@@ -1,5 +1,12 @@
 # Changelog
 
+## Yr archive first windows checked (task 2) — 2026-10-16 (Claude)
+
+- Read-only check of `Stranden1/yr-archive`, collect run logs and the live `health.json`.
+  15 Oct am and pm each held 49/49 station objects, an index and a closed manifest; 0 archive
+  errors; all 160 archive files added, none modified or deleted; all 69 collect runs from 15 Oct
+  08:00 to 16 Oct 15:00 UTC succeeded. Main health unchanged. 16 Oct am also complete.
+
 ## Forecast plans consolidated (task 5) — 2026-10-15 (Claude)
 
 - Added a one-page summary at the top of `PLAN_FORECAST_ARCHIVE.md`: status, what is done, ranked

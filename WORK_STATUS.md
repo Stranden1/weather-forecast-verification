@@ -1,22 +1,21 @@
 # Work status
 
-## Yr archive first windows checked (task 2) — 2026-10-16 (Claude)
+## Live check and winter readiness plan — 2026-10-21 (Claude)
 
 **Done**
-- Read-only check of `Stranden1/yr-archive` (file tree and commits through GitHub), collect run logs
-  and the live `health.json`. Objects are encrypted and were not decrypted; counts come from file
-  names and the runs' safe `yr_archive` summaries.
-- **15 Oct am:** 49/49 station objects, index, 2 attempts, closed manifest. Captured by run
-  38706965670 (08:37 UTC, 49 stations); closed by run 38744250366 (13:37 UTC, `closed_slots: 1`,
-  `incomplete_slots: 0`).
-- **15 Oct pm:** 49/49 station objects, index, 1 attempt, closed manifest. Captured by run
-  38818345689 (22:37 UTC, 49 stations); closed by run 38833380369 (01:07 UTC 16 Oct).
-- All runs: 0 archive errors, `published: true`. All 160 archive files were added; none were
-  modified or deleted. All 69 collect runs from 15 Oct 08:00 to 16 Oct 15:00 UTC succeeded.
-- Main health unchanged: yr 1323–1372, wn 2352, ecmwf 4508–4704 rows, 0 errors (activation run:
-  yr 1323, wn 2352, ecmwf 4606).
-- 16 Oct am also complete (49/49, manifest). 16 Oct pm was in progress at the check (22:08 UTC).
+- Read-only live check at 20 Oct 22:36 UTC. Collect runs use Ubuntu 24.04.5 LTS. Since 19 Oct,
+  100 of 103 runs succeeded; the 3 failures were transient network errors (Open-Meteo timeouts
+  19 Oct 06:37 and 20 Oct 15:09 UTC, Frost unreachable 19 Oct 12:07 UTC), each followed by a
+  successful run. `health.json` (last collection 20:37 UTC): yr 1372, wn 2352, ecmwf 4704,
+  frost 5371 rows, 0 errors; 18 collections in 48 h (16 expected).
+- Yr archive: every window from 15 Oct am to 20 Oct pm has 49/49 station objects; manifests exist
+  through 20 Oct am (20 Oct pm closes on a later run). Archive errors 0.
+- Planned the winter readiness work: `PLAN_WINTER_READINESS.html` (source) and
+  `PLAN_WINTER_READINESS.packed.html` (open this one). Vault copy:
+  `E:\AgnosticBrain\plans\weatherapp-winter-readiness.md`, linked from the project file.
+- Note: the page already has a below-freezing-hours card and a range-coverage section
+  ("Honest about uncertainty?"); the plan builds on them.
 
-**Remaining:** none for task 2; all five REVIEW_2026-10-14 tasks are done. Next steps follow the
-summary in `PLAN_FORECAST_ARCHIVE.md`. Decrypting a manifest to confirm its contents needs
-`WX_STATE_KEY`, which is not on this PC; that fits the owner's backup and recovery test.
+**Remaining:** the owner answers the five decisions on the plan page; then build in validated
+steps. `tests.yml` has not yet run on the new runner. No code, scoring, history or page files
+changed.

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Winter Readiness Plan</title>
+<link rel="stylesheet" href="htmlplan.css">
+<script src="htmlplan.js" defer></script>
+<style data-mock-shared>
+  .ui { font: 14px/1.4 Georgia, "Times New Roman", serif; color: #1c1b19; background: #fff; border: 1px solid #ddd8cc; border-radius: 8px; overflow: hidden; }
+  .ui h3 { margin: 0; padding: 10px 14px 4px; font-size: 16px; }
+  .ui p.s { margin: 0; padding: 0 14px 8px; color: #6b665b; font-size: 12.5px; }
+  .ui table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  .ui th, .ui td { text-align: left; padding: 6px 14px; border-top: 1px solid #f0ece2; }
+  .ui th { color: #6b665b; font-weight: 600; }
+  .ui .new { background: #eef7f0; }
+  .ui .dim { color: #8a8578; }
+</style>
+<body>
+
+<header>
+  <h1>Winter Readiness for the Accuracy Page</h1>
+  <doc-changes new="2" changed="4"></doc-changes>
+  <details class="thread"><summary>Why · 1 request</summary>
+    <doc-quote via="prompt" from="the user">Plan the winter readiness work first: snow-vs-rain flag for precipitation scoring, the inversion check of the height adjustment, and a T&lt;0 frost score.</doc-quote>
+  </details>
+</header>
+
+<main>
+<doc-plan>
+
+<!-- ═════ 1 · snow vs rain ═════ -->
+<doc-claim>
+  <p>The page shows rain errors for rain, mixed and snow hours apart.</p>
+  <doc-mock frame="none" w="460" caption="Three new rows in the Patterns table for rain. The values are examples."><template>
+<div class="ui">
+  <h3>Patterns to watch</h3>
+  <p class="s">Precipitation · 1 day ahead</p>
+  <table>
+    <tr><th>Situation</th><th>Paired hours</th><th>Yr error</th><th>WeatherNext (median) error</th></tr>
+    <tr><td>Dry hours</td><td>41,210</td><td>0.04</td><td>0.03</td></tr>
+    <tr><td>Wet hours</td><td>5,880</td><td>0.71</td><td>0.74</td></tr>
+    <tr class="new" data-ref="phase"><td>Wet, rain (2 °C and above)</td><td>4,950</td><td>0.69</td><td>0.72</td></tr>
+    <tr class="new"><td>Wet, mixed (0 to 2 °C)</td><td>610</td><td>0.80</td><td>0.83</td></tr>
+    <tr class="new"><td>Wet, snow (0 °C and below)</td><td>320</td><td>0.86</td><td>0.90</td></tr>
+    <tr><td>Heavy (&gt; 2 mm/h)</td><td>540</td><td>2.10</td><td>2.31</td></tr>
+  </table>
+</div></template>
+    <doc-pin ref="phase" anchor="r" title="New rows">The observed temperature at the hour sets the phase.</doc-pin>
+  </doc-mock>
+
+  <doc-claim>
+    <p>Each wet hour gets a phase from the observed temperature at that hour.</p>
+    <doc-code title="summarize.py · sketch" lang="py">
+<script type="text/plain">
+SNOW_MAX_C = 0.0   # at or below: snow
+RAIN_MIN_C = 2.0   # at or above: rain; between: mixed
+
+
+def phase(obs_t: pd.Series) -> pd.Series:
+    """Precipitation phase from the observed 2 m temperature (a proxy, not a sensor)."""
+    out = pd.Series("mixed", index=obs_t.index)
+    out[obs_t <= SNOW_MAX_C] = "snow"
+    out[obs_t >= RAIN_MIN_C] = "rain"
+    return out.where(obs_t.notna(), "unknown")
+</script>
+    </doc-code>
+    <doc-ask id="phase">
+      <p>Which temperature limits set the phase?</p>
+      <label><input type="radio" name="phase" value="0-2" checked> Snow at 0 °C or below, rain at 2 °C or above <small>three classes; mixed hours stay visible</small></label>
+      <label><input type="radio" name="phase" value="1" > One limit at +1 °C <small>two classes; simpler, but mixed hours go into both</small></label>
+    </doc-ask>
+    <doc-claim at="cloud/summarize.py:237">
+      <p><b>summarize.py:237</b> · conditions()</p>
+      <doc-code src="cloud/summarize.py" lines="237-249" hl="246-248">
+        <doc-pin line="247" title="The three phase rows go here"></doc-pin>
+      </doc-code>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim>
+    <p>The rain text says that gauges catch too little snow in wind.</p>
+    <doc-code diff file="site/app.js" start="119">
+<script type="text/plain">
+-    p: ["Does it catch wet hours?", "More than 0.1 mm of precipitation in an hour, including snow as water equivalent. WeatherNext's median is used for its yes/no prediction."],
++    p: ["Does it catch wet hours?", "More than 0.1 mm of precipitation in an hour, including snow as water equivalent. In wind, gauges catch less snow than falls, so snow hours can make forecasts look too wet. WeatherNext's median is used for its yes/no prediction."],
+</script>
+    </doc-code>
+    <doc-ask id="headline">
+      <p>Does the rain headline keep all wet hours?</p>
+      <label><input type="radio" name="headline" value="all" checked> Yes, all phases, with the new text <small>history and earlier numbers stay comparable</small></label>
+      <label><input type="radio" name="headline" value="rain"> No, rain hours only <small>cleaner in winter; the headline number changes</small></label>
+    </doc-ask>
+  </doc-claim>
+</doc-claim>
+
+<!-- ═════ 2 · inversion check ═════ -->
+<doc-claim>
+  <p>A study shows if the height adjustment fails on calm nights.</p>
+  <doc-mock frame="terminal" title="work/winter-inversion" w="470" caption="Sketch of the study output. Values are placeholders."><template><span class="dim">></span> python work/winter-inversion/analyze.py
+Stations with model cell 100 m or more above: <b>n</b>
+MAE 6–48 h, °C               WN     adj    adj−WN [95%]
+calm nights (wind &lt; 2 m/s)   <b>x.xx</b>   <b>x.xx</b>   +x.xx [..]
+other nights                 x.xx   x.xx   −x.xx [..]
+day hours                    x.xx   x.xx   −x.xx [..]
+<span class="y">If adj − WN is above 0 on calm nights,</span>
+<span class="y">the adjustment makes those nights worse.</span></template></doc-mock>
+
+  <doc-claim>
+    <p>A calm night hour is a night hour with observed wind below 2 m/s.</p>
+    <doc-code title="analyze.py · sketch" lang="py">
+<script type="text/plain">
+NIGHT_UTC = set(range(17, 24)) | set(range(0, 6))   # 18–06 Oslo time in winter
+CALM_MS = 2.0
+
+
+def regime(d: pd.DataFrame) -> pd.Series:
+    """calm_night, other_night or day, from the target hour and the observed wind."""
+    hour = pd.to_datetime(d.target, utc=True).dt.hour
+    night = hour.isin(NIGHT_UTC)
+    calm = d.obs_w < CALM_MS
+    out = pd.Series("day", index=d.index)
+    out[night] = "other_night"
+    out[night & calm] = "calm_night"
+    return out.where(~night | d.obs_w.notna(), "unknown")
+</script>
+    </doc-code>
+    <doc-ask id="calm">
+      <p>How does the study find calm, clear nights?</p>
+      <label><input type="radio" name="calm" value="wind" checked> Observed wind only <small>uses data we have; it does not see cloud</small></label>
+      <label><input type="radio" name="calm" value="cloud"> Also collect Frost cloud cover <small>better; a collection change; few stations report cloud</small></label>
+    </doc-ask>
+  </doc-claim>
+
+  <doc-claim>
+    <p>The study reads history only and changes no file outside work/.</p>
+    <doc-calls title="Study" caption="Same reading path as the four-product study.">
+<script type="text/plain">
++ **analyze.py** main()                           @ work/winter-inversion/analyze.py:1
+    read_scored(path)                               @ cloud/store.py:39  -- each day, in memory
+    adjusted_t(scored, heights)                     @ cloud/heights.py:57
+    flags(heights)                                  @ cloud/heights.py:70  -- picks stations with dz of 100 m or more
++   **regime**(d)                                   @ work/winter-inversion/analyze.py:1
+    day-block resample, 2,000 draws                 @ cloud/summarize.py:86
++   write results.json and FINDINGS_WINTER_INVERSION.md
+</script>
+    </doc-calls>
+    <doc-claim at="cloud/heights.py:57">
+      <p><b>heights.py:57</b> · adjusted_t()</p>
+      <doc-code src="cloud/heights.py" lines="57-67" hl="67">
+        <doc-pin line="67" tone="warn" title="One lapse rate for all weather">On calm winter nights, the valley air can be colder than the air higher up.</doc-pin>
+      </doc-code>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim>
+    <p>The study runs now, then once each month until March.</p>
+    <doc-code title="NEXT_STEPS.md · sketch" lang="md">
+<script type="text/plain">
+- Winter inversion check: run work/winter-inversion/analyze.py now (autumn baseline),
+  then about the 1st of Nov, Dec, Jan, Feb and Mar. Owner decides after the
+  Jan run whether the height-adjusted line changes. Do not tune the lapse rate
+  on the same data that judges it.
+</script>
+    </doc-code>
+    <doc-ask id="calmrow">
+      <p>Does the Patterns table also get a “Calm nights” row now?</p>
+      <label><input type="radio" name="calmrow" value="no" checked> No, study first <small>the page changes only after the owner decision</small></label>
+      <label><input type="radio" name="calmrow" value="yes"> Yes, now <small>one more row for temperature; visible all winter</small></label>
+    </doc-ask>
+  </doc-claim>
+</doc-claim>
+
+<!-- ═════ 3 · frost score ═════ -->
+<doc-claim>
+  <p>The freezing card also scores the height-adjusted WeatherNext line.</p>
+  <doc-mock frame="none" w="460" caption="Temperature only. The third column is new. Values are examples."><template>
+<div class="ui">
+  <h3>Does it catch below-freezing hours?</h3>
+  <p class="s">1 day ahead · land stations</p>
+  <table>
+    <tr><th>What happened</th><th>Yr</th><th>WeatherNext</th><th class="new" data-ref="col">WeatherNext, height-adjusted</th></tr>
+    <tr><td>Observed events caught</td><td>78%</td><td>84%</td><td class="new">80%</td></tr>
+    <tr><td>False alarms</td><td>310 hours</td><td>520 hours</td><td class="new">340 hours</td></tr>
+    <tr><td>Forecast events that were false alarms</td><td>22%</td><td>31%</td><td class="new">24%</td></tr>
+    <tr><td>Average miss during observed events</td><td>1.4 °C</td><td>1.5 °C</td><td class="new">1.3 °C</td></tr>
+  </table>
+</div></template>
+    <doc-pin ref="col" anchor="tl" title="New column">The cold bias at high cells can make false frost alarms.</doc-pin>
+  </doc-mock>
+  <doc-ask id="nights">
+    <p>When does the page score frost nights, not only hours?</p>
+    <label><input type="radio" name="nights" value="later" checked> Later, with WeatherNext snapshots <small>one run must cover the full night for both</small></label>
+    <label><input type="radio" name="nights" value="yr"> Now, Yr only, from the archive <small>no comparison; Yr archive since 15 Oct</small></label>
+  </doc-ask>
+
+  <doc-claim>
+    <p>practical() adds a wnh entry when the rows have the adjusted value.</p>
+    <doc-code diff file="cloud/views.py" start="37">
+<script type="text/plain">
+-        for p in ("yr", "wn"):
+-            col = "wn_p_p50" if p == "wn" and var == "p" else f"{p}_{var}"
++        providers = ("yr", "wn", "wnh") if var == "t" and "wn_t_adj" in g else ("yr", "wn")
++        for p in providers:
++            col = {"wnh": "wn_t_adj"}.get(p, "wn_p_p50" if p == "wn" and var == "p" else f"{p}_{var}")
+             forecast = threshold(g[col])
+</script>
+    </doc-code>
+    <doc-claim at="cloud/views.py:21">
+      <p><b>views.py:21</b> · practical()</p>
+      <doc-code src="cloud/views.py" lines="21-46" hl="37-39"></doc-code>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim>
+    <p>The card draws the third column only when the data has it.</p>
+    <doc-code title="app.js · sketch" lang="js" start="152">
+<script type="text/plain">
+const cols = [["yr", "Yr"], ["wn", wnName()]];
+if (g.wnh) cols.push(["wnh", "WeatherNext, height-adjusted"]);
+// header and each row map over cols, not over two fixed columns
+</script>
+    </doc-code>
+  </doc-claim>
+</doc-claim>
+
+<!-- ═════ shared ═════ -->
+<doc-claim aux="shared">
+  <p>Shared: all three parts read columns that each scored row has already.</p>
+  <doc-schema id="cols" lang="py" title="Scored row columns used">
+<script type="text/plain">
+obs_t: float      # observed 2 m temperature; sets the phase (1) and the frost event (3)
+obs_w: float      # observed 10 m mean wind; sets the calm night (2)
+obs_p: float      # observed hourly precipitation, interval end at target
+target: str       # UTC hour; sets night or day (2)
+wn_t: float       # WeatherNext at its cell height
+wn_t_adj: float   # derived in build(), never stored; 6.5 °C/km to station height
+station: str      # with config/wn_heights.json gives dz and offshore
+# … no new stored column; history day files stay as they are
+</script>
+  </doc-schema>
+</doc-claim>
+
+<!-- ═════ scope ═════ -->
+<doc-claim aux="scope">
+  <p>Not changing: history files, pairing, collection, the lapse rate and the headlines.</p>
+  <ul>
+    <li>No change to <code>history/</code> day files, pairing, finalization or the 0.1 mm wet limit.</li>
+    <li>No new collection, unless decision 3 picks Frost cloud cover.</li>
+    <li>The lapse rate stays 6.5 °C/km until the owner decides after the January study run.</li>
+    <li>The rain headline keeps all phases, unless decision 2 picks rain hours only.</li>
+    <li>No snow correction of gauge values. The page only splits and explains.</li>
+    <li>Offshore stations: no height adjustment, as now.</li>
+  </ul>
+</doc-claim>
+
+</doc-plan>
+</main>
+</body></html>
