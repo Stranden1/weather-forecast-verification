@@ -106,9 +106,15 @@ def main(argv=None) -> int:
         runs = state.meta().get("runs", [])
         if not runs:
             return 1
-        # CI runs this only AFTER saving successful sources and deploying health.
-        return int(any(s.get("errors", 0) for s in runs[-1].get("sources", {}).values())
-                   or runs[-1].get("yr_archive", {}).get("errors", 0) > 0)
+        # CI runs this only AFTER saving successful sources and deploying health. Only a
+        # source that errs FAIL_AFTER_RUNS runs in a row fails it; one-off outages don't.
+        bad = health.persistent_errors(runs)
+        now = [name for name, n in health.run_errors(runs[-1]).items() if n]
+        if bad:
+            print(f"errors in {health.FAIL_AFTER_RUNS}+ runs in a row:", ", ".join(bad))
+        elif now:
+            print("errors in this run only (not failing):", ", ".join(now))
+        return int(bool(bad))
     if a.step == "due":
         go, why = health.due(state.meta(), manual=a.manual)
         print(("collect: " if go else "skip: ") + why)

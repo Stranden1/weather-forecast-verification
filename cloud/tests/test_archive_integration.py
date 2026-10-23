@@ -105,10 +105,11 @@ class CollectorHookTest(unittest.TestCase):
 
     def test_check_reports_archive_failure_after_main_data_saved(self):
         state = Mock()
-        state.meta.return_value = {"runs": [{"sources": {"yr": {"errors": 0}}, "yr_archive": {"errors": 1}}]}
+        bad = lambda: {"sources": {"yr": {"errors": 0}}, "yr_archive": {"errors": 1}}
+        state.meta.return_value = {"runs": [bad(), bad()]}
         with patch("cloud.run.State", return_value=state):
             self.assertEqual(run.main(["check"]), 1)
-        state.meta.return_value["runs"][0]["yr_archive"]["errors"] = 0
+        state.meta.return_value["runs"][0]["yr_archive"]["errors"] = 0  # once is not a failure
         with patch("cloud.run.State", return_value=state):
             self.assertEqual(run.main(["check"]), 0)
 

@@ -345,8 +345,28 @@ class HealthTest(unittest.TestCase):
             self.assertEqual(h["sources"]["yr"]["status"], "error")
             before = st.meta_path.read_bytes()
             with mock.patch.object(runmod, "State", return_value=st):
-                self.assertEqual(runmod.main(["check"]), 1)
+                self.assertEqual(runmod.main(["check"]), 0)  # first failing run: not yet
             self.assertEqual(st.meta_path.read_bytes(), before)  # status check cannot mutate saved state
+            runmod.collect(st)
+            with mock.patch.object(runmod, "State", return_value=st):
+                self.assertEqual(runmod.main(["check"]), 1)  # the same sources again
+
+    def test_check_fails_only_when_a_source_errs_twice_in_a_row(self):
+        from cloud import run as runmod
+        run = lambda **errs: {"sources": {k: {"rows": 1, "errors": errs.get(k, 0)}
+                                          for k in ("yr", "wn", "ecmwf", "frost")}}
+        cases = [([run(ecmwf=2)], 0),                          # a one-off API timeout
+                 ([run(ecmwf=2), run()], 0),                   # already recovered
+                 ([run(ecmwf=2), run(frost=1)], 0),            # different sources
+                 ([run(ecmwf=2), run(ecmwf=1)], 1),
+                 ([run(), run(ecmwf=2), run(ecmwf=2, yr=1)], 1),
+                 ([], 1)]                                      # no run recorded at all
+        for runs, want in cases:
+            with self.subTest(runs=runs), mock.patch.object(runmod, "State") as st, \
+                    mock.patch("sys.stdout"):
+                st.return_value.meta.return_value = {"runs": runs}
+                self.assertEqual(runmod.main(["check"]), want)
+        self.assertEqual(health.persistent_errors([run(ecmwf=2), run(ecmwf=1, yr=3)]), ["ecmwf"])
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest import mock
 
 import pandas as pd
+import requests
 
 from cloud import openmeteo, score
 from cloud.config import PENDING_COLUMNS
@@ -21,6 +22,8 @@ class FakeResponse:
         self.data, self.status_code = data, status
 
     def json(self):
+        if isinstance(self.data, Exception):
+            raise self.data
         return self.data
 
     def raise_for_status(self):
@@ -29,15 +32,22 @@ class FakeResponse:
 
 
 class FakeSession:
-    """Serves the recorded forecast and metadata; can fail the first forecast call."""
-    def __init__(self, first_status=None):
-        self.calls, self.first_status = [], first_status
+    """Serves the recorded forecast and metadata. `fail` lists what the first forecast calls
+    get instead: an HTTP status, an exception to raise, or a body that is not valid JSON."""
+    def __init__(self, first_status=None, fail=()):
+        self.calls, self.fail = [], list(fail) or ([first_status] if first_status else [])
 
     def get(self, url, params=None, headers=None, timeout=None):
         self.calls.append((url, params))
         if url == openmeteo.URL:
-            if self.first_status and sum(u == openmeteo.URL for u, _ in self.calls) == 1:
-                return FakeResponse({}, self.first_status)
+            n = sum(u == openmeteo.URL for u, _ in self.calls)
+            if n <= len(self.fail):
+                f = self.fail[n - 1]
+                if isinstance(f, int):
+                    return FakeResponse({}, f)
+                if f == "truncated":
+                    return FakeResponse(json.JSONDecodeError("Expecting ',' delimiter", '{"a": 1', 7))
+                raise f
             return FakeResponse(FIXTURE["response"])
         model = url.split("/data/")[1].split("/")[0]
         return FakeResponse(FIXTURE["meta"][model])
@@ -96,6 +106,32 @@ class RobustnessTest(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertTrue(rows)
         sleep.assert_called()
+
+    def test_retries_after_timeout_and_truncated_reply(self):
+        for fail in ([requests.ReadTimeout("Read timed out. (read timeout=60)")],
+                     [requests.ConnectionError("reset")], ["truncated"],
+                     [requests.ReadTimeout("slow"), "truncated"]):
+            with self.subTest(fail=fail), mock.patch("time.sleep") as sleep:
+                rows, errors = openmeteo.collect(FIXTURE["stations"], FETCHED, FakeSession(fail=fail))
+                self.assertEqual(errors, [])
+                self.assertTrue(rows)
+                self.assertEqual(sleep.call_count, len(fail))
+
+    def test_gives_up_after_three_tries(self):
+        s = FakeSession(fail=[requests.ReadTimeout("slow")] * 3)
+        with mock.patch("time.sleep"):
+            rows, errors = openmeteo.collect(FIXTURE["stations"], FETCHED, s)
+        self.assertEqual(rows, [])
+        self.assertEqual(len(errors), 1)
+        self.assertIn("slow", errors[0])
+        self.assertEqual(sum(u == openmeteo.URL for u, _ in s.calls), 3)
+
+    def test_client_error_is_not_retried(self):
+        s = FakeSession(fail=[400])
+        with mock.patch("time.sleep"):
+            rows, errors = openmeteo.collect(FIXTURE["stations"], FETCHED, s)
+        self.assertEqual((rows, len(errors)), ([], 1))
+        self.assertEqual(sum(u == openmeteo.URL for u, _ in s.calls), 1)
 
     def test_wrong_location_count_is_an_error_not_a_crash(self):
         s = FakeSession()

@@ -35,15 +35,29 @@ def in_window(lead: float) -> bool:
     return any(lo <= lead <= hi for _, lo, hi in wanted_leads())
 
 
+RETRY_STATUS = (429, 500, 502, 503, 504)
+# Timeouts, dropped connections and cut-off bodies: Open-Meteo has these every few days.
+RETRY_ERRORS = (requests.Timeout, requests.ConnectionError, requests.exceptions.ChunkedEncodingError)
+
+
 def _get(session, url, params=None, tries: int = 3, wait: float = 10.0):
-    """GET with a short, polite back-off on rate limiting or server errors."""
+    """GET with a short, polite back-off on rate limiting, server errors, timeouts and
+    truncated replies (invalid JSON). Other HTTP errors (4xx) fail at once."""
     for attempt in range(tries):
-        r = session.get(url, params=params, headers={"User-Agent": USER_AGENT}, timeout=60)
-        if r.status_code in (429, 500, 502, 503, 504) and attempt < tries - 1:
-            time.sleep(wait * (attempt + 1))
-            continue
-        r.raise_for_status()
-        return r.json()
+        last = attempt == tries - 1
+        try:
+            r = session.get(url, params=params, headers={"User-Agent": USER_AGENT}, timeout=60)
+            if r.status_code not in RETRY_STATUS or last:
+                r.raise_for_status()
+                try:
+                    return r.json()
+                except ValueError:  # truncated or empty body (requests' JSONDecodeError)
+                    if last:
+                        raise
+        except RETRY_ERRORS:
+            if last:
+                raise
+        time.sleep(wait * (attempt + 1))
 
 
 def elevation_param(stations: list[dict]) -> str:

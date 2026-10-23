@@ -642,3 +642,11 @@ Plan: PLAN_WINTER_READINESS.html. Owner: "Build with the suggested default for a
 The lapse rate stays 6.5 °C/km. The calm-night study (FINDINGS_WINTER_INVERSION_2026-10-23.md)
 reruns about the 1st of Nov–Mar; the owner decides after the January run. Never fit a lapse rate
 or calm-night rule on the data that judges it.
+
+
+## Collect failure alerts — 2026-10-23 (owner)
+
+The collect workflow turns red (and GitHub emails) only when the same source has errors in
+2 collect runs in a row (`health.FAIL_AFTER_RUNS`). A one-off error is still logged by the check
+step and shown in health.json, but does not fail the run. Open-Meteo requests retry on timeouts,
+connection errors and truncated replies as well as 429/5xx.

@@ -21,6 +21,7 @@ WINDOW_H = 48
 # A scheduled run collects only when the last successful run is at least this old (2.5 h,
 # so a late run doesn't push the next one back a whole slot). Manual runs always collect.
 MIN_GAP_MIN = 150
+FAIL_AFTER_RUNS = 2  # `cloud.run check` fails only when a source errs this many runs in a row
 # Earth Engine's answers when the caller may not read WeatherNext yet.
 NO_ACCESS = re.compile(r"does not have access|does not have required permission|"
                        r"PERMISSION_DENIED|not authorized", re.I)
@@ -61,6 +62,22 @@ def failed(run: dict) -> bool:
     """A run failed when no enabled source delivered anything."""
     srcs = _sources(run)
     return not any(s.get("rows", 0) for s in srcs.values() if s.get("enabled", True))
+
+
+def run_errors(run: dict) -> dict[str, int]:
+    """Error count per source in one run, the Yr archive included."""
+    out = {name: s.get("errors", 0) for name, s in _sources(run).items()}
+    out["yr_archive"] = (run.get("yr_archive") or {}).get("errors", 0)
+    return out
+
+
+def persistent_errors(runs: list[dict], n: int = FAIL_AFTER_RUNS) -> list[str]:
+    """Sources with errors in each of the last n runs. A one-off outage that the next run
+    gets past (an API timeout) is left out, so it doesn't turn the workflow red."""
+    if len(runs) < n:
+        return []
+    recent = [run_errors(r) for r in runs[-n:]]
+    return sorted(name for name in recent[-1] if all(r.get(name, 0) for r in recent))
 
 
 def expected_runs(first: datetime, now: datetime) -> int:
