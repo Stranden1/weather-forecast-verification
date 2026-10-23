@@ -138,10 +138,13 @@
       ["Forecast events that were false alarms", (p, provider) => rate(p.far) + bar(p.far, provider)],
       ["Average miss during observed events", p => `${fmt(p.event_mae)} ${unit()}`],
     ];
+    // [data key, column title, colour token]; the height-adjusted column exists for temperature only.
+    const cols = [["yr", "Yr", "yr"], ["wn", wnName(), "wn"]];
+    if (g.wnh) cols.push(["wnh", "WeatherNext, height-adjusted (our estimate)", "ink-3"]);
     el.innerHTML = `<p class="event-count">${H_LABEL[S.eventH]} ahead · ${count(g.n)} paired hours over ${g.days} days at ${g.stations} stations.
       ${count(g.events)} observed event hours across ${g.event_days} days.</p>
-      <table class="event-table"><tr><th>What happened</th><th>Yr</th><th>${wnName()}</th></tr>
-      ${rows.map(([label, value]) => `<tr><td>${label}</td><td>${value(g.yr, "yr")}</td><td>${value(g.wn, "wn")}</td></tr>`).join("")}</table>
+      <div class="table-scroll"><table class="event-table"><tr><th>What happened</th>${cols.map(([, title]) => `<th>${title}</th>`).join("")}</tr>
+      ${rows.map(([label, value]) => `<tr><td>${label}</td>${cols.map(([key, , tone]) => `<td>${value(g[key], tone)}</td>`).join("")}</tr>`).join("")}</table></div>
       <p class="muted" style="font-size:13px">A false alarm means the forecast crossed the threshold but the measurement did not.
       These are descriptive counts for shared hours, not a winner test or independent storms.${g.days < D.meta.min_days_for_verdict ? " Only a few days are available; read this with care." : ""}</p>`;
   }

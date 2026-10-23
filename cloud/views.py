@@ -34,8 +34,12 @@ def practical(d: pd.DataFrame, var: str, offshore: set[str]) -> dict:
         observed = threshold(g[f"obs_{var}"])
         result = {"n": len(g), "days": int(g.day.nunique()), "stations": int(g.station.nunique()),
                   "events": int(observed.sum()), "event_days": int(g.loc[observed, "day"].nunique())}
-        for p in ("yr", "wn"):
-            col = "wn_p_p50" if p == "wn" and var == "p" else f"{p}_{var}"
+        # Temperature also scores our height-adjusted WeatherNext line, when the rows have it.
+        # Offshore has no adjustment (it would repeat WeatherNext), so it gets no such entry.
+        adjusted = var == "t" and "wn_t_adj" in g and group != "offshore"
+        providers = ("yr", "wn", "wnh") if adjusted else ("yr", "wn")
+        for p in providers:
+            col = {"wnh": "wn_t_adj"}.get(p, "wn_p_p50" if p == "wn" and var == "p" else f"{p}_{var}")
             forecast = threshold(g[col])
             hits, misses, false = int((forecast & observed).sum()), int((~forecast & observed).sum()), int((forecast & ~observed).sum())
             result[p] = {"hits": hits, "misses": misses, "false_alarms": false,

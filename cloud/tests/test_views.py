@@ -44,6 +44,19 @@ class ViewTest(unittest.TestCase):
         self.assertEqual((result['n'], result['events']), (3, 2))
         self.assertEqual([result['wn'][k] for k in ('hits', 'misses', 'false_alarms')], [1, 1, 0])
 
+    def test_freezing_card_scores_height_adjusted_line_on_land_only(self):
+        d = history()
+        d['obs_t'] = [-2, -1, 2, 1]
+        d['yr_t'] = [-1, 1, -1, 2]
+        d['wn_t'] = [-1, -2, -1, 2]
+        d['wn_t_adj'] = [-1, 0.5, 1, 2]  # adjustment removes the false alarm, adds a miss
+        land = practical(primary_pairs(d, 't'), 't', set())
+        self.assertEqual([land['all']['wnh'][k] for k in ('hits', 'misses', 'false_alarms')], [1, 1, 0])
+        self.assertEqual(land['all']['wn']['false_alarms'], 1)
+        offshore = practical(primary_pairs(d, 't'), 't', {'SN1'})
+        self.assertNotIn('wnh', offshore['offshore'])
+        self.assertNotIn('wnh', practical(primary_pairs(d, 'w'), 'w', set())['all'])
+
     def test_phase_limits_and_missing_temperature(self):
         t = pd.Series([-3, 0, 0.5, 1.99, 2, 8, None])
         self.assertEqual(list(phase(t)), ["snow", "snow", "mixed", "mixed", "rain", "rain", "unknown"])
