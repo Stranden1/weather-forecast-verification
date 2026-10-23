@@ -1,5 +1,11 @@
 # Changelog
 
+## Live check and winter readiness plan — 2026-10-21 (Claude)
+
+- Live check at 20 Oct 22:36 UTC: collect runs on Ubuntu 24.04.5; 100/103 runs succeeded since
+  19 Oct (3 transient Open-Meteo/Frost network failures); health 0 errors; Yr archive 49/49 for
+  every window 15–20 Oct. Planned winter readiness (`PLAN_WINTER_READINESS.html`), commit 18671f9.
+
 ## Yr archive first windows checked (task 2) — 2026-10-16 (Claude)
 
 - Read-only check of `Stranden1/yr-archive`, collect run logs and the live `health.json`.

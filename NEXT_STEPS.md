@@ -1,13 +1,14 @@
 # Next steps
 
-_Open items only. Updated 2026-10-21. Completed work is in CHANGELOG.md._
+_Open items only. Updated 2026-10-23. Completed work is in CHANGELOG.md._
 
 ## Order of work
 
 All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checked 16 Oct: 49/49, closed manifests, 0 errors). Follow the one-page summary in PLAN_FORECAST_ARCHIVE.md, one task per session. Open owner reviews:
 
 - **~27 Oct, four-product rerun:** at 30 paired days, rerun `work/four-product-2026-10-15/analyze.py` on the longer period (same cohort rules, day-block intervals). If IFS/AIFS still trail Yr and WeatherNext, the owner decides then whether the page gets an ECMWF section (DECISIONS.md, 16 Oct). The blend stays Yr + WeatherNext only; no offshore wording change.
-- **Winter readiness (planned 21 Oct, `PLAN_WINTER_READINESS.html`; open `.packed.html`):** snow/mixed/rain split of precipitation errors, read-only calm-night study of the WeatherNext height adjustment (baseline now, then monthly to March), and the height-adjusted line on the freezing card. Five owner decisions are open on the page; build nothing before the owner answers.
+- **Winter calm-night reruns:** run `work/winter-inversion/analyze.py <history dir>` about the 1st of Nov, Dec, Jan, Feb and Mar (needs `.env` with `WX_STATE_KEY` and current history from origin/main). Baseline: FINDINGS_WINTER_INVERSION_2026-10-23.md. The owner decides after the January run whether the height-adjusted line changes (DECISIONS.md, 23 Oct).
+- **Winter readiness page changes (committed 23 Oct, not pushed):** snow/mixed/rain rows and the snow caveat, and the height-adjusted column on the freezing card. They go live with the next push of `cloud/`/`site/`, which also gives the first `tests.yml` run on the new runner.
 - `FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Yr archive: occasionally confirm each day has am/pm folders with 49 stations and a manifest, and that `health.json.yr_archive.errors` is 0. A missed window shows as a partial/missing manifest.
 

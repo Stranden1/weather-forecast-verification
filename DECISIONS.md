@@ -624,3 +624,21 @@ Owner decisions on the three suggestions in FINDINGS_FOUR_PRODUCT_2026-10-15.md:
    WeatherNext ahead of Yr offshore. No wording that calls Yr the weakest offshore product until
    30 paired days and winter data confirm it.
 
+
+## Winter readiness — 2026-10-23 (owner chose the suggested defaults)
+
+Plan: PLAN_WINTER_READINESS.html. Owner: "Build with the suggested default for all five decisions."
+
+1. **Precipitation phase** from the observed 2 m temperature at the hour: snow at 0 °C or below,
+   rain at 2 °C or above, mixed between (`cloud/summarize.py` `phase()`). Shown as three wet-hour
+   rows in the Patterns table. A proxy, not a present-weather sensor.
+2. **The rain headline keeps all wet hours**; the rain card says gauges catch less snow in wind.
+   No snow correction of gauge values.
+3. **Calm nights use observed wind only** (night 17–05 UTC, wind below 2 m/s). No cloud collection.
+4. **No "Calm nights" row on the page** until the owner decides after the study.
+5. **Frost nights wait** for WeatherNext snapshots, so one run covers the whole night for both
+   providers. The freezing card scores hours, now with the height-adjusted line (land only).
+
+The lapse rate stays 6.5 °C/km. The calm-night study (FINDINGS_WINTER_INVERSION_2026-10-23.md)
+reruns about the 1st of Nov–Mar; the owner decides after the January run. Never fit a lapse rate
+or calm-night rule on the data that judges it.

@@ -1,21 +1,22 @@
 # Work status
 
-## Live check and winter readiness plan — 2026-10-21 (Claude)
+## Winter readiness built — 2026-10-23 (Claude)
 
-**Done**
-- Read-only live check at 20 Oct 22:36 UTC. Collect runs use Ubuntu 24.04.5 LTS. Since 19 Oct,
-  100 of 103 runs succeeded; the 3 failures were transient network errors (Open-Meteo timeouts
-  19 Oct 06:37 and 20 Oct 15:09 UTC, Frost unreachable 19 Oct 12:07 UTC), each followed by a
-  successful run. `health.json` (last collection 20:37 UTC): yr 1372, wn 2352, ecmwf 4704,
-  frost 5371 rows, 0 errors; 18 collections in 48 h (16 expected).
-- Yr archive: every window from 15 Oct am to 20 Oct pm has 49/49 station objects; manifests exist
-  through 20 Oct am (20 Oct pm closes on a later run). Archive errors 0.
-- Planned the winter readiness work: `PLAN_WINTER_READINESS.html` (source) and
-  `PLAN_WINTER_READINESS.packed.html` (open this one). Vault copy:
-  `E:\AgnosticBrain\plans\weatherapp-winter-readiness.md`, linked from the project file.
-- Note: the page already has a below-freezing-hours card and a range-coverage section
-  ("Honest about uncertainty?"); the plan builds on them.
+Owner chose the suggested default for all five plan decisions (DECISIONS.md, 23 Oct).
 
-**Remaining:** the owner answers the five decisions on the plan page; then build in validated
-steps. `tests.yml` has not yet run on the new runner. No code, scoring, history or page files
-changed.
+**Done** (local commits, not pushed)
+- 07093ab: precipitation Patterns table gets wet rain / mixed / snow rows, phased by the observed
+  2 m temperature (snow ≤ 0 °C, rain ≥ 2 °C); the rain card notes snow undercatch in wind.
+- 8246f76: the freezing card scores the height-adjusted WeatherNext line (all and land groups;
+  offshore has no adjustment, so no column there).
+- Tests: 174 cloud tests pass (3 new). Browser check on regenerated demo data
+  (`?demo`): the three phase rows sum to the wet-hours total; the third freezing column shows on
+  all/land and not offshore; no sideways scroll at 375 px.
+- Calm-night study, autumn baseline: FINDINGS_WINTER_INVERSION_2026-10-23.md. At the 12
+  stations whose cell is ≥100 m above them, the adjustment helps overall (−0.46 °C) but on calm
+  nights the gain shrinks to −0.16 and the bias turns +0.93 °C warm; it is worse on calm nights
+  at Grønliheia, Røros and Karasjok. Script `work/winter-inversion/analyze.py` is local only
+  (`work/` is ignored).
+
+**Remaining:** push when the owner says so (the page changes and the first `tests.yml` run on the
+new runner follow the push). Monthly study reruns Nov–Mar; owner decision after January.
