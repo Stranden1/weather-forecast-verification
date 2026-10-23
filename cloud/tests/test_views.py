@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 from cloud.score import SCORED_COLUMNS
-from cloud.summarize import build
+from cloud.summarize import build, conditions, phase
 from cloud.views import practical, primary_pairs
 
 STATIONS = [{"station_id": "SN1", "name": "Station", "latitude": 60, "longitude": 10, "elevation_m": 10}]
@@ -43,6 +43,19 @@ class ViewTest(unittest.TestCase):
         result = practical(primary_pairs(d, 'p'), 'p', set())['all']
         self.assertEqual((result['n'], result['events']), (3, 2))
         self.assertEqual([result['wn'][k] for k in ('hits', 'misses', 'false_alarms')], [1, 1, 0])
+
+    def test_phase_limits_and_missing_temperature(self):
+        t = pd.Series([-3, 0, 0.5, 1.99, 2, 8, None])
+        self.assertEqual(list(phase(t)), ["snow", "snow", "mixed", "mixed", "rain", "rain", "unknown"])
+
+    def test_wet_hours_split_by_phase_in_patterns(self):
+        d = history()
+        d['obs_p'] = [1, 1, 1, 0]
+        d['obs_t'] = [-1, 1, 5, -4]  # the dry cold hour is in no wet row
+        rows = {r["label"]: r for r in conditions(primary_pairs(d, 'p'), 'p', {"SN1": 10})}
+        self.assertEqual(rows["Wet hours"]["n"], 3)
+        self.assertEqual([rows[k]["n"] for k in ("Wet, rain (2 °C and above)", "Wet, mixed (0 to 2 °C)",
+                                                  "Wet, snow (0 °C and below)")], [1, 1, 1])
 
     def test_wind_threshold_includes_ten_meters_per_second(self):
         d = history()

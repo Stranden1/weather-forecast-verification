@@ -116,7 +116,7 @@
   const EVENT_DESCRIPTION = {
     t: ["Does it catch below-freezing hours?", "Air temperature below 0 °C at 2 m; this measures hours, not frost nights or road conditions."],
     w: ["Does it catch stronger wind?", "Mean wind of at least 10 m/s at 10 m, rather than gusts."],
-    p: ["Does it catch wet hours?", "More than 0.1 mm of precipitation in an hour, including snow as water equivalent. WeatherNext's median is used for its yes/no prediction."],
+    p: ["Does it catch wet hours?", "More than 0.1 mm of precipitation in an hour, including snow as water equivalent. In wind, gauges catch less snow than falls, so snow hours can make forecasts look too wet. WeatherNext's median is used for its yes/no prediction."],
   };
   function renderPractical() {
     const card = document.getElementById("practical"); if (!card) return;

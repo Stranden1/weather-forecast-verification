@@ -234,6 +234,23 @@ def coverage(df: pd.DataFrame, var: str, h: int) -> dict:
     return out
 
 
+SNOW_MAX_C = 0.0  # observed 2 m temperature at or below: snow
+RAIN_MIN_C = 2.0  # at or above: rain; between the two: mixed
+
+
+def phase(obs_t: pd.Series) -> pd.Series:
+    """Precipitation phase from the observed 2 m temperature at the hour.
+
+    A proxy, not a present-weather sensor. Gauges catch less snow than falls in wind,
+    so snow hours are shown apart rather than corrected. Missing temperature: "unknown".
+    """
+    t = pd.to_numeric(obs_t, errors="coerce")
+    out = pd.Series("mixed", index=t.index)
+    out[t <= SNOW_MAX_C] = "snow"
+    out[t >= RAIN_MIN_C] = "rain"
+    return out.where(t.notna(), "unknown")
+
+
 def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
     """Patterns to watch: how errors change with weather type and terrain."""
     groups = []
@@ -244,7 +261,12 @@ def conditions(d: pd.DataFrame, var: str, elevation: dict) -> list[dict]:
         groups += [("Light (< 5 m/s)", o < 5), ("Moderate (5–10 m/s)", (o >= 5) & (o < 10)),
                    ("Strong (≥ 10 m/s)", o >= 10)]
     else:
-        groups += [("Dry hours", o <= WET_THRESHOLD_MM), ("Wet hours", o > WET_THRESHOLD_MM),
+        wet = o > WET_THRESHOLD_MM
+        ph = phase(d["obs_t"]) if "obs_t" in d else pd.Series("unknown", index=d.index)
+        groups += [("Dry hours", o <= WET_THRESHOLD_MM), ("Wet hours", wet),
+                   ("Wet, rain (2 °C and above)", wet & (ph == "rain")),
+                   ("Wet, mixed (0 to 2 °C)", wet & (ph == "mixed")),
+                   ("Wet, snow (0 °C and below)", wet & (ph == "snow")),
                    ("Heavy (> 2 mm/h)", o > 2)]
     elev = d.station.map(elevation)
     groups += [("Lowland (< 200 m)", elev < 200), ("Hills (200–600 m)", (elev >= 200) & (elev < 600)),
