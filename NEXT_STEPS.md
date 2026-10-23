@@ -8,17 +8,15 @@ All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checke
 
 - **~27 Oct, four-product rerun:** at 30 paired days, rerun `work/four-product-2026-10-15/analyze.py` on the longer period (same cohort rules, day-block intervals). If IFS/AIFS still trail Yr and WeatherNext, the owner decides then whether the page gets an ECMWF section (DECISIONS.md, 16 Oct). The blend stays Yr + WeatherNext only; no offshore wording change.
 - **Winter calm-night reruns:** run `work/winter-inversion/analyze.py <history dir>` about the 1st of Nov, Dec, Jan, Feb and Mar (needs `.env` with `WX_STATE_KEY` and current history from origin/main). Baseline: FINDINGS_WINTER_INVERSION_2026-10-23.md. The owner decides after the January run whether the height-adjusted line changes (DECISIONS.md, 23 Oct).
-- **Winter readiness page changes (committed 23 Oct, not pushed):** snow/mixed/rain rows and the snow caveat, and the height-adjusted column on the freezing card. They go live with the next push of `cloud/`/`site/`, which also gives the first `tests.yml` run on the new runner.
 - `FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Yr archive: occasionally confirm each day has am/pm folders with 49 stations and a manifest, and that `health.json.yr_archive.errors` is 0. A missed window shows as a partial/missing manifest.
 
 ## Operations
 
 2. Confirm Revsbotn's resumed reporting in exact-hour cloud observations; keep it active. Fresh 10-minute Frost records were verified at 11:40/11:50 UTC on 12 Oct. Enningdalen and Alvheim recovered. Finalized-score warnings can lag live recovery.
-3. Ubuntu runner migration: collect/score/publish runs pass on Ubuntu 24.04.5 since 19 Oct (100/103 succeeded to 20 Oct 22:36 UTC; the 3 failures were transient Open-Meteo/Frost network errors). Still open: the first `tests.yml` run on the new runner (it runs on the next push of `cloud/`, `site/` or workflows).
-4. Renew the repository-only timer token **before 5 Nov 2026 17:15 UTC / 18:15 Oslo**. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
-5. Confirm a separate secure copy of `WX_STATE_KEY` and encrypted `history/`, and validate an isolated recovery from that copy. Current history decrypts; independent backup recovery remains unverified. No full project backup is needed.
-6. Old plaintext Git objects/caches: coordinate cleanup only if the publication policy still requires it. Never rewrite current immutable day files or main history as routine maintenance.
+3. Renew the repository-only timer token **before 5 Nov 2026 17:15 UTC / 18:15 Oslo**. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
+4. Confirm a separate secure copy of `WX_STATE_KEY` and encrypted `history/`, and validate an isolated recovery from that copy. Current history decrypts; independent backup recovery remains unverified. No full project backup is needed.
+5. Old plaintext Git objects/caches: coordinate cleanup only if the publication policy still requires it. Never rewrite current immutable day files or main history as routine maintenance.
 
 ## Next product/data decisions
 
