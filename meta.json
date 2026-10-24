@@ -1,0 +1,6666 @@
+{
+ "finalized_days": [
+  "2026-09-05",
+  "2026-09-06",
+  "2026-09-07",
+  "2026-09-08",
+  "2026-09-09",
+  "2026-09-10",
+  "2026-09-11",
+  "2026-09-12",
+  "2026-09-13",
+  "2026-09-14",
+  "2026-09-15",
+  "2026-09-16",
+  "2026-09-17",
+  "2026-09-18",
+  "2026-09-19",
+  "2026-09-20",
+  "2026-09-21",
+  "2026-09-22",
+  "2026-09-23",
+  "2026-09-24",
+  "2026-09-25",
+  "2026-09-26",
+  "2026-09-27",
+  "2026-09-28",
+  "2026-09-29",
+  "2026-09-30",
+  "2026-10-01",
+  "2026-10-02",
+  "2026-10-03",
+  "2026-10-04",
+  "2026-10-05",
+  "2026-10-06",
+  "2026-10-07",
+  "2026-10-08",
+  "2026-10-09",
+  "2026-10-10",
+  "2026-10-11",
+  "2026-10-12",
+  "2026-10-13",
+  "2026-10-14",
+  "2026-10-15",
+  "2026-10-16",
+  "2026-10-17",
+  "2026-10-18",
+  "2026-10-19",
+  "2026-10-20",
+  "2026-10-21",
+  "2026-10-22",
+  "2026-10-23"
+ ],
+ "first_fetch": "2026-09-23T20:30:02Z",
+ "runs": [
+  {
+   "fetched_at": "2026-10-11T01:07:44Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4589,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4589,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T04:07:45Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4732,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4732,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T07:07:40Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4878,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4878,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T09:37:42Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4993,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4993,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T12:37:39Z",
+   "yr_rows": 1384,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5134,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1384,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5134,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T15:37:37Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5271,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5271,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T18:07:41Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5376,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5376,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T20:37:47Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5503,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5503,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-11T23:37:42Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4500,
+   "obs_rows": 5649,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5649,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T02:28:05Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4654,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4654,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T05:07:42Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4767,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4767,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T08:07:37Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 4922,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4922,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T10:37:39Z",
+   "yr_rows": 1350,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5039,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1350,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5039,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T13:37:47Z",
+   "yr_rows": 1400,
+   "wn_rows": 2400,
+   "ecmwf_rows": 4800,
+   "obs_rows": 5184,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2400,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4800,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5184,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T16:37:43Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5329,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5329,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T19:37:37Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5474,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5474,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-12T22:07:38Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4508,
+   "obs_rows": 5590,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4508,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5590,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T00:37:42Z",
+   "yr_rows": 1367,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4584,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1367,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4584,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T03:37:34Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4729,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4729,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T06:07:44Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4849,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4849,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T09:07:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4989,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4989,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T12:07:40Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5148,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5148,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T14:37:50Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5262,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5262,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T17:37:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5406,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5406,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T20:37:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5551,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5551,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-13T23:37:41Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4410,
+   "obs_rows": 5695,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4410,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5695,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T02:07:46Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4677,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4677,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T05:07:39Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4808,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4808,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T07:37:47Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4940,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4940,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T10:37:39Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5081,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5081,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T13:07:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5185,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5185,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T16:07:50Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5323,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T18:41:55Z",
+   "yr_rows": 1370,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5453,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1370,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5453,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T21:37:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4606,
+   "obs_rows": 5594,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4606,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5594,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   }
+  },
+  {
+   "fetched_at": "2026-10-14T21:54:58Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4606,
+   "obs_rows": 5594,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4606,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5594,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T00:36:02Z",
+   "yr_rows": 1338,
+   "wn_rows": 2352,
+   "ecmwf_rows": 0,
+   "obs_rows": 4614,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: Expecting ',' delimiter: line 1 column 12315 (char 12314)",
+    "ECMWF (Open-Meteo) stations 26-49: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1338,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: Expecting ',' delimiter: line 1 column 12315 (char 12314)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4614,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T03:07:39Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4719,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4719,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T05:37:42Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4849,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4849,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T08:37:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4990,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4990,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T11:07:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5098,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5098,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T13:37:46Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5219,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5219,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T16:37:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5359,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5359,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T19:37:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5499,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5499,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-15T22:37:35Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4508,
+   "obs_rows": 5637,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4508,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5637,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T01:07:41Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4637,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4637,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T03:37:42Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4751,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4751,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T06:07:44Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4863,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4863,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T09:07:43Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5012,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5012,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T11:37:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5109,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5109,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T14:37:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5249,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5249,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T17:29:58Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5386,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5386,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T20:07:41Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5504,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5504,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-16T23:07:41Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4410,
+   "obs_rows": 5643,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4410,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5643,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T01:37:48Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4601,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4601,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T04:36:35Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4742,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4742,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T07:07:48Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4856,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4856,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T10:07:35Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4999,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4999,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T12:37:41Z",
+   "yr_rows": 1359,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5121,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1359,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5121,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T15:37:37Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5259,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5259,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T18:07:37Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5370,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5370,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T20:37:45Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5493,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5493,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-17T23:37:42Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4410,
+   "obs_rows": 5630,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4410,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5630,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T02:37:40Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4608,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4608,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T05:37:36Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4707,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4707,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T08:07:48Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4864,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4864,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T11:07:44Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5008,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5008,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T14:07:42Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5139,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5139,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T17:07:44Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5274,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5274,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T19:37:47Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5395,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5395,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-18T22:37:42Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4508,
+   "obs_rows": 5533,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4508,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5533,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T01:07:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4500,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4500,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T04:07:35Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4634,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4634,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T06:37:36Z",
+   "yr_rows": 1365,
+   "wn_rows": 2352,
+   "ecmwf_rows": 2304,
+   "obs_rows": 4754,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1365,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 2304,
+     "errors": 1,
+     "error": "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4754,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T09:07:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4860,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4860,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T12:07:43Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 0,
+   "errors": [
+    "Frost SN10380..SN76922 air_temperature,wind_speed: HTTPSConnectionPool(host='frost.met.no', port=443): Max retries exceeded with url: /observations/v0.jsonld?sources=SN10380%2CSN1120%2CSN120%2CSN12590%2CSN13760%2CSN18700%2CSN20949%2CSN20961%2CSN25630%2CSN2970%2CSN33430%2CSN34130%2CSN41825%2CSN44610%2CSN50540%2CSN53101%2CSN57770%2CSN60980%2CSN63420%2CSN65940%2CSN68860%2CSN70850%2CSN76245%2CSN76909%2CSN76922&referencetime=2026-10-15T00%3A00%3A00Z%2F2026-10-19T12%3A07%3A43Z&elements=air_temperature%2Cwind_speed&timeoffsets=default&levels=default&qualities=0%2C1%2C2%2C3%2C4 (Caused by NewConnectionError(\"HTTPSConnection(host='frost.met.no', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
+    "Frost SN10380..SN76922 sum(precipitation_amount PT1H): HTTPSConnectionPool(host='frost.met.no', port=443): Max retries exceeded with url: /observations/v0.jsonld?sources=SN10380%2CSN1120%2CSN120%2CSN12590%2CSN13760%2CSN18700%2CSN20949%2CSN20961%2CSN25630%2CSN2970%2CSN33430%2CSN34130%2CSN41825%2CSN44610%2CSN50540%2CSN53101%2CSN57770%2CSN60980%2CSN63420%2CSN65940%2CSN68860%2CSN70850%2CSN76245%2CSN76909%2CSN76922&referencetime=2026-10-15T00%3A00%3A00Z%2F2026-10-19T12%3A07%3A43Z&elements=sum%28precipitation_amount+PT1H%29&timeoffsets=default&levels=default&qualities=0%2C1%2C2%2C3%2C4 (Caused by NewConnectionError(\"HTTPSConnection(host='frost.met.no', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
+    "Frost SN76929..SN99540 air_temperature,wind_speed: HTTPSConnectionPool(host='frost.met.no', port=443): Max retries exceeded with url: /observations/v0.jsonld?sources=SN76929%2CSN76930%2CSN76933%2CSN76938%2CSN76939%2CSN76956%2CSN76957%2CSN76963%2CSN77040%2CSN80102%2CSN81790%2CSN84210%2CSN85890%2CSN86740%2CSN87110%2CSN89940%2CSN90450%2CSN92895%2CSN93700%2CSN94190%2CSN96310%2CSN97251%2CSN98550%2CSN99540&referencetime=2026-10-15T00%3A00%3A00Z%2F2026-10-19T12%3A07%3A43Z&elements=air_temperature%2Cwind_speed&timeoffsets=default&levels=default&qualities=0%2C1%2C2%2C3%2C4 (Caused by NewConnectionError(\"HTTPSConnection(host='frost.met.no', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
+    "Frost SN76929..SN99540 sum(precipitation_amount PT1H): HTTPSConnectionPool(host='frost.met.no', port=443): Max retries exceeded with url: /observations/v0.jsonld?sources=SN76929%2CSN76930%2CSN76933%2CSN76938%2CSN76939%2CSN76956%2CSN76957%2CSN76963%2CSN77040%2CSN80102%2CSN81790%2CSN84210%2CSN85890%2CSN86740%2CSN87110%2CSN89940%2CSN90450%2CSN92895%2CSN93700%2CSN94190%2CSN96310%2CSN97251%2CSN98550%2CSN99540&referencetime=2026-10-15T00%3A00%3A00Z%2F2026-10-19T12%3A07%3A43Z&elements=sum%28precipitation_amount+PT1H%29&timeoffsets=default&levels=default&qualities=0%2C1%2C2%2C3%2C4 (Caused by NewConnectionError(\"HTTPSConnection(host='frost.met.no', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 0,
+     "errors": 4,
+     "error": "Frost SN10380..SN76922 air_temperature,wind_speed: HTTPSConnectionPool(host='frost.met.no', port=443): Max retries exceeded with url: /observations/v0.jsonld?sources=SN10380%2CSN1120%2CSN120%2CSN12590%2CSN13760%2CSN18700%2CSN20949%2CSN20961%2CSN25630%2CSN2970%2CSN33430%2CSN34130%2CSN41825%2CSN44610%",
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T14:37:43Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5115,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5115,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T17:07:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5219,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5219,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T19:37:48Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5342,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5342,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-19T22:37:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4508,
+   "obs_rows": 5477,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4508,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5477,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T01:37:36Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4506,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4506,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T04:07:41Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4608,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4608,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T07:07:44Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4743,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4743,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T10:07:40Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4873,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4873,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T12:37:43Z",
+   "yr_rows": 1360,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5006,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1360,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5006,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T15:09:27Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 0,
+   "obs_rows": 5118,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out.",
+    "ECMWF (Open-Meteo) stations 26-49: Expecting ',' delimiter: line 1 column 40030 (char 40029)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out.",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5118,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T18:07:44Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5253,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5253,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T20:37:46Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5371,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5371,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-20T23:37:38Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4410,
+   "obs_rows": 5510,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4410,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5510,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T02:07:41Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4501,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4501,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T04:37:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4624,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4624,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T07:37:42Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4762,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4762,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T10:37:37Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4900,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4900,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T13:07:45Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5021,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5021,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T15:37:49Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5129,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5129,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T18:37:42Z",
+   "yr_rows": 1361,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5266,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1361,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5266,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-21T21:37:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4606,
+   "obs_rows": 5405,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4606,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5405,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T00:37:42Z",
+   "yr_rows": 1361,
+   "wn_rows": 2352,
+   "ecmwf_rows": 0,
+   "obs_rows": 4421,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+    "ECMWF (Open-Meteo) stations 26-49: Expecting value: line 1 column 1 (char 0)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1361,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4421,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T03:07:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4538,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4538,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T06:07:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4686,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4686,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T09:07:41Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4829,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4829,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T11:37:43Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4939,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4939,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T14:09:45Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5052,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5052,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T16:46:11Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5171,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5171,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T19:37:46Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5310,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5310,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-22T22:07:46Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4508,
+   "obs_rows": 5424,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4508,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5424,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T01:07:47Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4456,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4456,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T04:07:40Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 0,
+   "obs_rows": 4586,
+   "errors": [
+    "ECMWF (Open-Meteo) stations 1-25: Expecting value: line 1 column 1 (char 0)",
+    "ECMWF (Open-Meteo) stations 26-49: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)"
+   ],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 0,
+     "errors": 2,
+     "error": "ECMWF (Open-Meteo) stations 1-25: Expecting value: line 1 column 1 (char 0)",
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4586,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T06:37:42Z",
+   "yr_rows": 1362,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4709,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1362,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4709,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T09:37:48Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4848,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4848,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T12:07:51Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4974,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4974,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T15:07:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5095,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5095,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T18:07:48Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5252,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5252,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T20:37:49Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5359,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5359,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-23T23:37:47Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4410,
+   "obs_rows": 5497,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4410,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5497,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T02:07:48Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4538,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4538,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T05:07:45Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4682,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4682,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T08:07:40Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4822,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4822,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T11:07:38Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 4962,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 4962,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 49,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T13:37:41Z",
+   "yr_rows": 1372,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5075,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1372,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5075,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "ok",
+    "captured_stations": 0,
+    "closed_slots": 1,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  },
+  {
+   "fetched_at": "2026-10-24T16:07:50Z",
+   "yr_rows": 1323,
+   "wn_rows": 2352,
+   "ecmwf_rows": 4704,
+   "obs_rows": 5190,
+   "errors": [],
+   "sources": {
+    "yr": {
+     "rows": 1323,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "wn": {
+     "rows": 2352,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "ecmwf": {
+     "rows": 4704,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    },
+    "frost": {
+     "rows": 5190,
+     "errors": 0,
+     "error": null,
+     "enabled": true
+    }
+   },
+   "yr_archive": {
+    "enabled": true,
+    "status": "idle",
+    "captured_stations": 0,
+    "closed_slots": 0,
+    "incomplete_slots": 0,
+    "errors": 0,
+    "published": true
+   }
+  }
+ ],
+ "days": {
+  "2026-09-05": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "08d51685418a62763640ee44010792c3160d2dcbbe0be709b79f8322e5611b2c",
+   "status": "finalized"
+  },
+  "2026-09-06": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2f230a050f67c299931b94f556ab5cacb132408b9b3714fc461b05247de9880b",
+   "status": "finalized"
+  },
+  "2026-09-07": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "7e6a7d0d07b1f4a47a110190617ca2ec931e0c27e9f255547be15234e80c6511",
+   "status": "finalized"
+  },
+  "2026-09-08": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "b476cc5a631076391be6fb80817bb17544430628ded8658451c7bde775c799f3",
+   "status": "finalized"
+  },
+  "2026-09-09": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2469c1527b324be1c68c0e0cbbf0624b222fa87b6a9b6d38b6d6906b6d68a5c7",
+   "status": "finalized"
+  },
+  "2026-09-10": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "289112359c9b7dd0c094f53a686e3808c9d03d0a4c5135b6bc336da8ef3a61c5",
+   "status": "finalized"
+  },
+  "2026-09-11": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "28a99fa405a9e3ff9ab57aac8551b054ca79c6cbdb566233fe76e3d91f495ffd",
+   "status": "finalized"
+  },
+  "2026-09-12": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "06c096859a680e98e953f50cb064e4d560854178a26fd92799aa0e7a7efaa0c2",
+   "status": "finalized"
+  },
+  "2026-09-13": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "29ad86c9c1d2b60a3e999359e20972c261f364dca9268f6bf982188e5838c410",
+   "status": "finalized"
+  },
+  "2026-09-14": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "aa5fff075e2a1ff09d0ba98bf273eb69cce0d17be60463e21d3c065620671ddc",
+   "status": "finalized"
+  },
+  "2026-09-15": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "09a2a2acc48932fca5ce9cb84302e75222936605e41830a3a186b4f9ec48f621",
+   "status": "finalized"
+  },
+  "2026-09-16": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "63fae377dd61086ea78d3d37f4526a175fa0aa478c1b5e84cec5d9721a046674",
+   "status": "finalized"
+  },
+  "2026-09-17": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "d8c17d0661e4904a68259f08566dbd41c7dd581acaca7a182ff9cdded45b59f7",
+   "status": "finalized"
+  },
+  "2026-09-18": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "1181b424debe2ed35ac4370cbfea5660269874a229b432a7b294d2dc2acb5795",
+   "status": "finalized"
+  },
+  "2026-09-19": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "05967231bf46e638b3e9811a76f9caab5eae67e873a2dc09fe3413fa5a2f07bc",
+   "status": "finalized"
+  },
+  "2026-09-20": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "3724fb8f504fe88e57c339dcaac26828a78b5dad7b2a177546e6c8c204b66b04",
+   "status": "finalized"
+  },
+  "2026-09-21": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "6143ae515dd99191385b9b961d0bf62724e1e78e61fb387695992df1a7649939",
+   "status": "finalized"
+  },
+  "2026-09-22": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "45d156d4115eed085657ed77e5a3122442b84d36b5d7862f13b426942e2acd66",
+   "status": "finalized"
+  },
+  "2026-09-23": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "e184f379dcd1cad6cc36ec7f9a6cec92dbf5e122699114074e281823745862e0",
+   "status": "finalized"
+  },
+  "2026-09-24": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "2785054a8447fb536d603b2fd695b20b10927527d50f148f4a2fd0db2c134a6a",
+   "status": "finalized"
+  },
+  "2026-09-25": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "dafccd4726229ea49165455db3127caa360e5287f565abac4d3216c2bfb3d185",
+   "status": "finalized"
+  },
+  "2026-09-26": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "43a1bfe25efe7c7d71b92aeef52b4aa93ac7eafed8632c011f222b26b424521c",
+   "status": "finalized"
+  },
+  "2026-09-27": {
+   "coverage": null,
+   "late_finalized": null,
+   "legacy": true,
+   "sha256": "614b64b0ffda4ef590fa477f68730324eec1a618aeb613860a614eca7e0906fa",
+   "status": "finalized"
+  },
+  "2026-09-28": {
+   "coverage": 0.9958333333333333,
+   "observed_station_hours": 1195,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-09-29T12:56:52.150452+00:00",
+   "sha256": "94aa9292cada90047f23bf02e7ba560030f0b0f10a241de1d7730f4c518d3702",
+   "status": "finalized"
+  },
+  "2026-09-29": {
+   "coverage": 0.9941666666666666,
+   "observed_station_hours": 1193,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-09-30T12:36:48.365251+00:00",
+   "sha256": "b2dc8d7744427507e5e79782bb1e914fd8d379c188e8dd02e1d9435c5bbd9fac",
+   "status": "finalized"
+  },
+  "2026-09-30": {
+   "coverage": 0.9775,
+   "observed_station_hours": 1173,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-01T13:16:43.883870+00:00",
+   "sha256": "52cc7e6224df1808d27f9c036f4b0240875da4851abcde485663714c99c29b51",
+   "status": "finalized"
+  },
+  "2026-10-01": {
+   "coverage": 0.9466666666666667,
+   "observed_station_hours": 1136,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-02T12:36:33.041510+00:00",
+   "sha256": "906b146c2fea22a3f7dd772faeb1bde747bb84a685a6ef068de71b72341a941d",
+   "status": "finalized"
+  },
+  "2026-10-02": {
+   "coverage": 0.9491666666666667,
+   "observed_station_hours": 1139,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-03T09:11:01.480267+00:00",
+   "sha256": "fe51c9e9e48fea7409b0196671299e5fa0a1b58080def26a5d82dfc9365abc94",
+   "status": "finalized"
+  },
+  "2026-10-03": {
+   "coverage": 0.9466666666666667,
+   "observed_station_hours": 1136,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-04T12:24:57.062866+00:00",
+   "sha256": "74908728798c56f67ad77848f9cd7949c13058086265ac60b51b07c8cd2f4708",
+   "status": "finalized"
+  },
+  "2026-10-04": {
+   "coverage": 0.9391666666666667,
+   "observed_station_hours": 1127,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-05T09:13:16.310643+00:00",
+   "sha256": "dda7e98793391e595bbddbdaf5ea24ae13457734659ca7a2be13b4045f54efaf",
+   "status": "finalized"
+  },
+  "2026-10-05": {
+   "coverage": 0.9508333333333333,
+   "observed_station_hours": 1141,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-06T07:39:04.729126+00:00",
+   "sha256": "e218d7a8fefc94b4529e0dc9636258cc3316677f0011e57a44660d2e8dd850b1",
+   "status": "finalized"
+  },
+  "2026-10-06": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-07T08:40:29.587491+00:00",
+   "sha256": "7ebb58d78790eb59d2abf341bc6e70aed725e8560977bc2d66800564935aae58",
+   "status": "finalized"
+  },
+  "2026-10-07": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-08T06:08:59.330426+00:00",
+   "sha256": "dd2769ab618490f6fe93fd6ad743e2745c064ef5c8abf6fa405583a6a4cce5d8",
+   "status": "finalized"
+  },
+  "2026-10-08": {
+   "coverage": 0.9433333333333334,
+   "observed_station_hours": 1132,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-09T07:08:57.407043+00:00",
+   "sha256": "2e5eb1bda3a736006571919d7dd61ad63ee511397e8ebcab63ae0e6aa29aa497",
+   "status": "finalized"
+  },
+  "2026-10-09": {
+   "coverage": 0.9525,
+   "observed_station_hours": 1143,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-10T08:09:11.199342+00:00",
+   "sha256": "55266d512eb6aa966c068aec2adf92702f30b6c413da7d4278a534c6ad8daffb",
+   "status": "finalized"
+  },
+  "2026-10-10": {
+   "coverage": 0.9325,
+   "observed_station_hours": 1119,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-11T07:09:04.433095+00:00",
+   "sha256": "f7b380c2a9713344fcb52749e0db824c93ae666625bfd8260dc10982024a7405",
+   "status": "finalized"
+  },
+  "2026-10-11": {
+   "coverage": 0.9341666666666667,
+   "observed_station_hours": 1121,
+   "expected_station_hours": 1200,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20925",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-12T08:08:50.446580+00:00",
+   "sha256": "4aca5fe55a4f032e2857c5d09408b66cd448af68d1f566b8fe2b47d7c55b4acc",
+   "status": "finalized"
+  },
+  "2026-10-12": {
+   "coverage": 0.9821428571428571,
+   "observed_station_hours": 1155,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-13T06:09:13.305462+00:00",
+   "sha256": "402e1d99a63882fcbbcbb37aa3fcb6394725f771baac078b2579b40a44817827",
+   "status": "finalized"
+  },
+  "2026-10-13": {
+   "coverage": 0.983843537414966,
+   "observed_station_hours": 1157,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-14T07:39:12.333012+00:00",
+   "sha256": "704f4ca5469fdedc22a6eab2bd849829ea5727b9ba619a409a437e92aab87671",
+   "status": "finalized"
+  },
+  "2026-10-14": {
+   "coverage": 0.9668367346938775,
+   "observed_station_hours": 1137,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-15T08:39:08.239439+00:00",
+   "sha256": "c26ca4a9c6fbd97f4605eb954617ed3b421f1cc0ad24fac17dc4fea81f0033a8",
+   "status": "finalized"
+  },
+  "2026-10-15": {
+   "coverage": 0.9472789115646258,
+   "observed_station_hours": 1114,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-16T06:09:02.747979+00:00",
+   "sha256": "ab5edbefdb573894449c143240e776961e4bd4369bb51c5e8e208f5a3f832bb4",
+   "status": "finalized"
+  },
+  "2026-10-16": {
+   "coverage": 0.9549319727891157,
+   "observed_station_hours": 1123,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-17T07:10:01.663160+00:00",
+   "sha256": "47c03f19b7d027e5f2649ff56a536e1f2463581c18c8e2a97a2be2f4a45e9292",
+   "status": "finalized"
+  },
+  "2026-10-17": {
+   "coverage": 0.951530612244898,
+   "observed_station_hours": 1119,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-18T08:10:12.166692+00:00",
+   "sha256": "9b9c6246663446e255fea168ce0ab0fc4329f3d1aced3693e49290e1705e353d",
+   "status": "finalized"
+  },
+  "2026-10-18": {
+   "coverage": 0.9379251700680272,
+   "observed_station_hours": 1103,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-19T06:40:12.805035+00:00",
+   "sha256": "c10fa4c2c39eaa09a5633f66948e79018572a7e84671ca776f0b678c359129f3",
+   "status": "finalized"
+  },
+  "2026-10-19": {
+   "coverage": 0.9175170068027211,
+   "observed_station_hours": 1079,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-20T07:09:20.127786+00:00",
+   "sha256": "0ea382ba737e286c9710960e2a556cf842468b85a5baccbc244f31da9efda8b6",
+   "status": "finalized"
+  },
+  "2026-10-20": {
+   "coverage": 0.9285714285714286,
+   "observed_station_hours": 1092,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-21T07:39:14.009493+00:00",
+   "sha256": "9f5f81675044e78562053e0e622e26cd38e7d9ba745e2b38e3dd42e39a2c8043",
+   "status": "finalized"
+  },
+  "2026-10-21": {
+   "coverage": 0.935374149659864,
+   "observed_station_hours": 1100,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-22T06:09:09.545772+00:00",
+   "sha256": "8f01b53996e2def71588328870df31ad3774d40e252b586d2f0a604a594f3195",
+   "status": "finalized"
+  },
+  "2026-10-22": {
+   "coverage": 0.9489795918367347,
+   "observed_station_hours": 1116,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-23T06:39:01.240850+00:00",
+   "sha256": "24a50f2e89ce20de014109ce8f23b3de2767f91fdd3fc18f8bee4e4200e6ccce",
+   "status": "finalized"
+  },
+  "2026-10-23": {
+   "coverage": 0.9421768707482994,
+   "observed_station_hours": 1108,
+   "expected_station_hours": 1176,
+   "late_finalized": false,
+   "expected_stations": [
+    "SN10380",
+    "SN1120",
+    "SN120",
+    "SN12590",
+    "SN13760",
+    "SN18700",
+    "SN20949",
+    "SN20961",
+    "SN25630",
+    "SN2970",
+    "SN33430",
+    "SN34130",
+    "SN41825",
+    "SN44610",
+    "SN50540",
+    "SN53101",
+    "SN57770",
+    "SN60980",
+    "SN63420",
+    "SN65940",
+    "SN68860",
+    "SN70850",
+    "SN76245",
+    "SN76909",
+    "SN76922",
+    "SN76929",
+    "SN76930",
+    "SN76933",
+    "SN76938",
+    "SN76939",
+    "SN76956",
+    "SN76957",
+    "SN76963",
+    "SN77040",
+    "SN80102",
+    "SN81790",
+    "SN84210",
+    "SN85890",
+    "SN86740",
+    "SN87110",
+    "SN89940",
+    "SN90450",
+    "SN92895",
+    "SN93700",
+    "SN94190",
+    "SN96310",
+    "SN97251",
+    "SN98550",
+    "SN99540"
+   ],
+   "prepared_at": "2026-10-24T08:08:58.140503+00:00",
+   "sha256": "3078e8fddb58d0e46e436d43cf645082599561cad868b5e43234b7e62d61ddaa",
+   "status": "finalized"
+  }
+ }
+}
