@@ -1,21 +1,17 @@
 # Work status
 
-## Fewer false failure emails from collect — 2026-10-23 (Claude)
+## Four-product rerun at 29 paired days — 2026-10-26 (Claude)
 
-Owner asked why GitHub still emails "All jobs have failed". All 9 failed collect runs since
-29 Sep were one-off network errors (8 Open-Meteo timeouts or cut-off replies, 1 Frost outage);
-data was saved and the site deployed each time, and the next run passed. The red came from the
-final `cloud.run check` step, which failed on any source error in the latest run.
+Owner asked to run the rerun planned for ~27 Oct now. Main fast-forwarded to origin/main for
+current history (through 25 Oct).
 
-**Done** (branch `claude/collect-retries`, pushed and fast-forwarded into main on 23 Oct)
-- `cloud/openmeteo.py` `_get`: also retries (3 tries, 10 s / 20 s back-off) on timeouts,
-  dropped connections and truncated or empty JSON. 4xx errors still fail at once.
-- `cloud/health.py` `persistent_errors`, used by `cloud.run check`: the step fails only when the
-  same source (Yr archive included) has errors in 2 runs in a row (`FAIL_AFTER_RUNS`). It now
-  prints which sources erred, so the log says why.
-- Tests: 178 cloud tests pass (4 new methods; two existing check tests updated).
+**Done**
+- `work/four-product-2026-10-26/analyze.py`: unchanged copy of the 15 Oct script (same cohort
+  rules, day-block intervals, seed); the 15 Oct results are kept. Run is read-only.
+- FINDINGS_FOUR_PRODUCT_2026-10-26.md: 29 days at 6–12 h (27 Sep – 25 Oct). Every 15 Oct
+  conclusion holds with tighter intervals: Yr vs WeatherNext too close to call, IFS clearly worst,
+  AIFS beats IFS but trails Yr, Yr+WeatherNext average beats all four, adding ECMWF worsens it.
+  Offshore, IFS wind is now also clearly better than Yr.
 
-- PROJECT_STATUS.md and NEXT_STEPS.md refreshed: winter readiness is live and the first
-  `tests.yml` run on the Ubuntu runner passed (23 Oct, 463ef25).
-
-**Remaining:** none. The next failure email should only come from a source failing twice in a row.
+**Remaining:** owner decision on an ECMWF note on the page (options in the findings file).
+No page change made.
