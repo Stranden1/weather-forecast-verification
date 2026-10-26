@@ -650,3 +650,17 @@ The collect workflow turns red (and GitHub emails) only when the same source has
 2 collect runs in a row (`health.FAIL_AFTER_RUNS`). A one-off error is still logged by the check
 step and shown in health.json, but does not fail the run. Open-Meteo requests retry on timeouts,
 connection errors and truncated replies as well as 429/5xx.
+
+## ECMWF note on the page — 2026-10-26 (owner)
+
+The 26 Oct rerun (FINDINGS_FOUR_PRODUCT_2026-10-26.md, 29 days, 27 Sep–25 Oct) confirmed the
+15 Oct ranking. Owner chose option 1: "legg inn den korte ECMWF-merknaden på siden med
+forbeholdet om varselalder".
+
+- The page gets one static, dated note in "How to read this fairly": over 29 autumn days, IFS and
+  AIFS were behind Yr and WeatherNext at 6–48 h across the network, and AIFS beat IFS, with the
+  run-age caveat (Yr under an hour old, ECMWF 9–10 h). No ECMWF scores, charts or live figures.
+- The note is a one-off check and is not updated automatically; revise or remove it if a later
+  rerun (for example with winter data) changes the ranking.
+- Unchanged from 16 Oct: the published blend stays Yr + WeatherNext only, and no wording calls
+  Yr the weakest offshore product before winter data confirm it.

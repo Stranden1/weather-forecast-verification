@@ -13,5 +13,9 @@ current history (through 25 Oct).
   AIFS beats IFS but trails Yr, Yr+WeatherNext average beats all four, adding ECMWF worsens it.
   Offshore, IFS wind is now also clearly better than Yr.
 
-**Remaining:** owner decision on an ECMWF note on the page (options in the findings file).
-No page change made.
+- Owner chose option 1 (DECISIONS.md, 26 Oct): `site/index.html` gets a static "What about
+  ECMWF?" note in "How to read this fairly" (29 days, IFS/AIFS behind Yr and WeatherNext at
+  6–48 h, AIFS beat IFS, run-age caveat, not part of the average). ECMWF/Open-Meteo attribution
+  was already on the page. Checked in the local preview; 178 cloud tests pass.
+
+**Remaining:** none. Revisit the note if a winter rerun changes the ranking.

@@ -6,7 +6,7 @@ _Open items only. Updated 2026-10-26. Completed work is in CHANGELOG.md._
 
 All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checked 16 Oct: 49/49, closed manifests, 0 errors). Follow the one-page summary in PLAN_FORECAST_ARCHIVE.md, one task per session. Open owner reviews:
 
-- **Owner decision, ECMWF note on the page:** the 26 Oct rerun (FINDINGS_FOUR_PRODUCT_2026-10-26.md, 29 days) confirms the ranking: IFS/AIFS trail Yr and WeatherNext. Choose between a short ECMWF note now or waiting for winter data (DECISIONS.md, 16 Oct). The blend stays Yr + WeatherNext only; no offshore wording change before winter data.
+- **ECMWF note (live since 26 Oct):** static and dated (FINDINGS_FOUR_PRODUCT_2026-10-26.md). Rerun `work/four-product-2026-10-26/analyze.py` once winter data exist (about February) and revise or remove the note if the ranking changes (DECISIONS.md, 26 Oct). The blend stays Yr + WeatherNext only; no offshore wording change before winter data.
 - **Winter calm-night reruns:** run `work/winter-inversion/analyze.py <history dir>` about the 1st of Nov, Dec, Jan, Feb and Mar (needs `.env` with `WX_STATE_KEY` and current history from origin/main). Baseline: FINDINGS_WINTER_INVERSION_2026-10-23.md. The owner decides after the January run whether the height-adjusted line changes (DECISIONS.md, 23 Oct).
 - `FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Yr archive: occasionally confirm each day has am/pm folders with 49 stations and a manifest, and that `health.json.yr_archive.errors` is 0. A missed window shows as a partial/missing manifest.
