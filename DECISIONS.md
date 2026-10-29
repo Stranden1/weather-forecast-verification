@@ -664,3 +664,18 @@ forbeholdet om varselalder".
   rerun (for example with winter data) changes the ranking.
 - Unchanged from 16 Oct: the published blend stays Yr + WeatherNext only, and no wording calls
   Yr the weakest offshore product before winter data confirm it.
+
+## Ormen Lange stays active until 1 Dec — 2026-10-29 (owner)
+
+Since 15 Oct 10:00 UTC every hourly SN76933 temperature in Frost has qualityCode 6 ("very
+uncertain, model data": MET fills in model values). Frost still lists the station with no
+validTo, so the 12 Oct retirement rule ("a station that Frost no longer has") does not apply.
+Owner: "Ja, enig i å vente til 1. desember med Ormen Lange."
+
+- Keep `"active": 1`. `cloud/frost.py` already requests only qualityCodes 0–4, so code-6 values
+  never enter history; the map shows the station's missing-measurement ring.
+- Re-check about 1 Dec. If Frost still has only code 6, set `"active": 0` in
+  `config/stations.json` under the 12 Oct rule; its past rows stay in the scores.
+- The 180 rows (23 target hours, 15 Oct 10:00 – 16 Oct 08:00 UTC) scored from the failing sensor
+  before MET re-flagged them stay in history (immutable). Exclude them in any future
+  QC/observation-vintage dataset.

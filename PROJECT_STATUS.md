@@ -26,6 +26,6 @@ Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 pai
 - Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Ubuntu runner migration done: collect runs pass on Ubuntu 24.04.5 since 19 Oct, and the first `tests.yml` run on the new runner passed on 23 Oct (463ef25).
 - Failure alerts: since 23 Oct the collect workflow turns red only when the same source errs in 2 runs in a row, and Open-Meteo requests retry on timeouts and truncated replies (DECISIONS.md, 23 Oct).
-- Renew the timer token before 5 Nov 17:15 UTC / 18:15 Oslo.
+- Timer token renewed 26 Oct 2026; next expiry 26 Oct 2027 (SETUP_CLOUD.md).
 
 NEXT_STEPS.md holds open work; WORK_STATUS.md holds the latest checkpoint.

@@ -438,7 +438,7 @@ These are separate from feature recommendations and require explicit authorizati
 | Network drift | Wisting inactive; current 49 versus historical 50 | Version membership/metadata; freeze denominators for each target day and expose changing cohorts |
 | Immutable observations | Later Frost corrections cannot update scored days | New QC/observation-vintage analysis dataset only; never rewrite `history/` |
 | Ubuntu migration | Workflow uses `ubuntu-latest` | Observe tests and a real collecting/persisting/deploying run after migration; pin/change only with approval |
-| External timer credential | Documented expiry 5 November 2026, 17:15 UTC /18:15 Oslo | Owner renews scoped repository-only token before expiry; verify a due collection and a gate skip; keep fallback |
+| External timer credential | Renewed 26 Oct 2026; documented expiry 26 October 2027 | Owner renews scoped repository-only token before expiry; verify a due collection and a gate skip; keep fallback |
 | Repository growth | Current history ≈0.23 GB/year; expanded ciphertext several GB/year | Separate object archive; no Git rewrite/cleanup or migration of existing days in this task |
 | WeatherNext publication | Existing future-value restriction; past-value project policy documented | New archive remains private/encrypted, never enters `site/` or Pages artifacts |
 

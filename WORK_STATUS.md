@@ -18,4 +18,29 @@ current history (through 25 Oct).
   6–48 h, AIFS beat IFS, run-age caveat, not part of the average). ECMWF/Open-Meteo attribution
   was already on the page. Checked in the local preview; 178 cloud tests pass.
 
-**Remaining:** none. Revisit the note if a winter rerun changes the ranking.
+- Owner renewed the cron-job.org timer token on 26 Oct; new expiry 26 Oct 2027. Recorded in
+  SETUP_CLOUD.md, NEXT_STEPS.md, PROJECT_STATUS.md and PLAN_FORECAST_ARCHIVE.md.
+
+- Health check 28 Oct 20:35 UTC: **the timer has sent no dispatch since 26 Oct 20:07 UTC**
+  (first miss 20:37, right after the token change). Only the hourly GitHub schedule runs:
+  9 runs in 48 h, gaps up to 7.3 h; all succeeded, 0 source errors. Yr archive windows
+  27 Oct am and 28 Oct am got only a missing manifest (no run in 08:30–13:00 UTC); lost.
+  Scored day 27 Oct is complete, but its 6 h lead median rose to 6.4 h (5.9 before).
+  ECMWF note is live.
+- Ormen Lange (SN76933), checked 29 Oct: still in Frost (no validTo) and reporting, but every
+  hourly temperature since 15 Oct 10:00 UTC has qualityCode 6 ("very uncertain, model data":
+  MET fills it with model values). `cloud/frost.py` asks only for codes 0–4, so nothing enters
+  history; this is correct. Our history already scored 180 rows (23 hours, 15–16 Oct) from the
+  failing sensor before MET re-flagged them (0.05 % of temperature rows; e.g. 5.3 °C stored
+  where Frost now has ~10 °C). Immutable; note for any future QC/observation-vintage dataset.
+  Its wind has never been scored. Owner decided (DECISIONS.md, 29 Oct): keep it active, set
+  `"active": 0` if Frost still has only code 6 on 1 Dec.
+
+- 29 Oct: cron-job.org History showed 401 after 26 Oct; owner fixed the header and a Test run
+  returned 204, but GitHub got no run from the test nor at 10:07/10:37 UTC (only the 10:06
+  schedule run).
+
+**Remaining:** owner checks job 8590224 is enabled and saved (cron-job.org may auto-disable a
+job after repeated failures) and reads the 10:07/10:37 UTC History codes; then confirm a timer
+run at minute 7 or 37. Revisit the ECMWF note if a winter rerun
+changes the ranking.

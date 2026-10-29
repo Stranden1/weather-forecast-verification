@@ -13,8 +13,9 @@ All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checke
 
 ## Operations
 
+1. Ormen Lange (SN76933): temperature has only Frost qualityCode 6 (model-filled) since 15 Oct 10:00 UTC, so no new scored rows. Owner decision 29 Oct: keep active; re-check about 1 Dec and, if still code 6, retire it with `"active": 0` (DECISIONS.md, 29 Oct).
 2. Confirm Revsbotn's resumed reporting in exact-hour cloud observations; keep it active. Fresh 10-minute Frost records were verified at 11:40/11:50 UTC on 12 Oct. Enningdalen and Alvheim recovered. Finalized-score warnings can lag live recovery.
-3. Renew the repository-only timer token **before 5 Nov 2026 17:15 UTC / 18:15 Oslo**. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
+3. Timer token renewed 26 Oct 2026; it expires **26 Oct 2027**. Renew before then. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
 4. Confirm a separate secure copy of `WX_STATE_KEY` and encrypted `history/`, and validate an isolated recovery from that copy. Current history decrypts; independent backup recovery remains unverified. No full project backup is needed.
 5. Old plaintext Git objects/caches: coordinate cleanup only if the publication policy still requires it. Never rewrite current immutable day files or main history as routine maintenance.
 
