@@ -40,7 +40,9 @@ current history (through 25 Oct).
   returned 204, but GitHub got no run from the test nor at 10:07/10:37 UTC (only the 10:06
   schedule run).
 
-**Remaining:** owner checks job 8590224 is enabled and saved (cron-job.org may auto-disable a
-job after repeated failures) and reads the 10:07/10:37 UTC History codes; then confirm a timer
-run at minute 7 or 37. Revisit the ECMWF note if a winter rerun
-changes the ranking.
+- 30 Oct: fixed. The job had been auto-disabled by cron-job.org after the 401s ("Enable job"
+  off). Owner re-enabled it; test dispatch 00:20 UTC and the scheduled timer run 00:37 UTC both
+  reached GitHub and succeeded. Timer outage lasted 26 Oct 20:37 – 30 Oct 00:37 UTC.
+
+**Remaining:** none for the timer. Revisit the ECMWF note if a winter rerun changes the ranking;
+re-check Ormen Lange about 1 Dec.
