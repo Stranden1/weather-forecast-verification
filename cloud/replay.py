@@ -1,4 +1,4 @@
-"""How forecasts for the same moment change as it gets closer (see PLAN_REPLAYS.md).
+"""How forecasts for the same moment change as it gets closer (see docs/plans/PLAN_REPLAYS.md).
 
 Everything here reads the scored history only. Each history row already holds
 Yr and WeatherNext from the same fetch at one horizon, so following one
@@ -121,7 +121,7 @@ def steadiness(scored: pd.DataFrame, var: str) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------
-# Storm replays: what each service said before a notable event (PLAN_REPLAYS.md, step 2).
+# Storm replays: what each service said before a notable event (docs/plans/PLAN_REPLAYS.md, step 2).
 #
 # Events are chosen from the MEASUREMENTS only, never from forecast errors, so the list is
 # not tilted toward one service's misses. Each replay point reuses the scored history row for

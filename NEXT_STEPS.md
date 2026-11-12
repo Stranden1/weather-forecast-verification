@@ -1,19 +1,22 @@
 # Next steps
 
-_Open items only. Updated 2026-10-26. Completed work is in CHANGELOG.md._
+_Open items only. Updated 2026-11-12. Completed work is in CHANGELOG.md._
 
 ## Order of work
 
+**Next: outside review on Claude Fable 5.2** in its own session, following `BRIEF_FABLE_REVIEW.md` (code/robustness plus readability for ordinary people; report only, to `docs/reviews/`).
+
 All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checked 16 Oct: 49/49, closed manifests, 0 errors). Follow the one-page summary in PLAN_FORECAST_ARCHIVE.md, one task per session. Open owner reviews:
 
-- **ECMWF note (live since 26 Oct):** static and dated (FINDINGS_FOUR_PRODUCT_2026-10-26.md). Rerun `work/four-product-2026-10-26/analyze.py` once winter data exist (about February) and revise or remove the note if the ranking changes (DECISIONS.md, 26 Oct). The blend stays Yr + WeatherNext only; no offshore wording change before winter data.
-- **Winter calm-night reruns:** run `work/winter-inversion/analyze.py <history dir>` about the 1st of Nov, Dec, Jan, Feb and Mar (needs `.env` with `WX_STATE_KEY` and current history from origin/main). Baseline: FINDINGS_WINTER_INVERSION_2026-10-23.md. The owner decides after the January run whether the height-adjusted line changes (DECISIONS.md, 23 Oct).
-- `FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
+- **ECMWF note (live since 26 Oct):** static and dated (docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-26.md). Rerun `work/four-product-2026-10-26/analyze.py` once winter data exist (about February) and revise or remove the note if the ranking changes (DECISIONS.md, 26 Oct). The blend stays Yr + WeatherNext only; no offshore wording change before winter data.
+- **Winter calm-night reruns:** run `work/winter-inversion/analyze.py <history dir>` about the 1st of Nov, Dec, Jan, Feb and Mar (needs `.env` with `WX_STATE_KEY` and current history from origin/main). Baseline: docs/findings/FINDINGS_WINTER_INVERSION_2026-10-23.md. The owner decides after the January run whether the height-adjusted line changes (DECISIONS.md, 23 Oct).
+- `docs/findings/FINDINGS_PRESSURE_PILOT_2026-10-15.md`: a fair pressure comparison needs an ECMWF ensemble-mean series.
 - Yr archive: occasionally confirm each day has am/pm folders with 49 stations and a manifest, and that `health.json.yr_archive.errors` is 0. A missed window shows as a partial/missing manifest.
 
 ## Operations
 
 1. Ormen Lange (SN76933): temperature has only Frost qualityCode 6 (model-filled) since 15 Oct 10:00 UTC, so no new scored rows. Owner decision 29 Oct: keep active; re-check about 1 Dec and, if still code 6, retire it with `"active": 0` (DECISIONS.md, 29 Oct).
+   Ytterøyane Fyr (SN57770) has the same problem since 1 Nov 17:00 UTC (temperature and wind code 6). Owner to decide whether the same 1 Dec rule applies.
 2. Confirm Revsbotn's resumed reporting in exact-hour cloud observations; keep it active. Fresh 10-minute Frost records were verified at 11:40/11:50 UTC on 12 Oct. Enningdalen and Alvheim recovered. Finalized-score warnings can lag live recovery.
 3. Timer token renewed 26 Oct 2026; it expires **26 Oct 2027**. Renew before then. Enter it directly in cron-job.org job 8590224, never chat/files. Keep the timer and hourly fallback; cadence since activation was verified at 2.5–3.0 h.
 4. Confirm a separate secure copy of `WX_STATE_KEY` and encrypted `history/`, and validate an isolated recovery from that copy. Current history decrypts; independent backup recovery remains unverified. No full project backup is needed.

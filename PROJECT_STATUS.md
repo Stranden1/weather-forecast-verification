@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-10-26. Current state only; history is in CHANGELOG.md._
+_Updated 2026-11-12. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -12,6 +12,10 @@ The private transport checks repository privacy, scopes the new credential, adds
 
 Validation: all 171 cloud tests pass with archive and transport tests using synthetic keys and temporary bare Git remotes. Two read-only acquisition probes each captured 49/49 active stations, with zero errors and exact encrypted readback: ~0.459 MB and 8–11 seconds per batch, suggesting ~0.335 GB/year plus manifests. Real private-GitHub slots are now verified; independent backup recovery remains unverified. Evidence: work/yr-archive-2026-10-14/; existing NumPy/pandas deprecation warnings remain.
 
+## Latest check (12 Nov)
+
+history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. An outside review on Claude Fable 5.2 is next (`BRIEF_FABLE_REVIEW.md`).
+
 ## Local page and data checkpoints
 
 Task 1 scorecard revisions are committed as 944cd2d, with handoffs/reviews in 4e622eb. The journal style covers the whole page, supported blend findings are visible, published horizon values are primary, and station counts/caveats explain the map. The latest sentence shows both land counts and explicit ties; offshore unanimity is stated plainly. Earlier 1280/375/320 light/dark browser checks passed. Latest sentence checks also pass at all three widths in both themes; evidence: work/map-counts-2026-10-14/. Earlier full-page evidence: work/scorecard-revisions-2026-10-14/. Published 14 Oct 21:40 UTC (collect run 38641643498); live files match site/.
@@ -20,8 +24,8 @@ Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 pai
 
 ## Next and operations
 
-- Archive: first two real slots verified 16 Oct (49/49, closed manifests, 0 errors). Four-product comparison rerun on 26 Oct at 29 paired days (FINDINGS_FOUR_PRODUCT_2026-10-26.md) confirms the 15 Oct ranking with tighter intervals: at 6–48 h Yr and WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS but trails Yr, and the Yr+WeatherNext average beats all four. The page now carries a static, dated ECMWF note with the run-age caveat (DECISIONS.md, 26 Oct); ECMWF stays out of the blend. Task 4 (pressure pilot, FINDINGS_PRESSURE_PILOT_2026-10-15.md): WeatherNext and IFS/AIFS pressure backfill completely for the eight pilot stations; WeatherNext's ensemble mean has the lowest error, which is not a fair test against single ECMWF runs. Task 5 done: PLAN_FORECAST_ARCHIVE.md opens with a one-page summary and is the only forecast plan (FORECAST_PLAN.md replaced).
-- Winter readiness is live (pushed 23 Oct, 463ef25): rain/mixed/snow wet-hour rows with a snow-undercatch caveat, and the height-adjusted WeatherNext column on the freezing card. Calm-night baseline (FINDINGS_WINTER_INVERSION_2026-10-23.md): the height adjustment helps overall but turns warm-biased on calm nights at inland valley stations; monthly reruns to March, owner decision after January.
+- Archive: first two real slots verified 16 Oct (49/49, closed manifests, 0 errors). Four-product comparison rerun on 26 Oct at 29 paired days (docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-26.md) confirms the 15 Oct ranking with tighter intervals: at 6–48 h Yr and WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS but trails Yr, and the Yr+WeatherNext average beats all four. The page now carries a static, dated ECMWF note with the run-age caveat (DECISIONS.md, 26 Oct); ECMWF stays out of the blend. Task 4 (pressure pilot, docs/findings/FINDINGS_PRESSURE_PILOT_2026-10-15.md): WeatherNext and IFS/AIFS pressure backfill completely for the eight pilot stations; WeatherNext's ensemble mean has the lowest error, which is not a fair test against single ECMWF runs. Task 5 done: PLAN_FORECAST_ARCHIVE.md opens with a one-page summary and is the only forecast plan (docs/plans/FORECAST_PLAN.md replaced).
+- Winter readiness is live (pushed 23 Oct, 463ef25): rain/mixed/snow wet-hour rows with a snow-undercatch caveat, and the height-adjusted WeatherNext column on the freezing card. Calm-night baseline (docs/findings/FINDINGS_WINTER_INVERSION_2026-10-23.md): the height adjustment helps overall but turns warm-biased on calm nights at inland valley stations; monthly reruns to March, owner decision after January.
 - Independent key/history backup and recovery remain owner actions. Older plaintext Git objects remain a separate cleanup decision.
 - Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Ubuntu runner migration done: collect runs pass on Ubuntu 24.04.5 since 19 Oct, and the first `tests.yml` run on the new runner passed on 23 Oct (463ef25).

@@ -44,7 +44,7 @@ file, heading for ~100 GB/year. Almost none of it is needed for scoring.
   MAE difference; "too close to call" if it includes zero; none before 7 days.
 - The site explains Yr's **home advantage** (station-corrected first 2–3 days).
 - Rain: hourly amounts on 6 h–2 d horizons (Yr is 6-hourly beyond ~2.5 days),
-  with wet-hour POD / FAR / CSI. Canonical interval-end keys as in PRECIPITATION.md.
+  with wet-hour POD / FAR / CSI. Canonical interval-end keys as in legacy/PRECIPITATION.md.
 
 ### Storage where
 

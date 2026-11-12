@@ -18,7 +18,7 @@ Use the existing `.venv`. WeatherNext must use the same active station network a
 MET/Frost. Change or restart the scheduled task only after the relevant integration
 has passed validation. Preserve `.env` secrets and never include them in reports.
 
-Read `WEATHERNEXT.md` before changing the local WeatherNext integration.
+Read `legacy/WEATHERNEXT.md` before changing the local WeatherNext integration.
 
 ## Handoff documents (since 2026-09-26)
 

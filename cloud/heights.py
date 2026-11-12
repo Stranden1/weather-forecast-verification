@@ -1,7 +1,7 @@
 """Model-cell height vs station height, for the height-adjusted WeatherNext line.
 
 WeatherNext's station-head temperature is valid at the terrain height of its grid
-cell, not at our station (INVESTIGATION_COLD_BIAS_2026-09-26.md). Google does not
+cell, not at our station (docs/findings/INVESTIGATION_COLD_BIAS_2026-09-26.md). Google does not
 publish its grid heights, so the cell height here is the GMTED2010 mean over the
 0.05° cell (the elevation model the paper names), read the same way each sampling
 method reads temperature:

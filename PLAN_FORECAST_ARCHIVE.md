@@ -2,7 +2,7 @@
 
 ## One-page summary — updated 16 October 2026
 
-This is the project's **only forecast plan**. `FORECAST_PLAN.md` (12 Oct) is replaced; its open
+This is the project's **only forecast plan**. `docs/plans/FORECAST_PLAN.md` (12 Oct) is replaced; its open
 items and rules are carried over below. Sections 1–13 are the 14 Oct design audit, kept for
 detail. Where they conflict with this summary or with the owner decisions of 14 Oct
 (DECISIONS.md), the summary and DECISIONS win. In particular, M1 has **no durable retry spool**,
@@ -17,10 +17,10 @@ accuracy page.
 - M1 Yr archive: full Yr responses twice daily (08:30 and 20:30 UTC windows) in
   `Stranden1/yr-archive`, enabled 14 Oct 21:54 UTC. Checked 16 Oct: the 15 Oct am and pm windows
   each hold 49/49 stations, an index and a closed manifest, with 0 archive errors.
-- Four-product temperature/wind comparison (`FINDINGS_FOUR_PRODUCT_2026-10-15.md`): at 6–48 h, Yr and
+- Four-product temperature/wind comparison (`docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-15.md`): at 6–48 h, Yr and
   WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS, and the Yr+WeatherNext
   average beats all four. Offshore, Yr is the weakest product.
-- Pressure pilot, 8 stations (`FINDINGS_PRESSURE_PILOT_2026-10-15.md`): WeatherNext and IFS/AIFS
+- Pressure pilot, 8 stations (`docs/findings/FINDINGS_PRESSURE_PILOT_2026-10-15.md`): WeatherNext and IFS/AIFS
   pressure backfill completely. WeatherNext's ensemble mean has the lowest error, but a fair test
   needs an ECMWF ensemble mean.
 
@@ -44,7 +44,7 @@ accuracy page.
 - Daily view: a calendar-day summary, an overnight-freezing comparison, or both (Oslo dates proposed).
 - An authoritative source for Yr's hourly rain-probability threshold.
 
-**Rules carried over from FORECAST_PLAN.md**
+**Rules carried over from docs/plans/FORECAST_PLAN.md**
 - Show the human forecast view in Oslo time; keep accuracy rows in UTC. Handle 23/25-hour
   daylight-saving days in any local daily score.
 - Do not stitch unrelated issue times into one daily summary. Use one predeclared forecast choice
@@ -74,7 +74,7 @@ Pressure is feasible: **35/49 active stations returned MSLP observations; 27/49 
 ### What was actually checked
 
 - Working branch: `codex/scorecard-corrections`; HEAD `f868c2b` (private forecast comparison). Recent commits include `39c2617`, `d1f9669`, `3373c75`, `f546205`, `bdd645b`. Existing uncommitted scorecard and handoff edits were present before this audit and remain untouched.
-- Read the working agreement, current handoffs, decisions, `PLAN_WEBPAGE.md`, `SCORING.md`, `WEATHERNEXT.md`, `FORECAST_PLAN.md`, cloud collectors/storage/scoring/export/replay/health/persistence and the collection workflow. Code takes precedence over old prose. `SCORING.md` and much of `WEATHERNEXT.md` describe the retired local app, not current cloud behavior.
+- Read the working agreement, current handoffs, decisions, `PLAN_WEBPAGE.md`, `SCORING.md`, `legacy/WEATHERNEXT.md`, `docs/plans/FORECAST_PLAN.md`, cloud collectors/storage/scoring/export/replay/health/persistence and the collection workflow. Code takes precedence over old prose. `SCORING.md` and much of `legacy/WEATHERNEXT.md` describe the retired local app, not current cloud behavior.
 - `config/stations.json` has 49 active stations; retired stations remain in history. The configured SQLite path is absent. The reported deletion of the database and its archive on 11 October is recorded in `AGENTS.md`; this audit did not search for undeclared backups or attempt recovery.
 - Read-only decryption of all **37 local day files, 5 September–11 October**, succeeded: **224,292 rows**, 12,322,856 encrypted bytes. No forecast values or credentials were printed or saved. This validates the current working key, **not an independently recoverable backup**.
 - Remote directory inspection found **39 day files through 13 October**. Local quantitative results below use the 37-file checkout; no pull, rebase or history update was performed.
@@ -516,6 +516,6 @@ Required meaningful tests: slot boundary/cross-midnight/DST neutrality; missing/
 
 ## 13. Audit completion / next-session handoff
 
-Only this planning document was created. The existing modified files remain: `CHANGELOG.md`, `DECISIONS.md`, `NEXT_STEPS.md`, `PROJECT_STATUS.md`, `WORK_STATUS.md`, `site/app.js`, `site/index.html`, `site/style.css`, `tests/scorecard_ui_test.cjs`; existing untracked reviews `REVIEW_2026-10-11.md` and `REVIEW_2026-10-11_codex.md` remain. In accordance with this task's specific one-document request, no handoff rewrite was made over that work. No commit, push, deployment, schedule change, model training or backup operation occurred.
+Only this planning document was created. The existing modified files remain: `CHANGELOG.md`, `DECISIONS.md`, `NEXT_STEPS.md`, `PROJECT_STATUS.md`, `WORK_STATUS.md`, `site/app.js`, `site/index.html`, `site/style.css`, `tests/scorecard_ui_test.cjs`; existing untracked reviews `docs/reviews/REVIEW_2026-10-11.md` and `docs/reviews/REVIEW_2026-10-11_codex.md` remain. In accordance with this task's specific one-document request, no handoff rewrite was made over that work. No commit, push, deployment, schedule change, model training or backup operation occurred.
 
 Open scientific checks are explicit: Locationforecast hourly probability threshold; pressure reduction/instrument metadata beyond the pilot availability check; native ECMWF provenance versus service output; full-network snapshot bytes/runtime; independent key-and-data restoration. These do not prevent approval of the narrow Yr capture milestone. The next implementation session should first recheck Git status and coordinate with the existing scorecard work, then implement only the approved stage.

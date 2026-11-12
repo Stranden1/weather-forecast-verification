@@ -2,7 +2,7 @@
 
 _14 Oct 2026. Implemented and validated locally; disabled by default. Nothing pushed or enabled._
 
-Owner approval and work order: REVIEW_2026-10-14.md. This implements its simplified M1,
+Owner approval and work order: docs/reviews/REVIEW_2026-10-14.md. This implements its simplified M1,
 which overrides the original plan's bucket, second key and durable-spool requirements.
 
 ## What it retains

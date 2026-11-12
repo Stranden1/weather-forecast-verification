@@ -244,7 +244,7 @@ fixed-snapshot pairs and scores were checked. No cache or index was needed.
 - WeatherNext: newest hourly init (≤48 h) for short targets, newest synoptic
   otherwise; mean, p10, p50, p90. Score mean and median.
 - Yr from the `complete` endpoint (p10/p90, rain min/max/probability).
-- Hourly rain only for 6 h–48 h horizons; interval-end keys as in PRECIPITATION.md.
+- Hourly rain only for 6 h–48 h horizons; interval-end keys as in legacy/PRECIPITATION.md.
 - Verdicts: 95% block bootstrap by day on the MAE difference; none before 7 days.
 - Working state on a force-pushed `state` branch; permanent `history/` on main;
   site JSON built in CI and never committed.
@@ -383,7 +383,7 @@ transmission or supply to clearly identified and known third parties".
 
 ## WeatherNext sampling and station height — 2026-09-26 (Claude)
 
-Evidence: `INVESTIGATION_COLD_BIAS_2026-09-26.md`.
+Evidence: `docs/findings/INVESTIGATION_COLD_BIAS_2026-09-26.md`.
 
 - WeatherNext values are now **interpolated bilinearly from the native grid** (0.05° for
   temperature, 0.1° for wind/rain/pressure) at the station point, as in Google's own station
@@ -562,7 +562,7 @@ SN20925 (Wisting) is the first.
 - The owner chose a private side-by-side forecast UI, rather than public future WeatherNext values. Keep the existing public one-hour age gate and attribution.
 - `private_forecast/` reads already fetched encrypted cloud state in memory and serves only on 127.0.0.1. No collection, database, state/history writes, credential delivery, public-site export or remote sharing. Private future-value screenshots belong only in ignored local work directories.
 - Use the latest shared collection, retain original issue times and missing provider hours, and stop lines/ranges at gaps. Temperature/wind use WeatherNext's mean; precipitation uses its median and original interval end. Largest gap means prediction disagreement, never measured error.
-- Complete 48-hour capture and a fixed daily forecast remain proposals in FORECAST_PLAN.md. Do not infer daily extrema/totals or event probabilities from sparse snapshots or hourly quantiles.
+- Complete 48-hour capture and a fixed daily forecast remain proposals in docs/plans/FORECAST_PLAN.md. Do not infer daily extrema/totals or event probabilities from sparse snapshots or hourly quantiles.
 
 ## Scorecard usability — 2026-10-13 (Codex)
 
@@ -593,13 +593,13 @@ SN20925 (Wisting) is the first.
 
 ### Scorecard implementation — 2026-10-14
 
-- The approved revision list is in REVIEW_2026-10-14.md; it supersedes the earlier pending design approval. Apply the journal style to all sections, show the blend only for a better verdict, and keep published forecasts visually primary.
+- The approved revision list is in docs/reviews/REVIEW_2026-10-14.md; it supersedes the earlier pending design approval. Apply the journal style to all sections, show the blend only for a better verdict, and keep published forecasts visually primary.
 - Land/offshore summaries use the existing height metadata and selected paired data, with at least seven days. Unknown classifications are omitted; counts are descriptive, not significance tests. Keep height/lake caveats with station differences.
 - Preserve full WeatherNext attribution text beside value charts as footnotes. Commit validated steps without pushing.
 
 ## Simplified Yr archive implementation — 2026-10-14
 
-- REVIEW_2026-10-14.md owner approval supersedes the broader archive plan for M1: separate private Git repository, existing WX_STATE_KEY, no durable retry spool, raw Yr and simple manifests only. Enable only after separate owner OK.
+- docs/reviews/REVIEW_2026-10-14.md owner approval supersedes the broader archive plan for M1: separate private Git repository, existing WX_STATE_KEY, no durable retry spool, raw Yr and simple manifests only. Enable only after separate owner OK.
 - Receipt windows are UTC 08:30–13:00 and 20:30–01:00 (end exclusive). Collection start, request start and response receipt must fit the same slot. First successfully published response per station is frozen; later normal collections fill only missing stations. Keep every response's actual acquisition times and identify multi-attempt slots explicitly; they are not simultaneous network snapshots.
 - Use an immutable first-slot cutoff; never manufacture missing slots before activation or reopen finalized slots. Record missing/partial closure at the next successful collecting run. If no network was captured during the slot, disclose use of the network at detection.
 - Gzip then Fernet; all raw objects/attempt/closure manifests encrypted. Unknown/raw fields and numeric precision retained as exact response JSON bytes. Request metadata uses only endpoint, coordinates, actual timestamps/status and a caching-header allowlist; no contacts/tokens/cookies.
@@ -607,12 +607,12 @@ SN20925 (Wisting) is the first.
 
 ## Plans consolidated — 2026-10-15
 
-- PLAN_FORECAST_ARCHIVE.md is the single forecast plan; its one-page summary leads. FORECAST_PLAN.md is marked replaced and kept as a record. References to proposals "in FORECAST_PLAN.md" (complete 48-hour capture, fixed daily forecast) now mean that summary.
+- PLAN_FORECAST_ARCHIVE.md is the single forecast plan; its one-page summary leads. docs/plans/FORECAST_PLAN.md is marked replaced and kept as a record. References to proposals "in docs/plans/FORECAST_PLAN.md" (complete 48-hour capture, fixed daily forecast) now mean that summary.
 - Where the 14 Oct design audit body conflicts with the summary or the 14 Oct owner decisions, the summary and decisions win.
 
 ## Four-product findings: page suggestions — 2026-10-16 (owner)
 
-Owner decisions on the three suggestions in FINDINGS_FOUR_PRODUCT_2026-10-15.md:
+Owner decisions on the three suggestions in docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-15.md:
 
 1. **ECMWF comparison on the page: on hold.** Do not add IFS/AIFS scores or a "Yr and WeatherNext
    beat ECMWF" statement yet. Rerun the four-product comparison at 30 paired days (about 27 Oct)
@@ -627,7 +627,7 @@ Owner decisions on the three suggestions in FINDINGS_FOUR_PRODUCT_2026-10-15.md:
 
 ## Winter readiness — 2026-10-23 (owner chose the suggested defaults)
 
-Plan: PLAN_WINTER_READINESS.html. Owner: "Build with the suggested default for all five decisions."
+Plan: docs/plans/PLAN_WINTER_READINESS.html. Owner: "Build with the suggested default for all five decisions."
 
 1. **Precipitation phase** from the observed 2 m temperature at the hour: snow at 0 °C or below,
    rain at 2 °C or above, mixed between (`cloud/summarize.py` `phase()`). Shown as three wet-hour
@@ -639,7 +639,7 @@ Plan: PLAN_WINTER_READINESS.html. Owner: "Build with the suggested default for a
 5. **Frost nights wait** for WeatherNext snapshots, so one run covers the whole night for both
    providers. The freezing card scores hours, now with the height-adjusted line (land only).
 
-The lapse rate stays 6.5 °C/km. The calm-night study (FINDINGS_WINTER_INVERSION_2026-10-23.md)
+The lapse rate stays 6.5 °C/km. The calm-night study (docs/findings/FINDINGS_WINTER_INVERSION_2026-10-23.md)
 reruns about the 1st of Nov–Mar; the owner decides after the January run. Never fit a lapse rate
 or calm-night rule on the data that judges it.
 
@@ -653,7 +653,7 @@ connection errors and truncated replies as well as 429/5xx.
 
 ## ECMWF note on the page — 2026-10-26 (owner)
 
-The 26 Oct rerun (FINDINGS_FOUR_PRODUCT_2026-10-26.md, 29 days, 27 Sep–25 Oct) confirmed the
+The 26 Oct rerun (docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-26.md, 29 days, 27 Sep–25 Oct) confirmed the
 15 Oct ranking. Owner chose option 1: "legg inn den korte ECMWF-merknaden på siden med
 forbeholdet om varselalder".
 
@@ -679,3 +679,15 @@ Owner: "Ja, enig i å vente til 1. desember med Ormen Lange."
 - The 180 rows (23 target hours, 15 Oct 10:00 – 16 Oct 08:00 UTC) scored from the failing sensor
   before MET re-flagged them stay in history (immutable). Exclude them in any future
   QC/observation-vintage dataset.
+
+## Repository layout: live code in the root, retired code in legacy/ — 2026-11-12 (owner)
+
+Before an outside review the owner asked to tidy the repository ("Ja, rydd først").
+
+- `legacy/` holds the retired PC collector and its docs, moved unchanged. It is reference only;
+  it cannot run (its database is lost) and is not maintained or restarted.
+- `docs/findings/`, `docs/reviews/`, `docs/plans/` hold one-off analyses, outside reviews and
+  finished or replaced plans. New findings and reviews go there; active plans stay in the root.
+- The root keeps the live system (`cloud/`, `site/`, `history/`, `config/`, workflows, local
+  tools) and the handoff and setup documents.
+

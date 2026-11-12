@@ -28,10 +28,10 @@ database, and local collection is not part of the cloud maintenance workflow:
 
 ```powershell
 cd E:\WeatherApp
-.\.venv\Scripts\python.exe -m streamlit run app.py
+.\.venv\Scripts\python.exe -m streamlit run legacy/app.py
 ```
 
-Alternatively, double-click `run_windows.bat`; it also checks dependencies.
+Alternatively, double-click `legacy/run_windows.bat`; it also checks dependencies.
 The dashboard reads stored data; collection is an explicit Admin action or the
 existing background task. Git commits and pushes do not collect or change data.
 
@@ -49,7 +49,7 @@ Copy-Item .env.example .env  # New installations only; never overwrite your exis
 Edit `.env` locally: set `MET_USER_AGENT` to identify your app/contact and set
 `FROST_CLIENT_ID`. Do not enter a Frost client secret. For WeatherNext, set your
 Earth Engine project, authenticate with `.\.venv\Scripts\earthengine.exe authenticate`,
-and follow [WEATHERNEXT.md](WEATHERNEXT.md) before enabling automatic collection.
+and follow [legacy/WEATHERNEXT.md](legacy/WEATHERNEXT.md) before enabling automatic collection.
 Run the app and use Admin to build/refresh the station network and collect initial
 MET/Frost data. A clone does not include historical observations or forecasts.
 The station snapshot in `config/stations.json` documents the existing network;
@@ -74,7 +74,7 @@ Expose the installed Playwright package through `NODE_PATH` if needed. The brows
 blocks external requests by default; `WX_TEST_MAP_TILES=1` permits OpenStreetMap tiles.
 It checks both themes at 1280 and 375 px, period/rain consistency, station selection,
 single-point replays and horizontal overflow. Screenshots stay in ignored `work/`.
-The legacy `tests/dashboard_ui_test.py` uses a disposable database, not production data.
+`legacy/tests/dashboard_ui_test.py` uses a disposable database, not production data.
 
 ## What Git stores
 
@@ -120,4 +120,4 @@ dates; choose a station or time window, and expand details for bias and actual
 leads. Verified historical WeatherNext forecasts qualify using original publication
 time. Actual local retrieval timestamps and operational accuracy rules are kept.
 The existing database stores verification alongside forecasts; no extra service is
-needed. See `SCORING.md` and `WEATHERNEXT.md` for details.
+needed. See `SCORING.md` and `legacy/WEATHERNEXT.md` for details.
