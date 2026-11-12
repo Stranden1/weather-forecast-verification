@@ -14,7 +14,7 @@ Validation: all 171 cloud tests pass with archive and transport tests using synt
 
 ## Latest check (12 Nov)
 
-history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. An outside review on Claude Fable 5.2 is next (`BRIEF_FABLE_REVIEW.md`).
+history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. The outside review on Claude Fable 5.2 is done (`docs/reviews/REVIEW_2026-11_fable.md`, report only); the owner's decisions on it are next.
 
 ## Local page and data checkpoints
 

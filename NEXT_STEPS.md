@@ -4,7 +4,7 @@ _Open items only. Updated 2026-11-12. Completed work is in CHANGELOG.md._
 
 ## Order of work
 
-**Next: outside review on Claude Fable 5.2** in its own session, following `BRIEF_FABLE_REVIEW.md` (code/robustness plus readability for ordinary people; report only, to `docs/reviews/`).
+**Next: owner reads `docs/reviews/REVIEW_2026-11_fable.md`** (outside review, 12 Nov) and answers the five decisions in its last section: gate retry when a forecast source is empty, block bootstrap for verdicts, 2.5 or 3 h cadence, hit-rate limits, Norwegian front page. Nothing from the review is implemented yet; take one item per session.
 
 All five REVIEW_2026-10-14 tasks are done (task 2's first archive windows checked 16 Oct: 49/49, closed manifests, 0 errors). Follow the one-page summary in PLAN_FORECAST_ARCHIVE.md, one task per session. Open owner reviews:
 
