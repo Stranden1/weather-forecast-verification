@@ -180,7 +180,7 @@ class HeightTest(unittest.TestCase):
             summarize.build(scored, Path(tmp), stations, heights=HEIGHTS)
             board = json.loads((Path(tmp) / "leaderboard.json").read_text(encoding="utf-8"))
             meta = json.loads((Path(tmp) / "meta.json").read_text(encoding="utf-8"))
-            per = json.loads((Path(tmp) / "stations.json").read_text(encoding="utf-8"))
+            per = json.loads((Path(tmp) / "views.json").read_text(encoding="utf-8"))["all"]["stations"]
         self.assertEqual({s["id"]: s["offshore"] for s in meta["stations"]},
                          {"LAND": False, "SEA": True, "NOTE": False})
         s = board["t"]["24"]["all"]

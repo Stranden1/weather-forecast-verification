@@ -293,6 +293,12 @@ def bias_by_hour(d: pd.DataFrame) -> list[dict]:
     return out
 
 
+# Older per-variable dumps, all-time only, that the page no longer reads. Their content is in
+# views.json per period (and there rain is scored with WeatherNext's median, as on the page).
+RETIRED_FILES = ("trend.json", "stations.json", "calibration.json", "patterns.json", "rain.json",
+                 "bias.json", "steadiness.json")
+
+
 def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
           publish_values: bool = PUBLISH_FORECAST_VALUES, heights: dict | None = None,
           now: pd.Timestamp | None = None) -> dict:
@@ -323,51 +329,27 @@ def build(scored: pd.DataFrame, out_dir: Path = SITE_DATA_DIR, stations=None,
                "last30": {"start": start30, "end": end_day}}
     last30 = [day for day in days if day >= start30] if start30 else []
 
-    board, trend, per_station, calib, patterns, rain, bias = {}, {}, {}, {}, {}, {}, {}
+    # Only the headline scores are exported per variable here; everything else on the page
+    # comes per period from views.json (DECISIONS.md, 13 Nov 2026).
+    board = {}
     for var in VARIABLES:
         hs = PRECIP_HORIZONS if var == "p" else HORIZONS
-        board[var], trend[var], per_station[var], calib[var], patterns[var], bias[var] = {}, {}, {}, {}, {}, {}
+        board[var] = {}
         for h in hs:
             d = paired(scored[scored.h == h], var) if len(scored) else pd.DataFrame()
             if var == "p" and not d.empty and "e_wn50" in d:
                 d = d[d.e_wn50.notna()]  # one shared cohort for the median headline and its mean alternative
             if d.empty:
                 continue
-            key = str(h)
-            board[var][key] = {"all": stats(d, median_ci=var == "p"),
-                               "last30": stats(d[d.day.isin(last30)], median_ci=var == "p")}
-            t = d.groupby("day").agg(n=("e_yr", "size"), mae_yr=("e_yr", lambda s: s.abs().mean()),
-                                     mae_wn=("e_wn", lambda s: s.abs().mean())).reset_index()
-            trend[var][key] = [{"day": r.day, "n": int(r.n), "yr": _r(r.mae_yr), "wn": _r(r.mae_wn)}
-                               for r in t.itertuples()]
-            agg = dict(n=("e_yr", "size"), days=("day", "nunique"), yr=("e_yr", lambda s: s.abs().mean()),
-                       wn=("e_wn", lambda s: s.abs().mean()))
-            if "e_wnh" in d:
-                agg["wnh"] = ("e_wnh", lambda s: s.abs().mean())
-            st = d.groupby("station").agg(**agg).reset_index()
-            per_station[var][key] = {r.station: {"n": int(r.n), "days": int(r.days), "yr": _r(r.yr), "wn": _r(r.wn),
-                                                 **({"wnh": _r(r.wnh)} if "wnh" in agg else {})}
-                                     for r in st.itertuples()}
-            if var in ("t", "w"):
-                calib[var][key] = coverage(scored[scored.h == h], var, h)
-            patterns[var][key] = conditions(d, var, elevation)
-            bias[var][key] = bias_by_hour(d)
-            if var == "p":
-                rain[key] = events(d)
+            board[var][str(h)] = {"all": stats(d, median_ci=var == "p"),
+                                  "last30": stats(d[d.day.isin(last30)], median_ci=var == "p")}
 
     dump("leaderboard.json", board)
-    dump("trend.json", trend)
-    dump("stations.json", per_station)
-    dump("calibration.json", calib)
-    dump("patterns.json", patterns)
-    dump("rain.json", rain)
-    dump("bias.json", bias)
+    for name in RETIRED_FILES:  # don't leave stale copies next to the live files
+        (out_dir / name).unlink(missing_ok=True)
 
     from .views import build_views
     dump("views.json", build_views(scored, periods, elevation, offshore) if days else {})
-
-    from .replay import steadiness
-    dump("steadiness.json", {var: steadiness(scored, var) for var in VARIABLES})
 
     from .monthly import build_summary
     dump("summary.json", build_summary(scored, now))

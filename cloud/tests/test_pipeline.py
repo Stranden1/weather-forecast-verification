@@ -191,14 +191,17 @@ class SummarizeTest(unittest.TestCase):
         stations = [{"station_id": s, "name": s, "latitude": 60, "longitude": 10, "elevation_m": e}
                     for s, e in (("SN1", 10), ("SN2", 300), ("SN3", 900))]
         with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "trend.json").write_text("{}")  # a stale copy from an older export
             summarize.build(synthetic_scored(wn_extra=1.0), Path(tmp), stations, publish_values=False)
             board = json.loads((Path(tmp) / "leaderboard.json").read_text())
             self.assertEqual(board["t"]["24"]["all"]["verdict"], "yr")
             self.assertEqual(board["w"]["24"]["all"]["diff"], -0.1)
             recent = json.loads((Path(tmp) / "recent" / "SN1.json").read_text())
             self.assertNotIn("wn_t", recent)
-            cal = json.loads((Path(tmp) / "calibration.json").read_text())
+            cal = json.loads((Path(tmp) / "views.json").read_text())["all"]["calibration"]
             self.assertIn("yr", cal["t"]["24"])
+            for old in summarize.RETIRED_FILES:  # the page reads views.json instead
+                self.assertFalse((Path(tmp) / old).exists(), old)
             short = synthetic_scored(days=3)
             summarize.build(short, Path(tmp), stations)
             board = json.loads((Path(tmp) / "leaderboard.json").read_text())

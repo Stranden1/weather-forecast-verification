@@ -101,21 +101,21 @@ class SteadinessTest(unittest.TestCase):
         self.assertEqual(replay.steadiness(pd.DataFrame(), "t"), {"steps": [], "flip": {"n": 0}})
         self.assertEqual(replay.steadiness(frame([]), "w"), {"steps": [], "flip": {"n": 0}})
 
-    def test_build_writes_steadiness_json(self):
+    def test_build_writes_steadiness_view(self):
         T = "2026-10-01T12:00:00Z"
         scored = frame([row(T, 48, 13, 10, 11), row(T, 24, 13, 12, 10.5)])
         with tempfile.TemporaryDirectory() as tmp:
             summarize.build(scored, Path(tmp), stations=STATIONS)
-            data = json.loads((Path(tmp) / "steadiness.json").read_text(encoding="utf-8"))
+            data = json.loads((Path(tmp) / "views.json").read_text(encoding="utf-8"))["all"]["steadiness"]
         self.assertEqual(set(data), {"t", "w", "p"})
         self.assertEqual(data["t"]["steps"][0]["yr"]["rev"], 2.0)
         self.assertEqual(data["w"]["steps"], [])
 
-    def test_build_writes_bias_json(self):
+    def test_build_writes_bias_view(self):
         scored = frame([row("2026-10-01T12:00:00Z", 24, 13, 14, 12)])
         with tempfile.TemporaryDirectory() as tmp:
             summarize.build(scored, Path(tmp), stations=STATIONS)
-            data = json.loads((Path(tmp) / "bias.json").read_text(encoding="utf-8"))
+            data = json.loads((Path(tmp) / "views.json").read_text(encoding="utf-8"))["all"]["bias"]
         self.assertEqual(set(data), {"t", "w", "p"})
         day = next(b for b in data["t"]["24"] if b["label"].startswith("Day"))
         self.assertEqual((day["n"], day["bias_yr"], day["bias_wn"]), (1, 1.0, -1.0))

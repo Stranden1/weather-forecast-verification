@@ -743,3 +743,14 @@ Each part is implemented in its own session and noted below when done.
   the page, and still uses measurements only, never forecast errors.
 - Up to 9 notable days per month; earlier replays that drop out are rebuilt from history if the
   rule changes again. History is untouched.
+
+### Seven unread exports removed — 2026-11-13 (review finding 7)
+
+- The export no longer writes `trend.json`, `stations.json`, `calibration.json`, `patterns.json`,
+  `rain.json`, `bias.json` or `steadiness.json` (and deletes stale local copies). The page reads
+  the same content per period from `views.json`; checked before removal that nothing else did
+  (`site/`, `private_forecast/`, `project_hq/`, the UI tests and the work scripts read none of them).
+- The old files scored rain with WeatherNext's mean while the page uses the median; removing
+  them removes that trap. `leaderboard.json`, `views.json`, `summary.json`, `events.json`,
+  `meta.json`, `health.json` and `recent/` are unchanged. The live site drops the seven files
+  at the next deploy after a push.

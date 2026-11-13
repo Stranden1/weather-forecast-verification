@@ -235,7 +235,7 @@ class QuantileTest(unittest.TestCase):
                     for s in ("SN1", "SN2", "SN3")]
         with tempfile.TemporaryDirectory() as tmp:
             summarize.build(synthetic_scored(days=8), Path(tmp), stations)
-            cal = json.loads((Path(tmp) / "calibration.json").read_text())["t"]["24"]
+            cal = json.loads((Path(tmp) / "views.json").read_text())["all"]["calibration"]["t"]["24"]
             self.assertLess(cal["q"]["yr"]["width"], cal["q"]["wn"]["width"])  # ±1 vs ±1.5
             self.assertGreater(cal["q"]["n"], 0)
 
