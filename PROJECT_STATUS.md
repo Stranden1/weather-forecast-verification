@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-11-12. Current state only; history is in CHANGELOG.md._
+_Updated 2026-11-13. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -14,7 +14,7 @@ Validation: all 171 cloud tests pass with archive and transport tests using synt
 
 ## Latest check (12 Nov)
 
-history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. The outside review on Claude Fable 5.2 is done (`docs/reviews/REVIEW_2026-11_fable.md`, report only); the owner's decisions on it are next.
+history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. The outside review on Claude Fable 5.2 is done (`docs/reviews/REVIEW_2026-11_fable.md`); the owner answered its five decisions on 13 Nov (DECISIONS.md). Part A (robustness) is committed locally, not pushed: the gate retries when Yr or WeatherNext delivered nothing and keeps a steady 2.5 h cadence; CI installs exact versions from `cloud/requirements-lock.txt`; notable days are capped at 3 per type per month; seven unread exports are gone; a failed data download says so. 185 cloud tests pass. Parts B (block bootstrap), C (Norwegian front page) and D (hit rates, dumbbell) are next, one per session.
 
 ## Local page and data checkpoints
 
@@ -27,7 +27,7 @@ Last verified retained data: 37 scored days through 11 Oct, 224,292 rows, 25 pai
 - Archive: first two real slots verified 16 Oct (49/49, closed manifests, 0 errors). Four-product comparison rerun on 26 Oct at 29 paired days (docs/findings/FINDINGS_FOUR_PRODUCT_2026-10-26.md) confirms the 15 Oct ranking with tighter intervals: at 6–48 h Yr and WeatherNext are too close to call, IFS is clearly worst, AIFS beats IFS but trails Yr, and the Yr+WeatherNext average beats all four. The page now carries a static, dated ECMWF note with the run-age caveat (DECISIONS.md, 26 Oct); ECMWF stays out of the blend. Task 4 (pressure pilot, docs/findings/FINDINGS_PRESSURE_PILOT_2026-10-15.md): WeatherNext and IFS/AIFS pressure backfill completely for the eight pilot stations; WeatherNext's ensemble mean has the lowest error, which is not a fair test against single ECMWF runs. Task 5 done: PLAN_FORECAST_ARCHIVE.md opens with a one-page summary and is the only forecast plan (docs/plans/FORECAST_PLAN.md replaced).
 - Winter readiness is live (pushed 23 Oct, 463ef25): rain/mixed/snow wet-hour rows with a snow-undercatch caveat, and the height-adjusted WeatherNext column on the freezing card. Calm-night baseline (docs/findings/FINDINGS_WINTER_INVERSION_2026-10-23.md): the height adjustment helps overall but turns warm-biased on calm nights at inland valley stations; monthly reruns to March, owner decision after January.
 - Independent key/history backup and recovery remain owner actions. Older plaintext Git objects remain a separate cleanup decision.
-- Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
+- Timer/fallback unchanged; last cadence audit found 2.5–3.0-hour gaps. After the part A push the gate (145 min) gives a steady 2.5 h. Wisting inactive; 49 active stations share the network. Revsbotn resumed reports on 12 Oct; finalized warnings can lag recovery.
 - Ubuntu runner migration done: collect runs pass on Ubuntu 24.04.5 since 19 Oct, and the first `tests.yml` run on the new runner passed on 23 Oct (463ef25).
 - Failure alerts: since 23 Oct the collect workflow turns red only when the same source errs in 2 runs in a row, and Open-Meteo requests retry on timeouts and truncated replies (DECISIONS.md, 23 Oct).
 - Timer token renewed 26 Oct 2026; next expiry 26 Oct 2027 (SETUP_CLOUD.md).
