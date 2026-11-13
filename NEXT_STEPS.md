@@ -4,11 +4,11 @@ _Open items only. Updated 2026-11-13. Completed work is in CHANGELOG.md._
 
 ## Order of work
 
-**Next: owner approves pushing review part A** (6 local commits, 13 Nov; see WORK_STATUS.md). After the push, check the first runs: gate log "last complete run … min ago", collection every 150 min, `tests.yml` green on `cloud/requirements-lock.txt`.
+**Next: owner approves pushing review parts A and C** (8 local commits, 13 Nov; see WORK_STATUS.md and the screenshots in `work/front-page-2026-11-13/`). After the push, check the first runs: gate log "last complete run … min ago", collection every 150 min, `tests.yml` green on `cloud/requirements-lock.txt`, and the live page opening in Norwegian with the verdict table first.
 
 Then the rest of `docs/reviews/REVIEW_2026-11_fable.md`, one part per session (owner decisions recorded in DECISIONS.md, 13 Nov):
 - **Part B:** block bootstrap in `summarize.bootstrap_diff` (finding 2). Show the owner a before/after table of verdicts that change before committing; update SCORING.md.
-- **Part C:** Norwegian simple front page and split status line (suggested order, steps 1–2).
+- Part C follow-ups (not started): translate the detailed cards, build the monthly text in the browser instead of exporting English prose, optional `public_note` per station in `config/stations.json`.
 - **Part D:** hit rates within 1 °C / 2 m/s in `summarize.stats()`, icon rows, dumbbell chart (steps 3–4).
 - Left from part A, each needing its own small decision: finding 6 (history read and verified twice per run); finding 8's retired stations in `meta.json`, `allow_nan=False` on export (would stop the run before state is published), `WX_STATE_KEY` only on the Python steps, self-hosted fonts; one retry for a failed Yr station inside a run.
 
