@@ -54,12 +54,12 @@ async function main() {
           return route.abort();
         });
         page.on('pageerror', error => errors.push(error.message));
-        await page.goto(url, { waitUntil: 'networkidle' });
+        await page.goto(url + '/?visning=detaljert&lang=en', { waitUntil: 'networkidle' });
         await page.waitForFunction(() => document.querySelector('#tiles .tile'));
         await page.evaluate(() => document.fonts.ready);
         assert.equal(await page.locator('html').getAttribute('data-theme'), colorScheme, 'First visit follows system theme');
         const nextTheme = colorScheme === 'light' ? 'dark' : 'light';
-        assert.equal(await page.locator('#theme-toggle').textContent(), nextTheme === 'dark' ? 'Dark mode' : 'Light mode');
+        assert.equal(await page.locator('#theme-toggle').textContent(), nextTheme === 'dark' ? 'Dark' : 'Light');
         await page.emulateMedia({ colorScheme: nextTheme });
         await page.waitForFunction(theme => document.documentElement.dataset.theme === theme, nextTheme);
         await page.locator('#theme-toggle').click();
@@ -69,11 +69,11 @@ async function main() {
         assert.equal(await page.locator('html').getAttribute('data-theme'), colorScheme, 'Explicit choice survives reload and overrides system');
         await page.evaluate(() => document.fonts.ready);
         const layout = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth,
-          height: document.documentElement.scrollHeight, answerY: document.getElementById('answer').getBoundingClientRect().top,
-          tilesY: document.getElementById('tiles').getBoundingClientRect().top }));
+          height: document.documentElement.scrollHeight, tableY: document.getElementById('verdict-table').getBoundingClientRect().top }));
         assert(layout.scrollWidth <= width + 1, `${name}: page overflows horizontally`);
-        assert(layout.answerY < height, `${name}: answer is below the first screen`);
-        assert(layout.tilesY < height, `${name}: comparison is below the first screen`);
+        // Since the Norwegian front page (13 Nov 2026) the verdict table is the first-screen answer;
+        // the expert cards follow below it when the details are shown.
+        assert(layout.tableY < height, `${name}: verdict table is below the first screen`);
         assert.equal(await page.locator('#monthly').evaluate(el => el.open), false);
         // Scrolling the map into view must leave its controls unobstructed on phones.
         await page.locator('#map').scrollIntoViewIfNeeded();
@@ -241,7 +241,7 @@ async function main() {
     sample.all.stations.t['24'][ids[2]] = { yr: 1, wn: 1, n: 168, days: 7 };
     delete sample.all.stations.t['24'][ids[3]];
     await page.route('**/data/views.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(sample) }));
-    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.goto(url + '/?visning=detaljert&lang=en', { waitUntil: 'networkidle' });
     await page.waitForSelector('#map .leaflet-marker-icon');
     for (const [i, kind] of ['yr', 'wn', 'equal', 'missing'].entries()) {
       const marker = page.locator('#map .leaflet-marker-icon').nth(i);

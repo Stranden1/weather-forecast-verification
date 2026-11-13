@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="nb">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yr vs WeatherNext</title>
-<meta name="description" content="Which forecast is more accurate in Norway: Yr or Google's AI model WeatherNext? Checked every day against real weather observations.">
+<title>Yr mot Google</title>
+<meta name="description" content="Hvem treffer best på været i Norge: Yr eller Googles KI-modell WeatherNext? Sjekket hver dag mot det værstasjonene faktisk målte.">
 <script>
 (() => {
   let saved;
@@ -20,20 +20,81 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to comparison</a>
+<a class="skip-link" href="#main" data-i18n="skip">Hopp til sammenligningen</a>
 <header class="wrap hero">
   <div class="masthead">
     <div class="masthead-brand">
       <svg class="weather-mark" viewBox="0 0 52 52" fill="none" aria-hidden="true"><circle cx="26" cy="20" r="10"/><path d="M26 3v4M9 9l3 3M43 9l-3 3M4 20h5M43 20h5M6 33h40M12 40h28M20 47h12"/></svg>
-      <div><p class="eyebrow">Norway / Forecast scorecard</p><h1>Yr vs WeatherNext</h1></div>
+      <div><h1 id="title" data-i18n="title">Yr mot Google</h1><p class="tagline" data-i18n="tagline">Hvem treffer best på været i Norge?</p></div>
     </div>
-    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">Dark mode</button>
+    <div class="toolbar">
+      <div class="seg lang-seg" id="lang-seg" role="group" aria-label="Språk / Language">
+        <button type="button" data-v="nb" lang="nb" aria-pressed="true">NO</button><button type="button" data-v="en" lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Bytt til mørkt tema">Mørkt</button>
+    </div>
   </div>
-  <div class="edition-line"><p class="lede">Two forecasts. The weather has the final say.</p><p class="fresh" id="fresh">Loading…</p></div>
-  <details class="health-box" id="health-box"><summary class="health" id="health" role="status" hidden></summary><p id="health-detail" class="muted"></p></details>
+  <p class="lede" id="intro"></p>
+  <p class="status" id="status" role="status"><span class="status-dot" aria-hidden="true"></span><span id="status-text">…</span></p>
+  <p class="stations-line" id="stations-line" hidden></p>
 </header>
 
 <main class="wrap" id="main">
+  <div class="simple" id="simple">
+  <section class="card s-card" id="s-verdicts" aria-labelledby="s-verdicts-h">
+    <p class="section-kicker" id="s-verdicts-h" data-i18n="verdictsKicker">Kort fortalt</p>
+    <div class="s-story" id="s-story"></div>
+    <div class="table-scroll"><table class="verdict-table" id="verdict-table"></table></div>
+    <p class="verdict-key" id="verdict-key"></p>
+    <p class="verdict-detail" id="verdict-detail" aria-live="polite"></p>
+  </section>
+
+  <section class="card s-card" id="s-actual" aria-labelledby="s-actual-h">
+    <div class="card-head">
+      <div><p class="section-kicker" id="s-actual-h" data-i18n="actualKicker">Varsel mot virkelighet</p>
+        <p class="sub" id="s-actual-sub"></p></div>
+      <label class="pick"><span data-i18n="place">Sted</span> <select id="s-station"></select></label>
+    </div>
+    <div class="seg s-var" id="s-actual-var" role="group"></div>
+    <div class="chart s-chart"><canvas id="s-actual-chart"></canvas></div>
+    <p class="s-sentence" id="s-actual-text"></p>
+    <div id="s-actual-notice"></div>
+  </section>
+
+  <section class="card s-card" id="s-calendar" aria-labelledby="s-calendar-h">
+    <div class="card-head">
+      <div><p class="section-kicker" id="s-calendar-h" data-i18n="calendarKicker">Dag for dag</p>
+        <p class="sub" id="s-calendar-sub"></p></div>
+    </div>
+    <div class="seg s-var" id="s-calendar-var" role="group"></div>
+    <div class="calendar" id="calendar"></div>
+    <p class="calendar-key" id="calendar-key"></p>
+    <p class="s-sentence" id="calendar-count"></p>
+    <p class="muted s-note" id="calendar-note"></p>
+  </section>
+
+  <p class="card s-card tip" id="s-blend" hidden></p>
+
+  <section class="card s-card" id="s-frost" aria-labelledby="s-frost-h" hidden>
+    <p class="section-kicker" id="s-frost-h" data-i18n="frostKicker">Kuldegrader</p>
+    <h2 class="s-question" data-i18n="frostQuestion">Fanget varselet at det ble frost?</h2>
+    <div class="icon-rows" id="frost-rows"></div>
+    <p class="s-sentence" id="frost-false"></p>
+    <p class="muted s-note" id="frost-note"></p>
+  </section>
+
+  <section class="card s-card" id="s-fair" aria-labelledby="s-fair-h">
+    <p class="section-kicker" id="s-fair-h" data-i18n="fairKicker">Er dette rettferdig?</p>
+    <ul class="fair-list" id="fair-list"></ul>
+  </section>
+
+  <button class="details-toggle" id="details-toggle" type="button" aria-expanded="false" aria-controls="details"></button>
+  </div>
+
+  <div class="details" id="details" lang="en" hidden>
+  <p class="details-lang" id="details-lang" lang="nb" hidden>De detaljerte tallene er foreløpig bare på engelsk.</p>
+  <div class="edition-line"><p class="lede">Two forecasts. The weather has the final say.</p><p class="fresh" id="fresh">Loading…</p></div>
+  <details class="health-box" id="health-box"><summary class="health" id="health" role="status" hidden></summary><p id="health-detail" class="muted"></p></details>
   <div class="controls" role="group" aria-label="Filters">
     <div class="seg" id="var-seg" role="group" aria-label="Weather variable"></div>
     <div class="seg" id="period-seg" role="group" aria-label="Period">
@@ -200,10 +261,16 @@
     </ul>
     <p class="attrib" id="attrib"></p>
   </details>
+  </div>
+
+  <details class="card s-sources" id="s-sources"><summary data-i18n="sourcesTitle">Kilder og vilkår</summary>
+    <p data-i18n="sourcesLead">Tallene bygger på varsler og målinger fra MET Norway (Yr og Frost) og varsler fra Google (WeatherNext). Vilkårene krever at disse merknadene står ordrett på engelsk:</p>
+    <p class="attrib" id="s-attrib" lang="en"></p>
+  </details>
 </main>
 
 <footer class="wrap foot">
-  <span><a href="https://github.com/Stranden1/weather-forecast-verification">Open source</a> · updated automatically every 3 hours</span>
+  <span><a href="https://github.com/Stranden1/weather-forecast-verification" data-i18n="openSource">Åpen kildekode</a> · <span data-i18n="footerUpdated">oppdateres automatisk omtrent hver 2,5 time</span></span>
 </footer>
 
 <script src="vendor/chart.umd.js"></script>

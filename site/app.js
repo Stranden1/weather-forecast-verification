@@ -792,7 +792,7 @@
     }
     const silent = [...silentStations()].map(([id, t]) => [D.meta.stations.find(s => s.id === id).name, t]);
     if (silent.length) {
-      warn = true;
+      if (silent.length / D.meta.stations.length > SILENT_WARN) warn = true;
       const names = silent.length <= 3 ? ` (${silent.map(([n]) => n).join(", ")})` : "";
       parts.push(silent.length === 1
         ? `Scored history: 1 station has no measurements since ${dayMonth(silent[0][1])}${names}`
@@ -827,6 +827,429 @@
     document.getElementById("summary-list").innerHTML = older.map(para).join("");
   }
 
+  // ---------------------------------------------------------------------------------------------
+  // Simple layer: the front page, Norwegian by default with an English toggle. Built only from data
+  // that is already exported. Only the existing verdict (leaderboard.json) may name a winner; the
+  // calendar, the frost icons and the station sentence describe and never get winner styling.
+  // The expert cards below ("details") are unchanged and stay in English for now.
+  // ---------------------------------------------------------------------------------------------
+  const params = new URLSearchParams(location.search);
+  const store = {
+    get: k => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
+  };
+  let LANG = ["nb", "en"].includes(params.get("lang")) ? params.get("lang") : store.get("wx-lang") === "en" ? "en" : "nb";
+  const SIMPLE_H = [6, 24, 48, 120, 240];
+  const CITY_IDS = ["SN18700", "SN50540", "SN68860", "SN90450"]; // Oslo, Bergen, Trondheim, Tromsø first
+  const EQUAL_GAP = 0.05;   // calendar: a day is "about equal" when the gap is under 5 % (display rule only)
+  const SILENT_WARN = 0.2;  // the station line turns amber only when more than one in five are silent
+  const UNIT = { t: "°C", w: "m/s", p: "mm" };
+  const SS = { actualVar: "t", calVar: "t", station: store.get("wx-station") || CITY_IDS[0], cell: null };
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const locale = () => (LANG === "nb" ? "nb-NO" : "en-GB");
+  const num = (x, d = 1) => x == null || !Number.isFinite(+x) ? "–"
+    : new Intl.NumberFormat(locale(), { minimumFractionDigits: d, maximumFractionDigits: d }).format(x);
+  const int = x => new Intl.NumberFormat(locale()).format(x);
+  const pctOf = x => new Intl.NumberFormat(locale(), { style: "percent", maximumFractionDigits: 0 }).format(x);
+  const fmtDate = (iso, opts = { day: "numeric", month: "short" }, tz = "Europe/Oslo") =>
+    new Intl.DateTimeFormat(locale(), { timeZone: tz, ...opts }).format(new Date(iso));
+  const utcDay = (d, opts) => fmtDate(d + "T12:00:00Z", opts, "UTC");
+  function relTime(iso) {
+    const min = (Date.now() - Date.parse(iso)) / 6e4;
+    const rtf = new Intl.RelativeTimeFormat(LANG, { numeric: "auto" });
+    if (min < 60) return rtf.format(-Math.max(1, Math.round(min)), "minute");
+    if (min < 48 * 60) return rtf.format(-Math.round(min / 60), "hour");
+    return rtf.format(-Math.round(min / 1440), "day");
+  }
+  const joinList = items => items.length < 2 ? items.join("")
+    : items.slice(0, -1).join(", ") + ` ${t("and")} ` + items[items.length - 1];
+
+  const TXT = {
+    nb: {
+      title: "Yr mot Google", tagline: "Hvem treffer best på været i Norge?", skip: "Hopp til sammenligningen",
+      intro: n => `Hver dag sjekker vi varslene fra Yr og fra Google (WeatherNext), en KI-modell fra Google DeepMind, mot det ${n} målestasjoner faktisk målte.`,
+      updated: (ago, days) => `Oppdatert ${ago} · ${days} dager sjekket`,
+      lastFailed: (ago, good) => `Siste innsamling feilet ${ago}.` + (good ? ` Den siste vellykkede var ${good}.` : ""),
+      stale: ago => `Siste oppdatering var ${ago}. Innsamlingen kan ha stoppet.`,
+      failing: names => `${names}: feil to ganger på rad. De nyeste varslene kan mangle.`,
+      noData: "Ingen data publisert ennå.", loadError: "Kunne ikke laste dataene. Prøv igjen om litt.",
+      collecting: "Samler inn … de første tallene kommer omtrent en dag etter at innsamlingen startet.",
+      stations: (ok, all) => `${ok} av ${all} stasjoner leverer målinger.`,
+      silent: list => ` Ingen målinger fra ${list}; de timene er ikke med i sammenligningen.`,
+      since: (name, d) => `${name} siden ${d}`, and: "og",
+      verdictsKicker: "Kort fortalt", vars: { t: "Temperatur", w: "Vind", p: "Regn" },
+      varsLower: { t: "temperatur", w: "vind", p: "regn" }, varsShort: { t: "Temp.", w: "Vind", p: "Regn" },
+      hHead: { 6: "Om 6 t", 24: "I morgen", 48: "Om 2 d", 120: "Om 5 d", 240: "Om 10 d" },
+      hPhrase: { 6: "6 timer fram", 24: "for i morgen", 48: "2 dager fram", 120: "5 dager fram", 240: "10 dager fram" },
+      cell: { yr: "Yr", weathernext: "Google", too_close: "likt", not_enough_data: "–" },
+      storyYr: l => `Yr treffer best ${l}.`, storyWn: l => `Google treffer best ${l}.`,
+      storyEven: l => `${cap(l)} er det for jevnt til å kåre en vinner.`,
+      storyMixed: l => `${cap(l)} er det ulikt for temperatur, vind og regn.`,
+      keyYr: "Yr treffer best", keyWn: "Google treffer best", keyEven: "for jevnt til å kåre en vinner",
+      keyTap: "Trykk på en rute for å se tallene.",
+      verdictText: { yr: "Yr treffer best.", weathernext: "Google treffer best.", too_close: "For jevnt til å kåre en vinner.",
+        not_enough_data: "For få dager til å kåre en vinner ennå." },
+      cellDetail: (v, h, yr, wn, u, verdict, days) => `${v}, ${h}: Yr bommer i snitt med ${yr} ${u}, Google med ${wn} ${u}. ${verdict} Bygger på ${days} dager.`,
+      cellRain: " For regn bruker vi det midterste av Googles mange utfall.",
+      notScored: "ikke sjekket", tableCaption: "Hvem treffer best, etter hvor langt fram varselet gjelder",
+      tableCorner: "Hvor langt fram",
+      actualKicker: "Varsel mot virkelighet", place: "Sted",
+      actualSub: "Siste 7 dager, varselet slik det så ut dagen før.",
+      cities: "Byer", otherStations: "Andre stasjoner", measured: "Målt",
+      actualText: (place, yr, wn, u) => `I ${place} bommet Yr i snitt med ${yr} ${u} de siste 7 dagene` + (wn == null ? "." : `, Google med ${wn} ${u}.`),
+      actualNone: "Ingen ferske tall for denne stasjonen.",
+      noticeLead: "Googles vilkår krever denne merknaden på engelsk under grafer med Googles varseltall:",
+      wnHidden: "Googles varseltall vises ikke her; feilene deres er med i alle tallene.",
+      calendarKicker: "Dag for dag",
+      calendarSub: v => `${v} · varsel for i morgen. Hver rute er én dag.`,
+      calYr: "Yr nærmest", calWn: "Google nærmest", calEq: "omtrent likt", calNone: "ingen tall",
+      calCount: (y, g, e) => `Yr nærmest ${y} dager · Google nærmest ${g} dager · omtrent likt ${e} dager.`,
+      calCloseCall: who => `${who} var nærmest flest dager, men samlet er forskjellen for liten til å kåre en vinner.`,
+      calOther: (who, best) => `${who} var nærmest flest dager, men samlet bommer ${best} minst (se tabellen øverst).`,
+      calNote: "En dag er «omtrent likt» når forskjellen i snittfeil er under 5 %. Kalenderen beskriver dag for dag; bare tabellen øverst kårer en vinner.",
+      calDay: (d, yr, wn, u) => `${d}: Yr ${yr} ${u}, Google ${wn} ${u}`,
+      blend: list => `<b>Tips:</b> Ser du på begge varslene for i morgen og tar midt imellom, bommer du omtrent ${list} enn med det beste av dem alene.`,
+      blendPart: (p, v) => `${p} mindre på ${v}`,
+      frostKicker: "Kuldegrader", frostQuestion: "Fanget varselet at det ble frost?",
+      frostRow: (n, p) => `${n} av 10 frosttimer varslet (${p})`,
+      frostFalse: (a, b) => `Varslet frost som ikke kom: Yr ${a}, Google ${b}.`,
+      oneIn: n => `omtrent 1 av ${n} ganger`, never: "aldri", always: "nesten hver gang",
+      frostNote: (n, days, st) => `Timer under 0 °C, varsel for i morgen: ${n} målte frosttimer over ${days} dager ved ${st} stasjoner. Beskrivende tall, ikke en vinnertest.`,
+      fairKicker: "Er dette rettferdig?", readMore: "Les mer",
+      fair: [
+        ["Yr har hjemmebane.", "Yr justerer varslene sine med ferske målinger fra norske værstasjoner, også flere av dem vi sjekker mot."],
+        ["Google-varselet er et gjennomsnitt av mange mulige utfall.", "Det gir litt mindre bom i snitt, men kan dempe ekstremvær. For regn bruker vi derfor det midterste utfallet."],
+        ["Google regner for ruter på omtrent 5 km.", "I bratt terreng ligger ruta ofte høyere enn stasjonen, og da blir varselet for kaldt (omtrent 0,65 grader per 100 meter)."],
+      ],
+      showDetails: "Vis kart, alle stasjoner og detaljerte tall →", hideDetails: "Skjul detaljene ↑",
+      themeDark: "Mørkt", themeLight: "Lyst", themeToDark: "Bytt til mørkt tema", themeToLight: "Bytt til lyst tema",
+      sourcesTitle: "Kilder og vilkår",
+      sourcesLead: "Tallene bygger på varsler og målinger fra MET Norway (Yr og Frost) og varsler fra Google (WeatherNext). Vilkårene krever at disse merknadene står ordrett på engelsk:",
+      openSource: "Åpen kildekode", footerUpdated: "oppdateres automatisk omtrent hver 2,5 time",
+      chartLabel: "Målt og varslet de siste 7 dagene", calendarLabel: m => `Dager i ${m}`, varGroup: "Værtype",
+    },
+    en: {
+      title: "Yr vs Google", tagline: "Which forecast gets Norway's weather right?", skip: "Skip to the comparison",
+      intro: n => `Every day we check the forecasts from Yr and from Google (WeatherNext), an AI model from Google DeepMind, against what ${n} weather stations actually measured.`,
+      updated: (ago, days) => `Updated ${ago} · ${days} days checked`,
+      lastFailed: (ago, good) => `The last collection failed ${ago}.` + (good ? ` The last successful one was ${good}.` : ""),
+      stale: ago => `Last updated ${ago}. Collection may have stopped.`,
+      failing: names => `${names}: errors twice in a row. The latest forecasts may be missing.`,
+      noData: "No data published yet.", loadError: "Could not load the data. Please try again in a moment.",
+      collecting: "Collecting… the first scores appear about a day after collection starts.",
+      stations: (ok, all) => `${ok} of ${all} stations are reporting measurements.`,
+      silent: list => ` No measurements from ${list}; those hours are not in the comparison.`,
+      since: (name, d) => `${name} since ${d}`, and: "and",
+      verdictsKicker: "In short", vars: { t: "Temperature", w: "Wind", p: "Rain" },
+      varsLower: { t: "temperature", w: "wind", p: "rain" }, varsShort: { t: "Temp.", w: "Wind", p: "Rain" },
+      hHead: { 6: "In 6 h", 24: "Tomorrow", 48: "In 2 d", 120: "In 5 d", 240: "In 10 d" },
+      hPhrase: { 6: "6 hours ahead", 24: "for tomorrow", 48: "2 days ahead", 120: "5 days ahead", 240: "10 days ahead" },
+      cell: { yr: "Yr", weathernext: "Google", too_close: "even", not_enough_data: "–" },
+      storyYr: l => `Yr is closest ${l}.`, storyWn: l => `Google is closest ${l}.`,
+      storyEven: l => `${cap(l)} it is too close to call.`,
+      storyMixed: l => `${cap(l)} it differs between temperature, wind and rain.`,
+      keyYr: "Yr is closest", keyWn: "Google is closest", keyEven: "too close to call",
+      keyTap: "Tap a square to see the numbers.",
+      verdictText: { yr: "Yr is closest.", weathernext: "Google is closest.", too_close: "Too close to call.",
+        not_enough_data: "Not enough days for a verdict yet." },
+      cellDetail: (v, h, yr, wn, u, verdict, days) => `${v}, ${h}: Yr misses by ${yr} ${u} on average, Google by ${wn} ${u}. ${verdict} Based on ${days} days.`,
+      cellRain: " For rain we use the middle of Google's many outcomes.",
+      notScored: "not checked", tableCaption: "Who is closest, by how far ahead the forecast is",
+      tableCorner: "How far ahead",
+      actualKicker: "Forecast vs what happened", place: "Place",
+      actualSub: "Last 7 days, the forecast as it looked the day before.",
+      cities: "Cities", otherStations: "Other stations", measured: "Measured",
+      actualText: (place, yr, wn, u) => `In ${place} over the last 7 days, Yr missed by ${yr} ${u} on average` + (wn == null ? "." : `, Google by ${wn} ${u}.`),
+      actualNone: "No recent numbers for this station.",
+      noticeLead: "Google's terms require this notice under charts that show Google's forecast values:",
+      wnHidden: "Google's forecast values are not shown here; their errors are in every score.",
+      calendarKicker: "Day by day",
+      calendarSub: v => `${v} · forecast for tomorrow. Each square is one day.`,
+      calYr: "Yr closer", calWn: "Google closer", calEq: "about equal", calNone: "no data",
+      calCount: (y, g, e) => `Yr closer on ${y} days · Google closer on ${g} days · about equal on ${e} days.`,
+      calCloseCall: who => `${who} was closer on more days, but overall the difference is too small to call a winner.`,
+      calOther: (who, best) => `${who} was closer on more days, but overall ${best} misses least (see the table at the top).`,
+      calNote: "A day is \"about equal\" when the average errors differ by less than 5%. The calendar describes each day; only the table at the top names a winner.",
+      calDay: (d, yr, wn, u) => `${d}: Yr ${yr} ${u}, Google ${wn} ${u}`,
+      blend: list => `<b>Tip:</b> If you look at both forecasts for tomorrow and take the midpoint, you miss by about ${list} than with the better one alone.`,
+      blendPart: (p, v) => `${p} less on ${v}`,
+      frostKicker: "Below freezing", frostQuestion: "Did the forecast catch the frost?",
+      frostRow: (n, p) => `${n} of 10 freezing hours forecast (${p})`,
+      frostFalse: (a, b) => `Forecast frost that did not come: Yr ${a}, Google ${b}.`,
+      oneIn: n => `about 1 in ${n} times`, never: "never", always: "almost every time",
+      frostNote: (n, days, st) => `Hours below 0 °C, forecast for tomorrow: ${n} measured freezing hours over ${days} days at ${st} stations. Descriptive counts, not a winner test.`,
+      fairKicker: "Is this fair?", readMore: "Read more",
+      fair: [
+        ["Yr plays at home.", "Yr adjusts its forecasts with fresh measurements from Norwegian weather stations, including several of the ones we check against."],
+        ["Google's forecast is an average of many possible outcomes.", "That gives slightly smaller misses on average but can soften extreme weather. For rain we therefore use the middle outcome."],
+        ["Google forecasts for squares of about 5 km.", "In steep terrain the square is often higher than the station, so the forecast comes out too cold (about 0.65 degrees per 100 metres)."],
+      ],
+      showDetails: "Show map, all stations and detailed numbers →", hideDetails: "Hide the details ↑",
+      themeDark: "Dark", themeLight: "Light", themeToDark: "Switch to dark mode", themeToLight: "Switch to light mode",
+      sourcesTitle: "Sources and terms",
+      sourcesLead: "The numbers come from forecasts and measurements by MET Norway (Yr and Frost) and forecasts by Google (WeatherNext). The terms require these notices word for word:",
+      openSource: "Open source", footerUpdated: "updated automatically about every 2.5 hours",
+      chartLabel: "Measured and forecast over the last 7 days", calendarLabel: m => `Days in ${m}`, varGroup: "Weather type",
+    },
+  };
+  const t = (key, ...args) => { const v = TXT[LANG][key]; return typeof v === "function" ? v(...args) : v; };
+
+  // Headline numbers of one leaderboard block, the way the page scores them (rain: Google's median).
+  const pick = (v, s) => v === "p"
+    ? { yr: s.mae_yr, wn: s.mae_wn50, verdict: s.verdict_50 }
+    : { yr: s.mae_yr, wn: s.mae_wn, verdict: s.verdict };
+  const block = (v, h) => D.leaderboard?.[v]?.[h]?.all;
+
+  function applyStatic() {
+    document.documentElement.lang = LANG;
+    document.title = t("title");
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("#lang-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === LANG));
+    document.getElementById("details-lang").hidden = LANG !== "nb";
+    syncThemeControl();
+  }
+
+  function renderStatus() {
+    const el = document.getElementById("status"), text = document.getElementById("status-text"), m = D.meta || {}, h = D.health || {};
+    let warn = false, msg;
+    if (!m.variables) { msg = failed.has("meta") ? t("loadError") : t("noData"); warn = failed.has("meta"); }
+    else if (!m.days) msg = t("collecting");
+    else if (h.last_run_failed) { warn = true; msg = t("lastFailed", relTime(h.last_run), h.last_success && relTime(h.last_success)); }
+    else if (h.last_run && (Date.now() - Date.parse(h.last_run)) / 36e5 > STALE_H) { warn = true; msg = t("stale", relTime(h.last_run)); }
+    else if (h.failing?.length) { warn = true; msg = t("failing", joinList(h.failing.map(k => k === "wn" ? "Google (WeatherNext)" : SOURCE_NAME[k]))); }
+    else msg = t("updated", relTime(h.last_run || m.generated_at), int(m.days));
+    text.textContent = msg;
+    el.classList.toggle("warn", warn);
+
+    const line = document.getElementById("stations-line");
+    line.hidden = !m.stations?.length || !m.days;
+    if (line.hidden) return;
+    const silent = [...silentStations()];
+    const all = m.stations.length, names = silent.map(([id, last]) =>
+      t("since", m.stations.find(s => s.id === id).name, fmtDate(last)));
+    line.textContent = t("stations", all - silent.length, all) + (silent.length ? t("silent", joinList(names)) : "");
+    line.classList.toggle("warn", silent.length / all > SILENT_WARN);
+  }
+
+  // Verdict table: the existing 95 % verdicts, all days, for five horizons. The story sentences are
+  // built from the same verdicts, grouped by horizon.
+  function renderVerdicts() {
+    const vars = ["t", "w", "p"], cols = SIMPLE_H.filter(h => vars.some(v => block(v, h)?.n));
+    const verdictOf = (v, h) => { const s = block(v, h); return s?.n ? (pick(v, s).verdict || "not_enough_data") : null; };
+    const groups = { yr: [], weathernext: [], too_close: [], mixed: [] };
+    for (const h of cols) {
+      const vs = vars.map(v => verdictOf(v, h)).filter(x => x && x !== "not_enough_data");
+      if (!vs.length) continue;
+      groups[vs.every(x => x === vs[0]) ? vs[0] : "mixed"].push(t("hPhrase")[h]);
+    }
+    // "2 dager fram og 5 dager fram" reads as "2 og 5 dager fram": shared endings are said once.
+    const phrases = list => { const m = list.map(p => p.match(/^(\d+) (\S+) (fram|ahead)$/));
+      if (list.length < 2 || !m.every(Boolean)) return joinList(list);
+      const same = m.every(x => x[2] === m[0][2]);
+      return joinList(m.map((x, i) => same && i < m.length - 1 ? x[1] : `${x[1]} ${x[2]}`)) + ` ${m[0][3]}`; };
+    const story = [["yr", "storyYr"], ["weathernext", "storyWn"], ["too_close", "storyEven"], ["mixed", "storyMixed"]]
+      .filter(([k]) => groups[k].length).map(([k, key]) => `<p>${esc(t(key, phrases(groups[k])))}</p>`);
+    document.getElementById("s-story").innerHTML = story.join("");
+    const cls = { yr: "v-yr", weathernext: "v-wn", too_close: "v-even" };
+    const table = document.getElementById("verdict-table");
+    table.innerHTML = `<caption class="sr-only">${esc(t("tableCaption"))}</caption>
+      <tr><th scope="col"><span class="sr-only">${esc(t("tableCorner"))}</span></th>${cols.map(h => `<th scope="col">${esc(t("hHead")[h])}</th>`).join("")}</tr>
+      ${vars.map(v => `<tr><th scope="row"><span class="long">${esc(t("vars")[v])}</span><span class="short" aria-hidden="true">${esc(t("varsShort")[v])}</span></th>${cols.map(h => {
+        const vd = verdictOf(v, h);
+        if (!vd) return `<td class="v-none"><span title="${esc(t("notScored"))}">–</span><span class="sr-only">${esc(t("notScored"))}</span></td>`;
+        return `<td><button type="button" class="vcell ${cls[vd] || "v-none"}" data-cell="${v}:${h}" aria-pressed="${SS.cell === `${v}:${h}`}"
+          aria-label="${esc(`${t("vars")[v]}, ${t("hPhrase")[h]}: ${t("verdictText")[vd]}`)}">${esc(t("cell")[vd])}</button></td>`;
+      }).join("")}</tr>`).join("")}`;
+    table.onclick = e => { const b = e.target.closest(".vcell"); if (!b) return;
+      SS.cell = SS.cell === b.dataset.cell ? null : b.dataset.cell;
+      table.querySelectorAll(".vcell").forEach(c => c.setAttribute("aria-pressed", c.dataset.cell === SS.cell));
+      renderCellDetail(); };
+    const sw = c => `<span class="swatch ${c}" aria-hidden="true"></span>`;
+    document.getElementById("verdict-key").innerHTML =
+      `<span>${sw("v-yr")}${esc(t("keyYr"))}</span><span>${sw("v-wn")}${esc(t("keyWn"))}</span><span>${sw("v-even")}${esc(t("keyEven"))}</span><span class="muted">${esc(t("keyTap"))}</span>`;
+    renderCellDetail();
+  }
+  function renderCellDetail() {
+    const el = document.getElementById("verdict-detail");
+    const [v, h] = (SS.cell || ":").split(":"), s = SS.cell && block(v, h);
+    el.hidden = !s?.n;
+    if (el.hidden) { el.textContent = ""; return; }
+    const p = pick(v, s), d = v === "p" ? 2 : 1;
+    el.textContent = t("cellDetail", t("vars")[v], t("hPhrase")[h], num(p.yr, d), num(p.wn, d), UNIT[v],
+      t("verdictText")[p.verdict || "not_enough_data"], int(s.days)) + (v === "p" ? t("cellRain") : "");
+  }
+
+  function varSeg(id, key, onChange) {
+    const el = document.getElementById(id);
+    el.setAttribute("aria-label", t("varGroup"));
+    el.innerHTML = ["t", "w", "p"].map(v => `<button type="button" data-v="${v}" aria-pressed="${v === SS[key]}">${esc(t("vars")[v])}</button>`).join("");
+    el.onclick = e => { const b = e.target.closest("button"); if (!b) return; SS[key] = b.dataset.v; onChange(); };
+  }
+
+  // Forecast vs what happened: recent/<station>.json (24 h ahead, last 7 days), Oslo by default.
+  // The sentence describes; it never names a winner.
+  let actualRequest = 0;
+  async function renderActual() {
+    const m = D.meta, v = SS.actualVar, request = ++actualRequest;
+    document.getElementById("s-actual-sub").textContent = t("actualSub");
+    varSeg("s-actual-var", "actualVar", renderActual);
+    const sel = document.getElementById("s-station");
+    if (!m.stations.some(s => s.id === SS.station)) SS.station = CITY_IDS.find(id => m.stations.some(s => s.id === id)) || m.stations[0]?.id;
+    const cities = CITY_IDS.map(id => m.stations.find(s => s.id === id)).filter(Boolean);
+    const others = m.stations.filter(s => !CITY_IDS.includes(s.id)).sort((a, b) => a.name.localeCompare(b.name, "nb"));
+    const opt = s => `<option value="${esc(s.id)}" ${s.id === SS.station ? "selected" : ""}>${esc(s.name)}</option>`;
+    sel.innerHTML = (cities.length ? `<optgroup label="${esc(t("cities"))}">${cities.map(opt).join("")}</optgroup>` : "") +
+      `<optgroup label="${esc(t("otherStations"))}">${others.map(opt).join("")}</optgroup>`;
+    sel.onchange = () => { SS.station = sel.value; store.set("wx-station", sel.value); renderActual(); };
+    let rec = null;
+    try { rec = await fetch(`${DATA}recent/${SS.station}.json`).then(r => r.ok ? r.json() : null); } catch (e) {}
+    if (request !== actualRequest) return;
+    const text = document.getElementById("s-actual-text"), notice = document.getElementById("s-actual-notice");
+    const chartBox = document.querySelector("#s-actual .s-chart");
+    const station = m.stations.find(s => s.id === SS.station);
+    const obs = rec?.[`obs_${v}`], yr = rec?.[`yr_${v}`], wn = rec?.[v === "p" ? "wn_p_p50" : `wn_${v}`];
+    if (!rec || !obs?.some(x => x != null)) {
+      chartBox.hidden = true; notice.innerHTML = ""; text.textContent = t("actualNone");
+      if (charts["s-actual-chart"]) { charts["s-actual-chart"].destroy(); delete charts["s-actual-chart"]; }
+      return;
+    }
+    chartBox.hidden = false;
+    const hasWn = !!wn?.some(x => x != null);
+    // Both averages over the same hours (measured, Yr and, when shown, Google all present).
+    const mae = f => { const e = obs.map((o, i) => o != null && yr?.[i] != null && (!hasWn || wn[i] != null) ? Math.abs(f[i] - o) : null)
+      .filter(x => x != null); return e.length ? e.reduce((a, b) => a + b, 0) / e.length : null; };
+    const d = v === "p" ? 2 : 1;
+    text.textContent = t("actualText", station.name, num(mae(yr), d), hasWn ? num(mae(wn), d) : null, UNIT[v]);
+    const ds = [line(t("measured"), obs, css("--obs"), { pointRadius: 0, borderWidth: 3 }),
+                line("Yr", yr, css("--yr"), { pointRadius: 0 })];
+    if (hasWn) ds.push(line("Google", wn, css("--wn"), { pointRadius: 0 }));
+    notice.innerHTML = hasWn ? `<p class="muted s-note">${esc(t("noticeLead"))}</p><div lang="en">${wnNotice()}</div>`
+      : `<p class="muted s-note">${esc(t("wnHidden"))}</p>`;
+    const o = baseOptions(UNIT[v]);
+    o.scales.y.beginAtZero = v !== "t";
+    o.scales.y.title.display = true;
+    o.scales.y.ticks.callback = x => num(x, v === "p" ? 1 : 0);
+    // One tick per day, at local midnight, labelled with the weekday; the tooltip has the hour.
+    const days = rec.time.map(x => fmtDate(x, { hour: "2-digit", hourCycle: "h23" }) === "00" ? fmtDate(x, { weekday: "short" }) : "");
+    Object.assign(o.scales.x.ticks, { autoSkip: false, maxRotation: 0, callback: (_, i) => days[i] || null });
+    o.scales.x.grid = { display: true, color: (c) => days[c.index] ? css("--grid") : "transparent" };
+    o.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: ${num(c.parsed.y, d)} ${UNIT[v]}`;
+    document.getElementById("s-actual-chart").setAttribute("aria-label", `${t("chartLabel")}: ${station.name}`);
+    chart("s-actual-chart", { type: "line", options: o, data: {
+      labels: rec.time.map(x => fmtDate(x, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })), datasets: ds } });
+  }
+
+  // Calendar: one square per day from views.json → trend (24 h ahead, all days). Descriptive only.
+  function renderCalendar() {
+    const v = SS.calVar, m = D.meta, el = document.getElementById("calendar");
+    varSeg("s-calendar-var", "calVar", renderCalendar);
+    document.getElementById("s-calendar-sub").textContent = t("calendarSub", t("vars")[v]);
+    const rows = D.views?.all?.trend?.[v]?.["24"] || [], byDay = new Map(rows.map(r => [r.day, r]));
+    const { start, end } = m.periods?.all || { start: m.first_day, end: m.last_day };
+    const kind = r => { if (!r || r.yr == null || r.wn == null) return "none";
+      const gap = (r.wn - r.yr) / Math.max(r.yr, r.wn, 1e-9);
+      return gap >= EQUAL_GAP ? "yr" : gap <= -EQUAL_GAP ? "wn" : "eq"; };
+    const months = new Map(), count = { yr: 0, wn: 0, eq: 0 };
+    if (start && end) for (let ts = Date.parse(start + "T00:00:00Z"); ts <= Date.parse(end + "T00:00:00Z"); ts += 864e5) {
+      const day = new Date(ts).toISOString().slice(0, 10), r = byDay.get(day), k = kind(r);
+      if (k !== "none") count[k]++;
+      if (!months.has(day.slice(0, 7))) months.set(day.slice(0, 7), []);
+      months.get(day.slice(0, 7)).push({ day, r, k });
+    }
+    const d = v === "p" ? 2 : 1;
+    const label = { yr: t("calYr"), wn: t("calWn"), eq: t("calEq"), none: t("calNone") };
+    el.innerHTML = [...months].map(([ym, days]) => {
+      const name = utcDay(ym + "-15", { month: "short" });
+      const full = utcDay(ym + "-15", { month: "long", year: "numeric" });
+      const pad = +days[0].day.slice(8) - 1;  // so each column is the same day of the month
+      return `<div class="cal-row"><span class="cal-month" aria-hidden="true">${esc(name)}</span><div class="cal-days" role="list" aria-label="${esc(t("calendarLabel", full))}">${
+        '<span class="cal-pad"></span>'.repeat(pad)}${days.map(x => {
+          const tip = x.k !== "none" ? t("calDay", utcDay(x.day), num(x.r.yr, d), num(x.r.wn, d), UNIT[v]) : `${utcDay(x.day)}: ${label.none}`;
+          return `<span role="listitem" class="cal-day c-${x.k}" title="${esc(tip)}" aria-label="${esc(`${tip} (${label[x.k]})`)}"></span>`;
+        }).join("")}</div></div>`;
+    }).join("");
+    const sw = c => `<span class="cal-day c-${c}" aria-hidden="true"></span>`;
+    document.getElementById("calendar-key").innerHTML = ["yr", "wn", "eq", "none"].map(k => `<span>${sw(k)}${esc(label[k])}</span>`).join("");
+    let sentence = t("calCount", count.yr, count.wn, count.eq);
+    const s = block(v, 24), verdict = s?.n ? pick(v, s).verdict : null;
+    const leader = count.yr > count.wn ? "yr" : count.wn > count.yr ? "weathernext" : null;
+    const who = k => (k === "yr" ? "Yr" : "Google");
+    if (leader && verdict === "too_close") sentence += " " + t("calCloseCall", who(leader));
+    else if (leader && (verdict === "yr" || verdict === "weathernext") && verdict !== leader) sentence += " " + t("calOther", who(leader), who(verdict));
+    document.getElementById("calendar-count").textContent = sentence;
+    document.getElementById("calendar-note").textContent = t("calNote");
+  }
+
+  // Blend tip: only where the existing test says the midpoint is better (as in the details).
+  function renderBlend() {
+    const el = document.getElementById("s-blend");
+    const parts = ["t", "w"].map(v => [v, block(v, 24)])
+      .filter(([, s]) => s?.n && s.verdict_avg === "better" && Number.isFinite(s.avg_gain))
+      .map(([v, s]) => t("blendPart", pctOf(s.avg_gain), t("varsLower")[v]));
+    el.hidden = !parts.length;
+    el.innerHTML = parts.length ? t("blend", esc(joinList(parts))) : "";
+  }
+
+  // Frost: views.json → practical (hours below 0 °C, 24 h ahead, all stations, all days).
+  function renderFrost() {
+    const g = D.views?.all?.practical?.t?.["24"]?.all, card = document.getElementById("s-frost");
+    card.hidden = !(g?.events && g.yr?.pod != null && g.wn?.pod != null);
+    if (card.hidden) return;
+    const dots = (x, p) => { const n = Math.round(x * 10);
+      return `<span class="dots" aria-hidden="true">${Array.from({ length: 10 }, (_, i) => `<span class="dot10 ${i < n ? p : "off"}"></span>`).join("")}</span>`; };
+    document.getElementById("frost-rows").innerHTML = [["yr", "Yr"], ["wn", "Google"]].map(([p, name]) =>
+      `<div class="icon-row"><span class="icon-name">${name}</span>${dots(g[p].pod, p)}<span class="icon-text">${esc(t("frostRow", Math.round(g[p].pod * 10), pctOf(g[p].pod)))}</span></div>`).join("");
+    const oneIn = far => far == null ? "–" : far === 0 ? t("never") : Math.round(1 / far) <= 1 ? t("always") : t("oneIn", Math.round(1 / far));
+    document.getElementById("frost-false").textContent = t("frostFalse", oneIn(g.yr.far), oneIn(g.wn.far));
+    document.getElementById("frost-note").textContent = t("frostNote", int(g.events), int(g.days), int(g.stations));
+  }
+
+  function renderFair() {
+    const list = document.getElementById("fair-list");
+    list.innerHTML = t("fair").map(([lead, rest]) =>
+      `<li><b>${esc(lead)}</b> ${esc(rest)} <a href="#about" class="read-more">${esc(t("readMore"))}</a></li>`).join("");
+    list.onclick = e => {
+      if (!e.target.closest(".read-more")) return;
+      e.preventDefault();
+      setDetails(true);
+      const about = document.getElementById("about");
+      about.open = true;
+      about.scrollIntoView({ block: "start" });
+    };
+  }
+
+  function renderSources() {
+    const link = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,)]/g, u => `<a href="${u}" rel="noopener">${u}</a>`);
+    document.getElementById("s-attrib").innerHTML = (D.meta?.attribution || []).map(a => `<span>${link(a)}</span>`).join("<br>");
+  }
+
+  function renderSimple() {
+    applyStatic();
+    document.getElementById("intro").textContent = t("intro", D.meta?.stations?.length || "");
+    renderStatus();
+    const ok = !!D.meta?.variables && !!D.meta?.days;
+    document.querySelectorAll("#simple .s-card").forEach(el => { el.hidden = !ok; });
+    document.getElementById("details-toggle").hidden = !D.meta?.variables;
+    document.getElementById("s-sources").hidden = !D.meta?.variables;
+    document.getElementById("details-toggle").textContent = t(document.getElementById("details").hidden ? "showDetails" : "hideDetails");
+    if (!ok) return;
+    renderVerdicts(); renderActual(); renderCalendar(); renderBlend(); renderFrost(); renderFair(); renderSources();
+  }
+
+  // The expert cards: shown on request, remembered, and opened by ?visning=detaljert (or ?view=detailed).
+  let detailsReady = false;
+  function setDetails(open, remember = true) {
+    const el = document.getElementById("details"), btn = document.getElementById("details-toggle");
+    el.hidden = !open;
+    btn.setAttribute("aria-expanded", open);
+    btn.textContent = t(open ? "hideDetails" : "showDetails");
+    if (remember) store.set("wx-view", open ? "detailed" : "simple");
+    if (!open || !D.meta?.variables) return;
+    if (!detailsReady) { initDetails(); detailsReady = true; }
+    render();
+    if (map) map.invalidateSize();
+  }
+
   function render() {
     renderAnswer(); renderTiles(); renderPractical(); renderHorizon(); renderSteadiness(); renderBias(); renderTrend(); renderMap(); renderReplays(); renderPatterns();
     // Hide wholly empty sections, keeping selectors available when another horizon has data.
@@ -843,15 +1266,21 @@
   let hasThemeChoice = false;
   try { hasThemeChoice = ["light", "dark"].includes(localStorage.getItem("wx-theme")); } catch {}
   const syncThemeControl = () => {
-    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    themeToggle.textContent = next === "light" ? "Light mode" : "Dark mode";
-    themeToggle.setAttribute("aria-label", `Switch to ${next} mode`);
+    const toLight = document.documentElement.dataset.theme === "dark";
+    themeToggle.textContent = t(toLight ? "themeLight" : "themeDark");
+    themeToggle.setAttribute("aria-label", t(toLight ? "themeToLight" : "themeToDark"));
+  };
+  // Charts read the theme colours when drawn, so a theme change redraws what is visible.
+  const redraw = () => {
+    if (!D.meta?.variables) return;
+    renderSimple();
+    if (!document.getElementById("details").hidden) render();
   };
   systemTheme.addEventListener("change", e => {
     if (hasThemeChoice) return;
     document.documentElement.dataset.theme = e.matches ? "dark" : "light";
     syncThemeControl();
-    if (D.meta?.variables) render();
+    redraw();
   });
   syncThemeControl();
   themeToggle.onclick = () => {
@@ -860,24 +1289,23 @@
     hasThemeChoice = true;
     try { localStorage.setItem("wx-theme", theme); } catch {}
     syncThemeControl();
-    if (D.meta?.variables) render();
+    redraw();
   };
+  document.getElementById("lang-seg").onclick = e => {
+    const b = e.target.closest("button"); if (!b || b.dataset.v === LANG) return;
+    LANG = b.dataset.v;
+    store.set("wx-lang", LANG);
+    renderSimple();
+  };
+  document.getElementById("details-toggle").onclick = () => setDetails(document.getElementById("details").hidden);
 
-  load().then(() => {
-    const m = D.meta || {};
-    renderHealth();
-    renderSummary();
-    if (!m.variables) {
-      document.getElementById("fresh").textContent = failed.has("meta")
-        ? "Could not load the data. Please try again in a moment." : "No data published yet.";
-      return;
-    }
+  // One-time setup of the expert cards (English), run when they are first shown.
+  function initDetails() {
+    const m = D.meta;
     const updated = D.health?.generated_at ? "" : ` · updated ${m.generated_at.replace("T", " ").slice(0, 16)} UTC`;
     document.getElementById("fresh").textContent = m.days
       ? `${m.days} scored days · ${m.stations.length} active collection stations${updated}`
       : "Collecting… the first scores appear about a day after collection starts.";
-    if (m.demo) document.querySelector(".hero").insertAdjacentHTML("afterbegin",
-      `<p class="badge" style="margin-bottom:8px">Demo data: made-up numbers for previewing the layout</p>`);
     // One line per notice; URLs become links (text is escaped first).
     const link = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,)]/g, u => `<a href="${u}" rel="noopener">${u}</a>`);
     document.getElementById("attrib").innerHTML = (m.attribution || []).map(a => `<span>${link(a)}</span>`).join("<br>");
@@ -887,6 +1315,17 @@
         () => S.period, v => (S.period = v));
     seg(document.getElementById("horizon-view"), [["diff", "Difference"], ["mae", "Error size"]],
         () => S.hView, v => (S.hView = v));
-    render();
+  }
+
+  load().then(() => {
+    const m = D.meta || {};
+    renderHealth();
+    renderSummary();
+    renderSimple();
+    if (m.demo) document.querySelector(".hero").insertAdjacentHTML("afterbegin",
+      `<p class="badge" style="margin-bottom:8px">Demo data: made-up numbers for previewing the layout</p>`);
+    if (!m.variables) return;
+    const asked = params.get("visning") === "detaljert" || params.get("view") === "detailed";
+    if (asked || store.get("wx-view") === "detailed") setDetails(true, false);
   });
 })();

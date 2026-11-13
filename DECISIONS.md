@@ -754,3 +754,32 @@ Each part is implemented in its own session and noted below when done.
   them removes that trap. `leaderboard.json`, `views.json`, `summary.json`, `events.json`,
   `meta.json`, `health.json` and `recent/` are unchanged. The live site drops the seven files
   at the next deploy after a push.
+
+### Norwegian front page, simple layer — 2026-11-13 (decision 5, review part C)
+
+- The page opens on a **simple layer**, Norwegian by default (`lang="nb"`), with a NO | EN toggle
+  (remembered; `?lang=en` works). Text lives in one table (`TXT` in `site/app.js`); numbers and
+  dates use `Intl` with `nb-NO` / `en-GB` and Oslo time. The services are "Yr" and
+  "Google (WeatherNext)", shortened to "Google"; WeatherNext is explained once in the intro.
+- Content, all from data already exported: the verdict table (temperature, wind, rain at 6 h,
+  tomorrow, 2, 5 and 10 days; all days; rain uses Google's median, as on the page) with story
+  sentences built from the same verdicts; forecast vs measured for the last 7 days (Oslo by
+  default, Bergen, Trondheim, Tromsø first); a day-by-day calendar (a day is "about equal" under a
+  5 % gap, a display rule stated under it); the blend tip only where `verdict_avg` is "better";
+  frost icons (hit share and false alarms, 24 h); three plain fairness lines with "Les mer".
+- **Only the existing verdict names a winner.** The calendar, frost icons and station sentence
+  are descriptions with no winner styling; where the calendar count points another way than the
+  verdict, the page says so in words.
+- **Status is split.** One line says when the page was updated; it turns amber only when the last
+  run failed, there was no run for 8 h, or Yr, Google or Frost erred in 2 runs in a row
+  (`health.json` → `failing`, new). A neutral line says how many stations report and names the
+  silent ones; amber only if more than one in five are silent (the old detailed health line uses
+  the same station rule).
+- **Nothing was removed.** All earlier cards are behind "Vis kart, alle stasjoner og detaljerte
+  tall" (remembered; `?visning=detaljert` opens them) and are still in English for now; the page
+  says so in Norwegian. Google's required notice stays in English under every chart that draws
+  Google's values, with a Norwegian sentence before it; all attribution lines are also under
+  "Kilder og vilkår" on the front page.
+- Not done here (part D): hit rates within 1 °C / 2 m/s and the dumbbell chart. Not done at all
+  yet: translating the detailed cards, building the monthly text in the browser, `public_note`
+  per station.
