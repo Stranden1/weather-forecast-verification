@@ -52,9 +52,15 @@
   }
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+  // A file that is simply not there yet (404) is empty; a network, server or parse error is a
+  // failed download, so the page can say "try again" instead of "no data published yet".
+  const failed = new Set();
   async function load() {
     const names = ["meta", "leaderboard", "health", "summary", "events", "views"];
-    const got = await Promise.all(names.map(n => fetch(DATA + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}))));
+    const get = n => fetch(DATA + n + ".json")
+      .then(r => r.ok ? r.json() : (r.status === 404 ? {} : Promise.reject(new Error(r.status))))
+      .catch(() => { failed.add(n); return {}; });
+    const got = await Promise.all(names.map(get));
     names.forEach((n, i) => (D[n] = got[i]));
   }
 
@@ -328,7 +334,7 @@
   }
 
   // Steadiness: how much each service's forecast for the same station and hour changed from one
-  // horizon to the next (cloud/replay.py). All days so far; the period switch doesn't apply.
+  // horizon to the next (cloud/replay.py), for the selected period (views.json).
   const STEADY = {
     yr: ["Yr steadier", "yr"], weathernext: ["WeatherNext steadier", "wn"],
     too_close: ["Too close to call", ""], not_enough_data: ["Not enough days yet", ""],
@@ -861,7 +867,11 @@
     const m = D.meta || {};
     renderHealth();
     renderSummary();
-    if (!m.variables) { document.getElementById("fresh").textContent = "No data published yet."; return; }
+    if (!m.variables) {
+      document.getElementById("fresh").textContent = failed.has("meta")
+        ? "Could not load the data. Please try again in a moment." : "No data published yet.";
+      return;
+    }
     const updated = D.health?.generated_at ? "" : ` · updated ${m.generated_at.replace("T", " ").slice(0, 16)} UTC`;
     document.getElementById("fresh").textContent = m.days
       ? `${m.days} scored days · ${m.stations.length} active collection stations${updated}`
