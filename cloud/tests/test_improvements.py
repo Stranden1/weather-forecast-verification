@@ -280,20 +280,48 @@ class HealthTest(unittest.TestCase):
         self.assertFalse(h["last_run_failed"])
         self.assertEqual(h["sources"]["yr"]["status"], "ok")
 
-    def test_due_skips_until_150_minutes_after_last_success(self):
+    def test_due_skips_until_145_minutes_after_last_complete_run(self):
         meta = lambda *runs: {"first_fetch": runs[0]["fetched_at"], "runs": list(runs)}
+        ok = lambda h: run(h, wn=900, wn_err=None)          # both forecast sources delivered
         self.assertTrue(health.due({"runs": []}, NOW)[0])           # nothing collected yet
-        self.assertFalse(health.due(meta(run(1)), NOW)[0])          # hourly cron, 1 h later
-        self.assertFalse(health.due(meta(run(2.49)), NOW)[0])
-        self.assertTrue(health.due(meta(run(2.5)), NOW)[0])          # exactly 150 min
-        self.assertTrue(health.due(meta(run(5)), NOW)[0])
-        # Only successful runs count: a failed run 1 h ago doesn't hold the next one back.
-        failed = run(1, yr=0, frost=0, yr_err=50)
-        self.assertTrue(health.due(meta(run(4), failed), NOW)[0])
-        self.assertFalse(health.due(meta(run(2), failed), NOW)[0])
-        # Manual runs always collect; a clock-skewed future success doesn't block forever.
-        self.assertTrue(health.due(meta(run(0.5)), NOW, manual=True)[0])
-        self.assertTrue(health.due(meta(run(-1)), NOW)[0])
+        self.assertFalse(health.due(meta(ok(1)), NOW)[0])          # hourly cron, 1 h later
+        self.assertFalse(health.due(meta(ok(2)), NOW)[0])          # four 30-min ticks later
+        self.assertFalse(health.due(meta(ok(144.9 / 60)), NOW)[0])
+        self.assertTrue(health.due(meta(ok(145 / 60)), NOW)[0])    # exactly 145 min
+        # The timer's fifth tick: the gate runs ~1 s before the previous run's own stamp.
+        self.assertTrue(health.due(meta(ok((150 * 60 - 1) / 3600)), NOW)[0])
+        self.assertTrue(health.due(meta(ok(5)), NOW)[0])
+        # A failed run 1 h ago doesn't hold the next one back.
+        failed = run(1, yr=0, wn=0, frost=0, yr_err=50)
+        self.assertTrue(health.due(meta(ok(4), failed), NOW)[0])
+        self.assertTrue(health.due(meta(ok(2), failed), NOW)[0])
+        # Manual runs always collect; a clock-skewed future run doesn't block forever.
+        self.assertTrue(health.due(meta(ok(0.5)), NOW, manual=True)[0])
+        self.assertTrue(health.due(meta(ok(-1)), NOW)[0])
+
+    def test_due_retries_when_a_forecast_source_delivered_nothing(self):
+        meta = lambda *runs: {"first_fetch": runs[0]["fetched_at"], "runs": list(runs)}
+        ok = run(2, wn=900, wn_err=None)
+        no_yr = run(0.5, yr=0, wn=900, wn_err=None, yr_err=49)   # api.met.no down, Frost fine
+        no_wn = run(0.5, wn=0)                                     # Earth Engine refused
+        for bad in (no_yr, no_wn):
+            self.assertFalse(health.failed(bad))                   # still a success for the page
+            go, why = health.due(meta(ok, bad), NOW)
+            self.assertTrue(go)                                    # next 30-min tick tries again
+            self.assertIn("retrying", why)
+        self.assertIn("yr", health.due(meta(ok, no_yr), NOW)[1])
+        self.assertEqual(health.missing_forecasts(no_wn), ["wn"])
+        # Once a retry gets both forecasts, the normal gap applies again.
+        self.assertFalse(health.due(meta(ok, no_wn, run(0.25, wn=900, wn_err=None)), NOW)[0])
+        # A paused WeatherNext is not missing: Yr alone completes the run.
+        paused = run(1, wn=0, wn_err=None)
+        paused["sources"]["wn"]["enabled"] = False
+        self.assertEqual(health.missing_forecasts(paused), [])
+        self.assertFalse(health.due(meta(paused), NOW)[0])
+        # Older run records without per-source summaries use their row counts.
+        legacy = {"fetched_at": iso(NOW - timedelta(hours=1)), "yr_rows": 10, "wn_rows": 0,
+                  "obs_rows": 5, "errors": []}
+        self.assertTrue(health.due(meta(legacy), NOW)[0])
 
     def test_due_command_writes_github_output(self):
         from cloud import run as cli
@@ -301,7 +329,7 @@ class HealthTest(unittest.TestCase):
             state, out = Path(tmp) / "state", Path(tmp) / "out.txt"
             state.mkdir()
             recent = {"fetched_at": iso(datetime.now(UTC) - timedelta(minutes=30)),
-                      "sources": run(0)["sources"]}
+                      "sources": run(0, wn=900, wn_err=None)["sources"]}
             (state / "meta.json").write_text(json.dumps(
                 {"finalized_days": [], "first_fetch": recent["fetched_at"], "runs": [recent]}))
             with mock.patch.object(cli, "State", lambda: State(state)), \

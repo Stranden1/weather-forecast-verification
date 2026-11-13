@@ -49,7 +49,7 @@ the same project (noncommercial).
 ## 5. First run
 
 **Actions → Collect, score and publish → Run workflow.** Leave `trigger` at its
-default `manual` to bypass the 150-minute gate. It takes a few minutes.
+default `manual` to bypass the 145-minute gate. It takes a few minutes.
 Open the log: the `collect` line shows how many Yr, WeatherNext and Frost rows
 were saved and lists any errors. The first scores appear about a day later.
 
@@ -89,8 +89,9 @@ result). Use a **fine-grained personal access token**, restricted to
 **Actions: Read and write**. Store the real token only in the timer's secret store;
 never put it in documentation, source files or logs. `<token>` above is a placeholder.
 
-`trigger: timer` respects the same 150-minute gate as scheduled runs: a recent
-successful collection skips collection, state publication and Pages deployment.
+`trigger: timer` respects the same 145-minute gate as scheduled runs: a recent
+complete collection skips collection, state publication and Pages deployment. A run
+where Yr or WeatherNext delivered no rows is not complete, so the next tick collects again.
 `trigger: manual` bypasses the gate and is the default. The hourly GitHub schedule
 (`23 * * * *`) and shared `collect` concurrency group remain enabled.
 
@@ -115,7 +116,7 @@ does not guarantee collection. An independent service such as
 3. Enable notifications for failed requests and automatic job disabling, and verify
    that the job is enabled. A timer test should return **204**, not an HTML page.
 4. Check the resulting GitHub Actions run. When the last successful collection is
-   under 150 minutes old, the Gate log must say `skip`, with collection, publication
+   under 145 minutes old, the Gate log must say `skip`, with collection, publication
    and deployment steps skipped. Once due, those steps must run successfully.
 5. Check the public health timestamp advances after collection. A 204 only confirms
    GitHub accepted the request; it does not confirm the workflow or collectors succeeded.
@@ -133,8 +134,9 @@ workflow does not yet accept `trigger`, or the ref/input is invalid. Do not send
 `trigger=timer` until the updated workflow is on `main`.
 
 The 30-minute requests are wake-up attempts, not collections. With prompt starts,
-the gate allows collection roughly every 150-180 minutes; delayed GitHub execution
-can still extend that. Keep the PC collector until measured cloud coverage matches.
+the gate allows collection every 150 minutes (the fifth tick; the gap is 145 minutes
+so runner jitter cannot push it to the sixth). Delayed GitHub execution can still
+extend that.
 
 References: [GitHub schedule limitations](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
 [cron-job.org request and notification settings](https://docs.cron-job.org/rest-api.html).

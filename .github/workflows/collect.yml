@@ -1,7 +1,8 @@
-# Collects Yr + WeatherNext + Frost about every 3 hours, scores finished days,
-# and publishes the webpage. GitHub starts scheduled runs late or drops them, so the
-# cron fires hourly and a gate step ends the run early (successfully, collecting and
-# deploying nothing) while the last successful collect is under 150 min old.
+# Collects Yr + WeatherNext + Frost every 2.5 hours, scores finished days, and
+# publishes the webpage. An external timer dispatches every 30 min and the cron fires
+# hourly as a fallback; a gate step ends the run early (successfully, collecting and
+# deploying nothing) while the last complete collect is under 145 min old. A run where
+# Yr or WeatherNext delivered no rows is not complete, so the next tick retries.
 # Working state lives on the `state` branch, which is replaced (not appended) on
 # every collecting run, so the repository does not grow with it.
 name: Collect, score and publish
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       trigger:
-        description: "Manual bypasses the gate; timer respects the 150-minute interval"
+        description: "Manual bypasses the gate; timer respects the 145-minute interval"
         type: choice
         options:
           - manual
@@ -57,7 +58,7 @@ jobs:
       - name: Restore and validate working state (only a missing branch starts fresh)
         run: python -m cloud.persistence restore
 
-      - name: Gate (skip if the last successful collect is under 150 min old)
+      - name: Gate (skip if the last complete collect is under 145 min old)
         id: due
         run: python -m cloud.run due ${{ github.event_name == 'workflow_dispatch' && inputs.trigger == 'manual' && '--manual' || '' }}
 

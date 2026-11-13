@@ -691,3 +691,33 @@ Before an outside review the owner asked to tidy the repository ("Ja, rydd førs
 - The root keeps the live system (`cloud/`, `site/`, `history/`, `config/`, workflows, local
   tools) and the handoff and setup documents.
 
+
+## Owner decisions on the November review — 2026-11-13 (owner)
+
+The owner answered the five decisions in `docs/reviews/REVIEW_2026-11_fable.md`:
+
+1. The gate retries at the next 30-minute tick when Yr or WeatherNext delivered no rows: **yes**.
+2. The verdict test resamples blocks of consecutive days instead of single days: **yes**
+   (part B; not implemented yet, scores unchanged until then).
+3. Cadence between collections: **2.5 hours**.
+4. Hit-rate limits 1 °C for temperature and 2 m/s for wind: **yes** (part D; not exported yet).
+5. Norwegian by default with an English toggle, and the name "Google (WeatherNext)": **yes**
+   (part C; not implemented yet).
+
+Each part is implemented in its own session and noted below when done.
+
+### Gate: complete runs and a steady 2.5 h — 2026-11-13 (decisions 1 and 3)
+
+- `health.due` now asks whether the **last run was complete**: every enabled forecast source
+  (Yr, WeatherNext; `health.FORECAST_SOURCES`) delivered at least one row. If not, the next tick
+  collects again. Frost alone is not enough, and ECMWF (not published) does not count. A paused
+  WeatherNext (`enabled: false`) is not required.
+- When the last run was complete, the gate skips until it is `MIN_GAP_MIN` = **145** min old
+  (was 150 since the last *successful* run). The timer ticks every 30 min and the gate runs a
+  second or two before the previous run's own timestamp, so 150 lost to jitter and the real
+  cadence was 2.5 or 3 h. 145 makes it a steady fifth tick.
+- Unchanged: `last_success` and `last_run_failed` on the page still use "any source delivered";
+  the health line's expectation stays `RUN_EVERY_H` = 3 (lenient, so retries or a late tick
+  never show a false "collection gap"); `FAIL_AFTER_RUNS` = 2; the hourly cron fallback.
+- A long forecast outage now means a collect every 30 min until it ends. That is intended:
+  every missed forecast snapshot is lost for good. No retry was added inside a run.

@@ -16,11 +16,18 @@ from .timeutil import iso, parse
 
 SOURCES = {"yr": "Yr ", "wn": "WeatherNext", "frost": "Frost"}  # error-message prefixes
 ROW_KEYS = {"yr": "yr_rows", "wn": "wn_rows", "frost": "obs_rows"}
-RUN_EVERY_H = 3  # expected cadence: collect.yml fires hourly and skips until MIN_GAP_MIN has passed
+# Lenient expectation for the "runs in 48 h" count on the page. The real cadence is 2.5 h
+# (MIN_GAP_MIN); 3 h leaves room for retries and late timer ticks without a false warning.
+RUN_EVERY_H = 3
 WINDOW_H = 48
-# A scheduled run collects only when the last successful run is at least this old (2.5 h,
-# so a late run doesn't push the next one back a whole slot). Manual runs always collect.
-MIN_GAP_MIN = 150
+# A scheduled run collects only when the last complete run is at least this old. The timer
+# ticks every 30 min, and the gate runs a second or two earlier in the job than the moment
+# the previous run stamped, so the gap is set just under five ticks (150 min): the cadence is
+# a steady 2.5 h instead of 2.5 or 3 h by runner jitter (DECISIONS.md, 13 Nov 2026).
+MIN_GAP_MIN = 145
+# A run is complete only when every enabled forecast source delivered rows. Frost alone is
+# not enough: forecast snapshots missed now can never be collected later.
+FORECAST_SOURCES = ("yr", "wn")
 FAIL_AFTER_RUNS = 2  # `cloud.run check` fails only when a source errs this many runs in a row
 # Earth Engine's answers when the caller may not read WeatherNext yet.
 NO_ACCESS = re.compile(r"does not have access|does not have required permission|"
@@ -62,6 +69,17 @@ def failed(run: dict) -> bool:
     """A run failed when no enabled source delivered anything."""
     srcs = _sources(run)
     return not any(s.get("rows", 0) for s in srcs.values() if s.get("enabled", True))
+
+
+def missing_forecasts(run: dict) -> list[str]:
+    """Enabled forecast sources (Yr, WeatherNext) that delivered no rows in this run."""
+    srcs = _sources(run)
+    return [name for name in FORECAST_SOURCES
+            if srcs.get(name, {}).get("enabled", True) and not srcs.get(name, {}).get("rows", 0)]
+
+
+def complete(run: dict) -> bool:
+    return not missing_forecasts(run)
 
 
 def run_errors(run: dict) -> dict[str, int]:
@@ -120,13 +138,18 @@ def due(meta: dict, now: datetime | None = None, manual: bool = False) -> tuple[
     if manual:
         return True, "manual run"
     now = now or datetime.now(timezone.utc)
-    last = build(meta, now)["last_success"]
-    if last is None:
-        return True, "no successful run yet"
-    age_min = (now - parse(last)).total_seconds() / 60
+    runs = sorted(meta.get("runs") or [], key=lambda r: r["fetched_at"])
+    if not runs:
+        return True, "no run yet"
+    last = runs[-1]
+    missing = missing_forecasts(last)
+    if missing:
+        # Retry at the next tick: a 6-hour forecast outage would otherwise leave permanent holes.
+        return True, f"last run had no rows from {', '.join(missing)}; retrying"
+    age_min = (now - parse(last["fetched_at"])).total_seconds() / 60
     if 0 <= age_min < MIN_GAP_MIN:
-        return False, f"last success {age_min:.0f} min ago (< {MIN_GAP_MIN})"
-    return True, f"last success {age_min:.0f} min ago"
+        return False, f"last complete run {age_min:.0f} min ago (< {MIN_GAP_MIN})"
+    return True, f"last complete run {age_min:.0f} min ago"
 
 
 def write(meta: dict, out_dir: Path = SITE_DATA_DIR, now: datetime | None = None) -> dict:
