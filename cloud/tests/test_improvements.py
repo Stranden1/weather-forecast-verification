@@ -273,6 +273,18 @@ class HealthTest(unittest.TestCase):
         self.assertEqual((h["runs_48h"], h["expected_48h"]), (16, 16))  # 51 h ago is outside
         self.assertNotIn("error", h["sources"]["wn"])  # raw messages are never published
 
+    def test_build_lists_sources_failing_in_a_row(self):
+        meta = lambda *runs: {"first_fetch": runs[0]["fetched_at"], "runs": list(runs)}
+        ok = lambda h, **kw: run(h, wn=900, wn_err=None, **kw)
+        self.assertEqual(health.build(meta(ok(4), ok(1, yr_err=3)), NOW)["failing"], [])  # one-off
+        self.assertEqual(health.build(meta(ok(4, yr_err=2), ok(1, yr_err=3)), NOW)["failing"], ["yr"])
+        ecmwf = ok(1)
+        ecmwf["sources"]["ecmwf"] = {"rows": 0, "errors": 5, "error": "x", "enabled": True}
+        twice = [ok(4), ecmwf]
+        twice[0]["sources"]["ecmwf"] = dict(ecmwf["sources"]["ecmwf"])
+        self.assertEqual(health.build(meta(*twice), NOW)["failing"], [])  # not shown on the page
+        self.assertEqual(health.build({"runs": []}, NOW)["failing"], [])
+
     def test_expected_runs_right_after_start(self):
         runs = [run(7), run(1)]
         h = health.build({"first_fetch": runs[0]["fetched_at"], "runs": runs}, NOW)

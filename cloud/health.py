@@ -114,7 +114,7 @@ def build(meta: dict, now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     runs = sorted(meta.get("runs") or [], key=lambda r: r["fetched_at"])
     out = {"generated_at": iso(now), "last_run": None, "last_run_failed": None,
-           "last_success": None, "sources": {}, "runs_48h": 0, "expected_48h": 0}
+           "last_success": None, "sources": {}, "runs_48h": 0, "expected_48h": 0, "failing": []}
     if not runs:
         return out
     last = runs[-1]
@@ -124,6 +124,9 @@ def build(meta: dict, now: datetime | None = None) -> dict:
     ok = [r for r in runs if not failed(r)]
     out.update(last_run=last["fetched_at"], last_run_failed=failed(last),
                last_success=ok[-1]["fetched_at"] if ok else None)
+    # Published sources that erred FAIL_AFTER_RUNS runs in a row: the page's status line turns
+    # amber for these only, not for a one-off error (ECMWF and the Yr archive are not shown).
+    out["failing"] = [n for n in persistent_errors(runs) if n in SOURCES]
     out["sources"] = {name: {"status": status(name, s), "rows": s.get("rows", 0),
                              "errors": s.get("errors", 0)}
                       for name, s in _sources(last).items()}
