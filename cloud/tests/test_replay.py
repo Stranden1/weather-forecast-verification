@@ -209,13 +209,39 @@ class EventTest(unittest.TestCase):
         self.assertEqual(replay.find_events(df), replay.find_events(changed))
 
     def test_keeps_recent_and_most_extreme(self):
-        events = [{"id": f"d{i:02d}-rain", "day": f"2026-08-{i:02d}", "type": "rain", "value": float(i)}
-                  for i in range(1, 32)]
-        events.append({"id": "d00-rain", "day": "2026-07-01", "type": "rain", "value": 99.0})
+        # One event per month for 40 months: the monthly cap keeps them all.
+        days = [f"{2023 + i // 12}-{i % 12 + 1:02d}-15" for i in range(40)]
+        events = [{"id": f"{d}-rain", "day": d, "type": "rain", "value": 20.0 + i % 3}
+                  for i, d in enumerate(days)]
+        events.append({"id": "2022-12-01-rain", "day": "2022-12-01", "type": "rain", "value": 99.0})
         kept = [e["id"] for e in replay.select_events(events)]
-        self.assertEqual(len(kept), 31)          # 30 newest + the old record-breaker
-        self.assertIn("d00-rain", kept)
-        self.assertEqual(kept[0], "d31-rain")    # newest first
+        self.assertEqual(len(kept), 31)                # 30 newest + the old record-breaker
+        self.assertIn("2022-12-01-rain", kept)
+        self.assertEqual(kept[0], f"{days[-1]}-rain")  # newest first
+
+    def test_only_the_three_most_extreme_days_per_month_and_type(self):
+        # A cold November: every day meets the fixed -5 °C bar.
+        cold = [{"id": f"2026-11-{d:02d}-cold", "day": f"2026-11-{d:02d}", "type": "cold",
+                 "value": -5.0 - (d * 7 % 11)} for d in range(1, 31)]
+        wind = [{"id": f"2026-11-{d:02d}-wind", "day": f"2026-11-{d:02d}", "type": "wind",
+                 "value": 15.0 + d / 10} for d in range(1, 11)]
+        october = [{"id": "2026-10-20-cold", "day": "2026-10-20", "type": "cold", "value": -5.1}]
+        kept = replay.select_events(cold + wind + october)
+        by = lambda kind, month: [e for e in kept if e["type"] == kind and e["day"].startswith(month)]
+        self.assertEqual(len(by("cold", "2026-11")), 3)
+        self.assertEqual(min(e["value"] for e in cold),
+                         min(e["value"] for e in by("cold", "2026-11")))   # the coldest is kept
+        self.assertTrue(all(e["value"] <= -14.0 for e in by("cold", "2026-11")))
+        self.assertEqual([e["day"] for e in by("wind", "2026-11")],
+                         ["2026-11-10", "2026-11-09", "2026-11-08"])         # windiest, newest first
+        self.assertEqual(len(by("cold", "2026-10")), 1)  # a mild month keeps its only cold day
+        self.assertEqual(len(kept), 7)
+
+    def test_monthly_tie_goes_to_the_newer_day(self):
+        events = [{"id": f"2026-11-0{d}-rain", "day": f"2026-11-0{d}", "type": "rain", "value": 25.0}
+                  for d in range(1, 6)]
+        self.assertEqual(sorted(e["day"] for e in replay.monthly_top(events)),
+                         ["2026-11-03", "2026-11-04", "2026-11-05"])
 
 
 class ReplayTest(unittest.TestCase):

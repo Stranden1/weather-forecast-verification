@@ -138,6 +138,10 @@ EVENT_TYPES = {
 }
 KEEP_RECENT = 30
 KEEP_TOP_PER_TYPE = 5
+# The fixed bars above are met almost every day in winter (every day 1-11 Nov 2026 was a cold
+# snap), so only the most extreme days of each type in each calendar month count as notable.
+# Ranked by the measured headline value only, never by forecast errors (DECISIONS.md, 13 Nov 2026).
+KEEP_PER_MONTH = 3
 
 
 def _observations(scored: pd.DataFrame) -> pd.DataFrame:
@@ -189,13 +193,27 @@ def find_events(scored: pd.DataFrame, offshore: set[str] = frozenset()) -> list[
     return events
 
 
+def _most_extreme(events: list[dict], n: int) -> list[dict]:
+    """The n most extreme events (all of one type); a tie goes to the newer day."""
+    sign = lambda e: -1 if e["type"] == "cold" else 1
+    return sorted(events, key=lambda e: (sign(e) * e["value"], e["day"]), reverse=True)[:n]
+
+
+def monthly_top(events: list[dict], n: int = KEEP_PER_MONTH) -> list[dict]:
+    """The n most extreme days of each type in each calendar month (UTC)."""
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for e in events:
+        groups.setdefault((e["day"][:7], e["type"]), []).append(e)
+    return [e for g in groups.values() for e in _most_extreme(g, n)]
+
+
 def select_events(events: list[dict]) -> list[dict]:
-    """The most recent 30 plus the 5 most extreme of each type; newest first."""
+    """Of each month's 3 most extreme days per type: the most recent 30 plus the 5 most extreme
+    of each type; newest first."""
+    events = monthly_top(events)
     keep = {e["id"] for e in sorted(events, key=lambda e: e["day"], reverse=True)[:KEEP_RECENT]}
     for kind in EVENT_TYPES:
-        same = [e for e in events if e["type"] == kind]
-        sign = -1 if kind == "cold" else 1
-        keep |= {e["id"] for e in sorted(same, key=lambda e: sign * e["value"], reverse=True)[:KEEP_TOP_PER_TYPE]}
+        keep |= {e["id"] for e in _most_extreme([e for e in events if e["type"] == kind], KEEP_TOP_PER_TYPE)}
     return sorted((e for e in events if e["id"] in keep), key=lambda e: (e["day"], e["id"]), reverse=True)
 
 

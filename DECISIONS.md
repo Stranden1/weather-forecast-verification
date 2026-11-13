@@ -732,3 +732,14 @@ Each part is implemented in its own session and noted below when done.
   environment, run all cloud tests, write the lock, commit (that triggers `tests.yml`).
 - `test_dependencies.py` fails when the installed versions differ from the lock, so a passing
   run in CI proves the collector's versions were tested.
+
+### Notable days: three per month and type — 2026-11-13 (review finding 4)
+
+- The fixed bars stay (rain day ≥ 20 mm, land wind ≥ 15 m/s, cold ≤ −5 °C) as the minimum.
+  Of the days that meet them, only the **3 most extreme of each type in each calendar month**
+  (UTC) are notable (`replay.KEEP_PER_MONTH`), ranked by the measured headline value; a tie goes
+  to the newer day. Then, as before, the 30 most recent plus the 5 most extreme of each type.
+- Chosen over a per-station percentile because it is stable as history grows, easy to state on
+  the page, and still uses measurements only, never forecast errors.
+- Up to 9 notable days per month; earlier replays that drop out are rebuilt from history if the
+  rule changes again. History is untouched.
