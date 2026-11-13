@@ -10,5 +10,5 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with: { python-version: "3.12" }
-      - run: pip install -r cloud/requirements.txt
+      - run: pip install -r cloud/requirements-lock.txt
       - run: python -m unittest discover -s cloud/tests -t . -v

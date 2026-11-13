@@ -1,0 +1,42 @@
+# Exact versions the cloud pipeline runs on (collect.yml and tests.yml install this file).
+# Generated 2026-11-13 from the environment where all cloud tests pass, and checked to
+# resolve unchanged for Linux x86_64 / Python 3.12 (the GitHub runner).
+#
+# Upgrade on purpose: change the ranges in requirements.txt if needed, install them in a
+# fresh environment, run `python -m unittest discover -s cloud/tests -t .`, then write the
+# new exact versions here in their own commit (it triggers tests.yml). Never upgrade as a
+# side effect of another change. See DECISIONS.md, 13 Nov 2026.
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+cryptography==50.0.1
+earthengine-api==1.7.43
+google-api-core==2.37.0
+google-api-python-client==2.200.0
+google-auth==2.58.0
+google-auth-httplib2==0.4.2
+google-cloud-core==2.7.0
+google-cloud-storage==3.14.1
+google-crc32c==1.8.0
+google-resumable-media==2.10.2
+googleapis-common-protos==1.75.3
+httplib2==0.32.0
+idna==3.19
+numpy==2.5.2
+opentelemetry-api==1.44.0
+pandas==2.3.3
+proto-plus==1.28.4
+protobuf==7.36.1
+pyasn1==0.6.4
+pyasn1-modules==0.4.2
+pycparser==3.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+pytz==2026.3.post1
+requests==2.34.2
+six==1.17.0
+typing-extensions==4.16.0
+tzdata==2026.3
+uritemplate==4.2.0
+urllib3==2.7.0

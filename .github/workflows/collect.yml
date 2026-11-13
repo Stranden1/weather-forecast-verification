@@ -51,9 +51,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: cloud/requirements.txt
+          cache-dependency-path: cloud/requirements-lock.txt
 
-      - run: pip install -r cloud/requirements.txt
+      - run: pip install -r cloud/requirements-lock.txt
 
       - name: Restore and validate working state (only a missing branch starts fresh)
         run: python -m cloud.persistence restore

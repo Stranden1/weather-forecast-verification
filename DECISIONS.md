@@ -721,3 +721,14 @@ Each part is implemented in its own session and noted below when done.
   never show a false "collection gap"); `FAIL_AFTER_RUNS` = 2; the hourly cron fallback.
 - A long forecast outage now means a collect every 30 min until it ends. That is intended:
   every missed forecast snapshot is lost for good. No retry was added inside a run.
+
+### Locked dependencies — 2026-11-13 (review finding 3)
+
+- CI (`collect.yml`, `tests.yml`) installs `cloud/requirements-lock.txt`: exact versions of all
+  34 packages, the set the 179 cloud tests pass with today (pandas 2.3.3, numpy 2.5.2,
+  earthengine-api 1.7.43 …), checked to resolve unchanged on Linux / Python 3.12.
+  `cloud/requirements.txt` keeps the allowed ranges.
+- Upgrades are deliberate and alone in their commit: install the new versions in a fresh
+  environment, run all cloud tests, write the lock, commit (that triggers `tests.yml`).
+- `test_dependencies.py` fails when the installed versions differ from the lock, so a passing
+  run in CI proves the collector's versions were tested.

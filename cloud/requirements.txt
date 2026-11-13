@@ -1,3 +1,4 @@
+# Allowed ranges. CI installs the exact versions in requirements-lock.txt; update both together.
 pandas>=2.2,<4
 numpy>=1.26
 requests>=2.32,<3
