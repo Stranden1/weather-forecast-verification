@@ -1,6 +1,6 @@
 # Project status
 
-_Updated 2026-11-13. Current state only; history is in CHANGELOG.md._
+_Updated 2026-11-14. Current state only; history is in CHANGELOG.md._
 
 ## Summary
 
@@ -14,7 +14,7 @@ Validation: all 171 cloud tests pass with archive and transport tests using synt
 
 ## Latest check (12 Nov)
 
-history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. The outside review on Claude Fable 5.2 is done (`docs/reviews/REVIEW_2026-11_fable.md`); the owner answered its five decisions on 13 Nov (DECISIONS.md). Part A (robustness) is committed locally, not pushed: the gate retries when Yr or WeatherNext delivered nothing and keeps a steady 2.5 h cadence; CI installs exact versions from `cloud/requirements-lock.txt`; notable days are capped at 3 per type per month; seven unread exports are gone; a failed data download says so. 185 cloud tests pass. Part C is also committed locally: the page opens on a Norwegian simple layer (verdict table, forecast vs measured, calendar, blend tip, frost icons, fairness lines) with an English toggle, a status line that turns amber only for real faults, and every earlier card unchanged behind "Vis detaljer". Parts B (block bootstrap) and D (hit rates, dumbbell) are next, one per session.
+history/ holds 68 scored days, 5 Sep–11 Nov, with no gaps (live meta: 498,754 rows). Collect runs every ~30 min with 0 source errors; Yr archive errors 0; 178 cloud tests pass. Two offshore stations deliver only model-filled (code 6) Frost data: Ormen Lange since 15 Oct, Ytterøyane Fyr since 1 Nov; the page header shows a station history warning. Repository tidied on 12 Nov: the retired PC collector is in `legacy/`, older findings, reviews and finished plans are in `docs/`. The outside review on Claude Fable 5.2 is done (`docs/reviews/REVIEW_2026-11_fable.md`); the owner answered its five decisions on 13 Nov (DECISIONS.md). Part A (robustness) is committed locally, not pushed: the gate retries when Yr or WeatherNext delivered nothing and keeps a steady 2.5 h cadence; CI installs exact versions from `cloud/requirements-lock.txt`; notable days are capped at 3 per type per month; seven unread exports are gone; a failed data download says so. 185 cloud tests pass. Part C is also committed locally: the page opens on a Norwegian simple layer (verdict table, forecast vs measured, calendar, blend tip, frost icons, fairness lines) with an English toggle, a status line that turns amber only for real faults, and every earlier card unchanged behind "Vis detaljer". Part B is committed locally too: the verdict test resamples blocks of 4 consecutive days, because neighbouring days are correlated (lag-1 0.34); 3 of 130 exported verdicts and 2 monthly cells change (DECISIONS.md, 13 Nov). 199 cloud tests pass. None of A, B or C is pushed. Part D (hit rates, dumbbell) is next.
 
 ## Local page and data checkpoints
 
