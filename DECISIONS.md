@@ -698,11 +698,11 @@ The owner answered the five decisions in `docs/reviews/REVIEW_2026-11_fable.md`:
 
 1. The gate retries at the next 30-minute tick when Yr or WeatherNext delivered no rows: **yes**.
 2. The verdict test resamples blocks of consecutive days instead of single days: **yes**
-   (part B; not implemented yet, scores unchanged until then).
+   (part B; done, see below).
 3. Cadence between collections: **2.5 hours**.
 4. Hit-rate limits 1 °C for temperature and 2 m/s for wind: **yes** (part D; not exported yet).
 5. Norwegian by default with an English toggle, and the name "Google (WeatherNext)": **yes**
-   (part C; not implemented yet).
+   (part C; done, see below).
 
 Each part is implemented in its own session and noted below when done.
 
@@ -783,3 +783,31 @@ Each part is implemented in its own session and noted below when done.
 - Not done here (part D): hit rates within 1 °C / 2 m/s and the dumbbell chart. Not done at all
   yet: translating the detailed cards, building the monthly text in the browser, `public_note`
   per station.
+
+### Verdict test: blocks of 4 consecutive days — 2026-11-13 (decision 2, review finding 2)
+
+- `summarize.bootstrap_diff` now resamples **blocks of 4 consecutive scored days** (circular
+  block bootstrap, `BLOCK_DAYS` = 4) instead of single days. Same 2000 resamples, seed and 95 %
+  rule. Scores, pairing, cohorts, thresholds and the blend are unchanged; only the interval
+  around the difference moves.
+- **Why.** Neighbouring days are correlated (weather regimes; one forecast run feeds several
+  target days). Measured on all 69 days (5 Sep–12 Nov), the median lag-1 autocorrelation of the
+  daily WeatherNext − Yr difference is 0.34, 0.34–0.51 for temperature and wind up to 3 days.
+  Single-day resampling treated the days as independent and made the intervals too narrow.
+- **Why 4, fixed.** The AR(1) plug-in rule (2ρ/(1−ρ²))^(2/3)·n^(1/3) gives 3.4 now (ρ 0.34,
+  n 69), about 4.2 for temperature and wind, 3.7 at 90 days and 4.7 at 180. 4 was chosen from
+  the autocorrelation before the verdicts were compared and is not tuned on them. It is
+  revisited only if the measured autocorrelation changes, with a dated note here.
+- The monthly verdicts and the steadiness verdict use the same function and change with it.
+  The blend's test (`bootstrap_gain`) still uses single days: the owner chose to leave it
+  unchanged (14 Nov 2026); it can be raised again later.
+- **Verdicts that changed** (all data to 12 Nov; before → after, 95 % interval):
+  - Temperature, 1 day, last 30 days: WeatherNext ahead (−0.107 … −0.016) → too close to call
+    (−0.125 … +0.003).
+  - Rain median, 12 h, all days: Yr ahead (+0.001 … +0.010) → too close to call (−0.001 … +0.011).
+  - Revision size, temperature, 7 → 5 days (last 30 days): too close (−0.209 … +0.012) →
+    WeatherNext steadier (−0.201 … −0.004).
+  - October, temperature 2 days: WeatherNext ahead (−0.110 … −0.018) → too close (−0.132 … 0.000).
+  - September, temperature 3 days (10 days of data): too close (−0.136 … +0.017) →
+    WeatherNext ahead (−0.121 … −0.000).
+  The other 127 exported verdicts and all other monthly cells are unchanged.

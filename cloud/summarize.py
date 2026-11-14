@@ -15,6 +15,12 @@ from .heights import adjusted_t, flags, load_heights
 
 MIN_DAYS_FOR_VERDICT = 7
 BOOTSTRAP = 2000
+# Days are not independent: weather regimes last several days and one forecast run feeds
+# neighbouring target days, so the daily differences are autocorrelated (lag 1 about 0.4).
+# The verdict test therefore resamples blocks of this many consecutive scored days (circular
+# block bootstrap). Fixed in advance from the autocorrelation, never tuned on the verdicts
+# (DECISIONS.md and SCORING.md, 13 Nov 2026). 1 gives the old single-day test.
+BLOCK_DAYS = 4
 
 
 _TAG = re.compile(r"\s*\[SN\d+\]\s*$")
@@ -83,20 +89,35 @@ def baseline(d: pd.DataFrame) -> dict | None:
     return out
 
 
-def bootstrap_diff(d: pd.DataFrame, seed: int = 1) -> tuple[float | None, float | None]:
-    """95% interval for MAE(WeatherNext) - MAE(Yr), resampling whole days.
+def block_indices(k: int, rng: np.random.Generator, block: int | None = None) -> np.ndarray:
+    """BOOTSTRAP resamples of k day positions (in date order) for the circular block bootstrap.
 
-    Errors on the same day are strongly correlated across stations and hours, so
-    days (not individual rows) are the independent unit.
+    Each resample strings together blocks of `block` consecutive days, each block starting at a
+    random day and wrapping from the last day to the first, cut to k days. Wrapping keeps the
+    first and last days as likely as the rest. `block` 1 is the plain day bootstrap.
+    """
+    block = BLOCK_DAYS if block is None else block
+    if block <= 1 or k <= block:
+        return rng.integers(0, k, size=(BOOTSTRAP, k))
+    starts = rng.integers(0, k, size=(BOOTSTRAP, -(-k // block)))
+    return ((starts[:, :, None] + np.arange(block)) % k).reshape(BOOTSTRAP, -1)[:, :k]
+
+
+def bootstrap_diff(d: pd.DataFrame, seed: int = 1, block: int | None = None) -> tuple[float | None, float | None]:
+    """95% interval for MAE(WeatherNext) - MAE(Yr), resampling blocks of consecutive days.
+
+    Errors on the same day are strongly correlated across stations and hours, so days (not
+    individual rows) are the unit; neighbouring days are correlated too, so they are drawn in
+    blocks of BLOCK_DAYS (`block_indices`). Days are taken in date order; a missing day is skipped.
     """
     per_day = d.groupby("day").agg(n=("e_yr", "size"),
                                   a_yr=("e_yr", lambda s: s.abs().sum()),
-                                  a_wn=("e_wn", lambda s: s.abs().sum()))
+                                  a_wn=("e_wn", lambda s: s.abs().sum())).sort_index()
     k = len(per_day)
     if k < MIN_DAYS_FOR_VERDICT:
         return None, None
     rng = np.random.default_rng(seed)
-    idx = rng.integers(0, k, size=(BOOTSTRAP, k))
+    idx = block_indices(k, rng, block)
     n = per_day.n.to_numpy()[idx].sum(1)
     diff = (per_day.a_wn.to_numpy()[idx].sum(1) - per_day.a_yr.to_numpy()[idx].sum(1)) / n
     return float(np.percentile(diff, 2.5)), float(np.percentile(diff, 97.5))

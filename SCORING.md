@@ -254,3 +254,35 @@ See local work/precipitation-aggregation-benchmark/REPORT.md. These few
 correlated days, nonidentical lead ages and point-gauge/grid differences do
 not support a general provider ranking. The read-only +/-3h timing diagnostic
 is not production scoring.
+
+## Verdict test on the cloud page: block bootstrap — 2026-11-13
+
+Applies to the live page (`cloud/summarize.py`). Scores, pairing, cohorts, thresholds and the
+blend are unchanged; only the uncertainty around the difference is computed differently.
+
+- **What is tested.** Per variable, horizon and period: the difference MAE(WeatherNext) −
+  MAE(Yr) over the paired rows (rain: WeatherNext's median for `verdict_50`, its mean for
+  `verdict`; temperature also height-adjusted for `verdict_h`). The point difference is the
+  plain difference over all rows, as before.
+- **The interval.** 2000 resamples (seed 1). A resample is built from **blocks of 4
+  consecutive scored days** (`BLOCK_DAYS`), each block starting at a random day; blocks wrap
+  from the last day to the first (circular block bootstrap) and the resample is cut to the
+  original number of days. Each day keeps its own rows, so a day's weight is its row count,
+  as before. The 2.5 and 97.5 percentiles give the 95 % interval.
+- **The verdict.** Yr ahead if the whole interval is above 0, WeatherNext ahead if it is below
+  0, too close to call otherwise; under 7 scored days, not enough data. Unchanged.
+- **Why blocks.** Errors at all stations and hours on one day move together, so the day is the
+  unit (unchanged). Neighbouring days are alike as well: a weather regime lasts several days
+  and one forecast run feeds several target days. Resampling single days treated them as
+  independent and made the interval too narrow. Measured on 5 Sep–12 Nov 2026 (69 days, the
+  leaderboard cohorts): median lag-1 autocorrelation of the daily difference 0.34 (temperature
+  and wind up to 3 days: 0.34–0.51; rain: 0–0.33), lag 2 still up to 0.36 for temperature.
+- **Why 4.** The AR(1) plug-in rule for the block length, (2ρ/(1−ρ²))^(2/3)·n^(1/3), gives
+  3.4 at ρ = 0.34 and n = 69, about 4.2 for the temperature/wind cohorts (ρ ≈ 0.42), and 3.7 at
+  n = 90 rising to 4.7 at n = 180. 4 is fixed in advance and is not tuned on the verdicts; it is
+  revisited only if the autocorrelation changes, and that change is logged here.
+- **Same test elsewhere.** The monthly verdicts (`summary.json`) and the steadiness verdict
+  (revision size, `views.json`) call the same function and use blocks too. The blend's
+  better/worse test (`bootstrap_gain`, `verdict_avg`) still resamples single days.
+- At the switch, 3 of 130 exported verdicts and 2 monthly cells changed (DECISIONS.md,
+  2026-11-13). Work files: `work/block-bootstrap-2026-11-13/` (local, git-ignored).
