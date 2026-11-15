@@ -1,12 +1,12 @@
 # Next steps
 
-_Open items only. Updated 2026-11-14. Completed work is in CHANGELOG.md._
+_Open items only. Updated 2026-11-15. Completed work is in CHANGELOG.md._
 
 ## Order of work
 
-**Next: owner approves pushing review parts A, B and C** (13 local commits, 13–14 Nov; see WORK_STATUS.md, CHANGELOG.md and the screenshots in `work/front-page-2026-11-13/`). After the push, check the first runs: gate log "last complete run … min ago", collection every 150 min, `tests.yml` green on `cloud/requirements-lock.txt`, the live page opening in Norwegian with the verdict table first, and the verdicts that part B changes (DECISIONS.md, 13 Nov: one-day temperature over the last 30 days and 12 h rain median become "too close").
+Review parts A, B and C were pushed and their first runs checked on 15 Nov (WORK_STATUS.md). Keep an eye on the next few runs: a steady 150 min between complete collections, and `health.json.failing` empty.
 
-Then the rest of `docs/reviews/REVIEW_2026-11_fable.md`, one part per session (owner decisions recorded in DECISIONS.md, 13 Nov):
+Next, the rest of `docs/reviews/REVIEW_2026-11_fable.md`, one part per session (owner decisions recorded in DECISIONS.md, 13 Nov):
 - Part C follow-ups (not started): translate the detailed cards, build the monthly text in the browser instead of exporting English prose, optional `public_note` per station in `config/stations.json`.
 - **Part D:** hit rates within 1 °C / 2 m/s in `summarize.stats()`, icon rows, dumbbell chart (steps 3–4).
 - Left from part B: whether the blend test (`bootstrap_gain`) should also use 4-day blocks (owner kept single days on 14 Nov; raise again only with a before/after table).
